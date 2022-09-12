@@ -1,1 +1,1 @@
-export const csm = () => `Completed`;
+export { config, parseConfigArgs as argsToConfigSettings } from './methods/config';
