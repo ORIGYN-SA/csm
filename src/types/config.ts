@@ -34,20 +34,15 @@ export type ConfigSettings = {
   args: ConfigArgs;
   assetTypeMapPatterns: AssetTypeMap;
   stageFolder: string;
-  collectionFolder: FolderInfo | undefined;
-  nftsFolder: FolderInfo | undefined;
-  nftFolders: FolderInfo[];
+  collectionFolder: string;
+  nftsFolder: string;
+  nftFolderNames: string[];
   nftDefinitionCount: number;
   nftQuantities: number[];
   totalNftCount: number;
   fileMap: FileInfoMap;
   collectionLibraries: LibraryFile[];
   totalFileSize: number;
-};
-
-export type FolderInfo = {
-  name: string;
-  path: string;
 };
 
 export type FileInfo = {
