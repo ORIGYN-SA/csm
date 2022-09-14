@@ -40,22 +40,22 @@ function getArgValue(argv: string[], argNames: string[], defaultValue: string = 
 }
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
-  const nftCanisterId = getArgValue(argv, ['-i', 'nftCanisterId']);
+  const nftCanisterId = getArgValue(argv, ['-i', '--nftCanisterId']);
 
   const args: ConfigArgs = {
-    environment: getArgValue(argv, ['-e', '-environment']),
-    collectionId: getArgValue(argv, ['-c', '-collectionId']),
-    collectionDisplayName: getArgValue(argv, ['-d', '-collectionDisplayName']),
-    tokenPrefix: getArgValue(argv, ['-t', '-tokenPrefix']),
+    environment: getArgValue(argv, ['-e', '--environment']),
+    collectionId: getArgValue(argv, ['-c', '--collectionId']),
+    collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
+    tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
     nftCanisterId,
-    creatorPrincipal: getArgValue(argv, ['-p', '-creatorPrincipal']),
-    namespace: getArgValue(argv, ['-n', '-namespace']),
-    folderPath: getArgValue(argv, ['-f', '-folderPath']),
-    assetMappings: getArgValue(argv, ['-m', '-assetMappings']),
+    creatorPrincipal: getArgValue(argv, ['-p', '--creatorPrincipal']),
+    namespace: getArgValue(argv, ['-n', '--namespace']),
+    folderPath: getArgValue(argv, ['-f', '--folderPath']),
+    assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
-    nftOwnerId: getArgValue(argv, ['-o', '-nftOwnerId'], nftCanisterId),
-    soulbound: getArgValue(argv, ['-s', '-soulbound'], 'false'),
-    nftQuantities: getArgValue(argv, ['-q', '-nftQuantities']),
+    nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
+    soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
+    nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
   };
 
   // validate args
@@ -299,15 +299,15 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
   const collectionFiles = flattenFiles(settings.collectionFolder, settings.stageFolder);
 
   for (const filePath of collectionFiles) {
-    const relPath = path.relative('collection', filePath).toLowerCase();
-
     let libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();
 
     let title = path.basename(filePath);
 
     // dapps should not include the namespace or file extension in the url,
     // since the dapp menu in the UI shell currently has hard-coded names
-    if (DAAPS_FOLDER === path.dirname(relPath)) {
+    const relPath = path.relative(path.join(settings.stageFolder, 'collection'), filePath).toLowerCase();
+    const dirName = path.dirname(relPath).toLocaleLowerCase();
+    if (DAAPS_FOLDER === dirName) {
       libraryId = path.basename(filePath).toLowerCase();
       const extPos = libraryId.lastIndexOf('.');
       if (extPos > 0) {
