@@ -5,113 +5,59 @@ import * as utils from '../utils';
 import mime from 'mime-types';
 import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap } from '../types/config';
 import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
+import { parseAssetTypeMapPatterns } from './arg-parser';
+import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
+import * as constants from '../constants';
 
-// *** constants ***
-const IMMUTABLE = true;
-const STAGE_FOLDER = '__staged';
-const COLLECTION_FOLDER = 'collection';
-const DAAPS_FOLDER = 'dapps';
-const NFTS_FOLDER = 'nfts';
-const CONFIG_FILE_NAME = 'full_def.json';
-const ignoredFolders = ['node_modules', '.vscode', '.idea', '.vessel'];
-const ignoredFiles = ['.ds_store', '.gitignore'];
-
-// HTML and CSS attributes can use double or single quotes
-// however, neither are allowed in URLs, so there
-// is no need to use a backreference to the first quote.
-const HTML_URL_ATTRIBS_REGEX = /<(?:link|script|img|video)[^>]*(?:href|src|srcset)\s*=\s*[\"']([^\"']+)[\"'][^>]*>/gi;
-const CSS_URL_ATTRIBS_REGEX = /[:\s]url\s*\(\s*[\"']([^\"']*)[\"']\s*\)/gi;
-const SRCSET_VALUE_UNIT_REGEX = /(\s\d+w)|(\s\d+(?:\.\d+)?x)/gi;
-const HTTP_OR_HTTPS_REGEX = /https?:\/\//gi;
-const DATA_URL_REGEX = /data:/gi;
-
-const LINE_DIVIDER_SUBCOMMAND = '**************************************';
-const LINE_DIVIDER_SECTION = '--------------------------------------';
-
-function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
-  const index = argv.findIndex((arg) => argNames.includes(arg.toLocaleLowerCase()));
-  if (index > -1 && argv.length - 1 > index) {
-    const value = argv[index + 1];
-    if (!value.startsWith('-')) {
-      return value.trim() || defaultValue;
-    }
+export function config(args: ConfigArgs): string {
+  // config object
+  let settings = initConfigSettings(args) as any;
+  const err = validateConfigSettings(settings);
+  if (err) {
+    throw `Invalid config settings: ${err}`;
   }
-  return defaultValue;
-}
 
-export function parseConfigArgs(argv: string[]): ConfigArgs {
-  const nftCanisterId = getArgValue(argv, ['-i', '--nftCanisterId']);
+  console.log(constants.LINE_DIVIDER_SECTION);
+  console.log('\nCreating metadata for the collection\n');
+  const collectionMetadata = configureCollectionMetadata(settings);
 
-  const args: ConfigArgs = {
-    environment: getArgValue(argv, ['-e', '--environment']),
-    collectionId: getArgValue(argv, ['-c', '--collectionId']),
-    collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
-    tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
-    nftCanisterId,
-    creatorPrincipal: getArgValue(argv, ['-p', '--creatorPrincipal']),
-    namespace: getArgValue(argv, ['-n', '--namespace']),
-    folderPath: getArgValue(argv, ['-f', '--folderPath']),
-    assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
-    //optional args
-    nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
-    soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
-    nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
+  console.log(constants.LINE_DIVIDER_SECTION);
+  console.log('\nCreating metadata for the NFTs\n');
+  const nftsMetadata = configureNftsMetadata(settings);
+
+  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
+
+  // build config summary
+  const summary: ConfigSummary = {
+    totalFilesFound: Object.keys(settings.fileMap).length,
+    totalFileSize: `${settings.totalFileSize} (${utils.formatBytes(settings.totalFileSize)})`,
+    totalNftDefinitionCount: settings.nftDefinitionCount,
+    totalNftCount: settings.nftQuantities ? settings.totalNftCount : settings.nftDefinitionCount,
   };
 
-  // validate args
-  if (!args.environment) {
-    throw 'Missing environment argument (-e).';
-  } else if (!args.collectionId) {
-    throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
-  } else if (!args.collectionDisplayName) {
-    throw 'Missing collection display name argument (-d).';
-  } else if (!args.tokenPrefix) {
-    throw 'Missing token prefix argument (-t).';
-  } else if (!args.nftCanisterId) {
-    throw 'Missing canister id argument (-i).';
-  } else if (!args.creatorPrincipal) {
-    throw 'Missing creator principal id argument (-p).';
-  } else if (!args.namespace) {
-    throw 'Missing namespace argument (-n).';
-  } else if (!args.folderPath) {
-    throw 'Missing folder argument (-f) with the path to the folder containing the NFT assets.';
-  } else if (!args.assetMappings) {
-    throw 'Missing NFT argument/s (-m) with a comma delimited list of asset type to file name mappings.';
-  }
+  const outputFilePath = path.join(settings.stageFolder, constants.CONFIG_FILE_NAME);
 
-  return args;
-}
+  // output definition file
+  console.log('Creating config file with metadata...');
+  fse.ensureDirSync(path.dirname(outputFilePath));
 
-function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
-  // parses (with validation):
-  // 'primary:index#.html, experience:index#.html, preview:preview#.png'
-  // to:
-  // { primary: 'index#.html', experience: 'index#.html', preview: 'preview#.png' }
+  const configFileData = buildConfigFileData(args, summary, collectionMetadata, nftsMetadata);
+  fs.writeFileSync(outputFilePath, JSON.stringify(configFileData, null, 2));
+  console.log('Config file with metadata created');
 
-  const assetTypeMapPatterns = {};
+  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
-  patterns
-    .split(/\s?,\s?/)
-    .map((n) => n.split(/\s?:\s?/))
-    .forEach((m) => {
-      console.log('m', m);
-      if (m.length != 2) {
-        const err = `Invalid syntax for mapping asset types to file names. ${m}`;
-        throw err;
-      }
+  console.log('Config Summary:\n');
+  console.log(`Total Files Found: ${summary.totalFilesFound}`);
+  console.log(`Total File Size: ${summary.totalFileSize}`);
+  console.log(`Total NFT Definition Count: ${summary.totalNftDefinitionCount}`);
+  console.log(`Total NFT Count: ${summary.totalNftCount}`);
+  console.log(`Metadata File: '${outputFilePath}'`);
 
-      const assetType = m[0].trim().toLowerCase();
-      const fileName = m[1].trim();
+  console.log('\nFinished (config subcommand)\n');
+  console.log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
 
-      if (!['primary', 'preview', 'experience', 'hidden'].includes(assetType)) {
-        const err = `Invalid asset type '${assetType}'. Valid types are: 'primary', 'preview', 'experience' and 'hidden'.`;
-        throw err;
-      }
-
-      assetTypeMapPatterns[assetType] = fileName;
-    });
-
-  return assetTypeMapPatterns;
+  return outputFilePath;
 }
 
 function initConfigSettings(args: ConfigArgs): ConfigSettings {
@@ -122,13 +68,13 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     nftQuantities = args.nftQuantities.split(',').map((q) => Number(q.trim()));
   }
 
-  const stageFolder = path.join(args.folderPath, '..', STAGE_FOLDER);
-  copyToStageFolder(args.folderPath, stageFolder);
+  const stageFolder = path.join(args.folderPath, '..', constants.STAGE_FOLDER);
+  copyFolder(args.folderPath, stageFolder);
 
   const subFolders = getSubFolders(stageFolder);
-  let collectionFolder = subFolders.find((f) => path.basename(f).toLowerCase() === COLLECTION_FOLDER) || '';
+  let collectionFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.COLLECTION_FOLDER) || '';
 
-  let nftsFolder = subFolders.find((f) => path.basename(f).toLowerCase() === NFTS_FOLDER) || '';
+  let nftsFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.NFTS_FOLDER) || '';
   let nftFolderNames: string[] = [];
   if (nftsFolder) {
     nftFolderNames = getSubFolders(nftsFolder)
@@ -178,27 +124,27 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
 
 function validateConfigSettings(settings: ConfigSettings): string {
   if (!settings.collectionFolder) {
-    return `\nExpected to find a '${COLLECTION_FOLDER}' folder at ${path.relative(
+    return `\nExpected to find a '${constants.COLLECTION_FOLDER}' folder at ${path.relative(
       settings.stageFolder,
-      path.join(settings.args.folderPath, COLLECTION_FOLDER),
+      path.join(settings.args.folderPath, constants.COLLECTION_FOLDER),
     )}\n`;
   }
 
   if (!settings.nftsFolder) {
-    return `\nExpected to find an '${NFTS_FOLDER}' folder at ${path.relative(
+    return `\nExpected to find an '${constants.NFTS_FOLDER}' folder at ${path.relative(
       settings.stageFolder,
-      path.join(settings.args.folderPath, NFTS_FOLDER),
+      path.join(settings.args.folderPath, constants.NFTS_FOLDER),
     )}\n`;
   }
 
   for (let i = 0; i < settings.nftDefinitionCount; i++) {
     if (i !== parseInt(settings.nftFolderNames[i])) {
-      return `The ${NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 0. Missing folder ${i}.'`;
+      return `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 0. Missing folder ${i}.'`;
     }
   }
 
   if (settings.nftDefinitionCount === 0) {
-    return `No NFT definitions found. Please create a folder under the '${NFTS_FOLDER}' folder for each NFT definition and name it with the index of the NFT starting with 0.`;
+    return `No NFT definitions found. Please create a folder under the '${constants.NFTS_FOLDER}' folder for each NFT definition and name it with the index of the NFT starting with 0.`;
   }
 
   if (settings.nftQuantities?.length && settings.nftDefinitionCount != settings.nftQuantities.length) {
@@ -235,64 +181,6 @@ function getResourceUrl(settings: ConfigSettings, resourceName: string, tokenId:
   }
 }
 
-function copyToStageFolder(folderPath: string, stageFolder: string) {
-  // create or empty stage folder, then copy all files to it
-  fse.ensureDirSync(stageFolder);
-  fse.emptyDirSync(stageFolder);
-  fse.copySync(folderPath, stageFolder, { overwrite: true });
-}
-
-export function config(args: ConfigArgs): string {
-  // config object
-  let settings = initConfigSettings(args) as any;
-  const err = validateConfigSettings(settings);
-  if (err) {
-    throw `Invalid config settings: ${err}`;
-  }
-
-  console.log(LINE_DIVIDER_SECTION);
-  console.log('\nCreating metadata for the collection\n');
-  const collectionMetadata = configureCollectionMetadata(settings);
-
-  console.log(LINE_DIVIDER_SECTION);
-  console.log('\nCreating metadata for the NFTs\n');
-  const nftsMetadata = configureNftsMetadata(settings);
-
-  console.log(`\n${LINE_DIVIDER_SECTION}\n`);
-
-  // build config summary
-  const summary: ConfigSummary = {
-    totalFilesFound: Object.keys(settings.fileMap).length,
-    totalFileSize: `${settings.totalFileSize} (${utils.formatBytes(settings.totalFileSize)})`,
-    totalNftDefinitionCount: settings.nftDefinitionCount,
-    totalNftCount: settings.nftQuantities ? settings.totalNftCount : settings.nftDefinitionCount,
-  };
-
-  const outputFilePath = path.join(settings.stageFolder, CONFIG_FILE_NAME);
-
-  // output definition file
-  console.log('Creating config file with metadata...');
-  fse.ensureDirSync(path.dirname(outputFilePath));
-
-  const configFileData = buildConfigFileData(args, summary, collectionMetadata, nftsMetadata);
-  fs.writeFileSync(outputFilePath, JSON.stringify(configFileData, null, 2));
-  console.log('Config file with metadata created');
-
-  console.log(`\n${LINE_DIVIDER_SECTION}\n`);
-
-  console.log('Config Summary:\n');
-  console.log(`Total Files Found: ${summary.totalFilesFound}`);
-  console.log(`Total File Size: ${summary.totalFileSize}`);
-  console.log(`Total NFT Definition Count: ${summary.totalNftDefinitionCount}`);
-  console.log(`Total NFT Count: ${summary.totalNftCount}`);
-  console.log(`Metadata File: '${outputFilePath}'`);
-
-  console.log('\nFinished (config subcommand)\n');
-  console.log(`${LINE_DIVIDER_SUBCOMMAND}\n`);
-
-  return outputFilePath;
-}
-
 function buildFileMap(settings: ConfigSettings): FileInfoMap {
   // create mapping of local file names and their on-chain URLs
   const fileInfoMap: FileInfoMap = {};
@@ -307,7 +195,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
     // since the dapp menu in the UI shell currently has hard-coded names
     const relPath = path.relative(path.join(settings.stageFolder, 'collection'), filePath).toLowerCase();
     const dirName = path.dirname(relPath).toLocaleLowerCase();
-    if (DAAPS_FOLDER === dirName) {
+    if (constants.DAAPS_FOLDER === dirName) {
       libraryId = path.basename(filePath).toLowerCase();
       const extPos = libraryId.lastIndexOf('.');
       if (extPos > 0) {
@@ -333,7 +221,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
     // defaults to 1 NFT per NFT definition
     const nftQuantity = settings.nftQuantities?.[i] || 1;
 
-    const nftFolder = path.join(settings.stageFolder, NFTS_FOLDER, `${i}`);
+    const nftFolder = path.join(settings.stageFolder, constants.NFTS_FOLDER, `${i}`);
 
     for (let j = 0; j < nftQuantity; j++) {
       // ignore config file for collection references
@@ -379,7 +267,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
 function configureCollectionMetadata(settings: ConfigSettings): Meta {
   const resources: MetadataClass[] = [];
-  const files = flattenFiles(COLLECTION_FOLDER, settings.stageFolder);
+  const files = flattenFiles(constants.COLLECTION_FOLDER, settings.stageFolder);
 
   // map asset types to files that match the corresponding pattern
   const mappings = getAssetTypeMap(files, settings.assetTypeMapPatterns);
@@ -493,7 +381,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   const libraries: LibraryFile[] = [];
 
   const tokenId = `${settings.args.tokenPrefix}${nftIndex}`;
-  const files = flattenFiles(path.join(NFTS_FOLDER, nftIndex.toString()), settings.stageFolder);
+  const files = flattenFiles(path.join(constants.NFTS_FOLDER, nftIndex.toString()), settings.stageFolder);
 
   // get shared collection files listed in config file
   let collFiles: string[] = [];
@@ -616,60 +504,6 @@ function getCollectionReferences(filePath: string): string[] {
   return refs;
 }
 
-function getSubFolders(parentFolder: string): string[] {
-  const subFolders = fs
-    .readdirSync(path.resolve(parentFolder))
-    .filter(
-      (subFolder) =>
-        !ignoredFolders.includes(subFolder.toLowerCase()) &&
-        fs.lstatSync(path.resolve(parentFolder, subFolder)).isDirectory(),
-    )
-    .map((subFolder) => path.resolve(parentFolder, subFolder));
-
-  return subFolders;
-}
-
-function flattenFiles(
-  currentFolder: string,
-  rootFolder: string,
-  flatFiles: string[] = [],
-  uniqueFileNames = new Set(),
-): string[] {
-  const currentFolderFullPath = path.resolve(rootFolder, currentFolder);
-  const objects = fs.readdirSync(currentFolderFullPath);
-
-  const subFolders = objects.filter(
-    (folderName) =>
-      !ignoredFolders.includes(folderName.toLowerCase()) &&
-      fs.lstatSync(path.resolve(currentFolderFullPath, folderName)).isDirectory(),
-  );
-
-  const files = objects.filter(
-    (fileName) =>
-      !ignoredFiles.includes(fileName.toLowerCase()) &&
-      fs.lstatSync(path.resolve(currentFolderFullPath, fileName)).isFile(),
-  );
-
-  files.forEach((file) => {
-    const fileNameLower = path.basename(file).toLowerCase();
-
-    if (uniqueFileNames.has(fileNameLower)) {
-      const err = `Duplicate file name: ${file}`;
-      throw err;
-    }
-    uniqueFileNames.add(fileNameLower);
-
-    const fullFilePath = path.resolve(currentFolderFullPath, file);
-    flatFiles.push(fullFilePath);
-  });
-
-  subFolders.forEach((subFolder) => {
-    flattenFiles(path.resolve(currentFolderFullPath, subFolder), rootFolder, flatFiles, uniqueFileNames);
-  });
-
-  return flatFiles;
-}
-
 function getAssetTypeMap(files: string[], assetTypeMapPatterns: AssetTypeMap): AssetTypeMap {
   const mappings: AssetTypeMap = {};
 
@@ -709,15 +543,15 @@ function createClassForResource(
 
   return {
     Class: [
-      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId, IMMUTABLE),
-      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`, IMMUTABLE),
-      createTextAttrib('location_type', 'canister', IMMUTABLE),
-      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl, IMMUTABLE),
-      createTextAttrib('content_type', mimeType, IMMUTABLE),
-      createTextAttrib('content_hash', utils.getFileHash(filePath), IMMUTABLE),
-      createNatAttrib('size', fileSize, IMMUTABLE),
-      createNatAttrib('sort', sort, IMMUTABLE),
-      createTextAttrib('read', 'public', !IMMUTABLE),
+      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId, constants.IMMUTABLE),
+      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`, constants.IMMUTABLE),
+      createTextAttrib('location_type', 'canister', constants.IMMUTABLE),
+      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl, constants.IMMUTABLE),
+      createTextAttrib('content_type', mimeType, constants.IMMUTABLE),
+      createTextAttrib('content_hash', utils.getFileHash(filePath), constants.IMMUTABLE),
+      createNatAttrib('size', fileSize, constants.IMMUTABLE),
+      createNatAttrib('sort', sort, constants.IMMUTABLE),
+      createTextAttrib('read', 'public', !constants.IMMUTABLE),
     ],
   };
 }
@@ -913,15 +747,15 @@ function createClassesForResourceReferences(
 
     resourceReferences.push({
       Class: [
-        createTextAttrib('library_id', libraryId, IMMUTABLE),
-        createTextAttrib('title', title, IMMUTABLE),
-        createTextAttrib('location_type', locationType, IMMUTABLE),
-        createTextAttrib('location', (location as TextValue).Text, IMMUTABLE),
-        createTextAttrib('content_type', (contentType as TextValue).Text, IMMUTABLE),
-        createTextAttrib('content_hash', (contentHash as TextValue).Text, IMMUTABLE),
-        createNatAttrib('size', (size as NatValue).Nat, IMMUTABLE),
-        createNatAttrib('sort', (sort as NatValue).Nat, IMMUTABLE),
-        createTextAttrib('read', 'public', !IMMUTABLE),
+        createTextAttrib('library_id', libraryId, constants.IMMUTABLE),
+        createTextAttrib('title', title, constants.IMMUTABLE),
+        createTextAttrib('location_type', locationType, constants.IMMUTABLE),
+        createTextAttrib('location', (location as TextValue).Text, constants.IMMUTABLE),
+        createTextAttrib('content_type', (contentType as TextValue).Text, constants.IMMUTABLE),
+        createTextAttrib('content_hash', (contentHash as TextValue).Text, constants.IMMUTABLE),
+        createNatAttrib('size', (size as NatValue).Nat, constants.IMMUTABLE),
+        createNatAttrib('sort', (sort as NatValue).Nat, constants.IMMUTABLE),
+        createTextAttrib('read', 'public', !constants.IMMUTABLE),
       ],
     });
   }
@@ -941,51 +775,8 @@ function buildConfigFileData(args: ConfigArgs, summary: ConfigSummary, collectio
   };
 }
 
-function findUrls(filePath: string, contents: string): RegExpMatchArray[] {
-  const ext = path.extname(filePath).toLowerCase();
-  const isHtmlFile = ['.html', '.htm'].includes(ext);
-  const isCssFile = ext === '.css';
-
-  if (!isHtmlFile && !isCssFile) {
-    return [];
-  }
-
-  let regex: RegExp = isHtmlFile ? HTML_URL_ATTRIBS_REGEX : CSS_URL_ATTRIBS_REGEX;
-
-  const matches = [...contents.matchAll(regex)];
-
-  return matches;
-}
-
-function getExternalUrls(filePath: string): string[] {
-  let contents: string = fs.readFileSync(filePath).toString();
-  const matches = findUrls(filePath, contents);
-
-  console.log(`\nregex matches ${matches.length}`);
-  console.log(JSON.stringify(matches, null, 2));
-
-  if (matches.length === 0) {
-    return [];
-  }
-
-  const urls = matches.flatMap((m) =>
-    // regex group matching the value of an href, src or srcset attribute,
-    // or a CSS url function
-    // could be a single url, or multiple urls if the attribute is srcset
-    m[1]
-      // split comma delimited list of images if srcset attribute
-      .split(',')
-      // trim any spaces left after the above split
-      .map((v) => v.trim())
-      // only return urls that start with http or https (external)
-      .filter((v) => v.search(/https?:\/\//gi) === 0),
-  );
-
-  return urls;
-}
-
 function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
-  console.log(`\n${LINE_DIVIDER_SECTION}\n`);
+  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
   console.log('Replacing relative URLs with NFT URLs in file:\n', filePath);
 
   let contents: string = fs.readFileSync(filePath).toString();
@@ -1005,7 +796,7 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       // check if srcset value with units like 200w or 1.5x
       // and remove units so that only url remains
       for (let i = 0; i < urls.length; i++) {
-        let srcsetUnitMatches = [...urls[i].matchAll(SRCSET_VALUE_UNIT_REGEX)];
+        let srcsetUnitMatches = [...urls[i].matchAll(constants.SRCSET_VALUE_UNIT_REGEX)];
         if (srcsetUnitMatches.length > 0) {
           urls[i] = urls[i].substring(0, srcsetUnitMatches[srcsetUnitMatches.length - 1].index);
         }
@@ -1016,7 +807,7 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
     .filter((m) => m.indexOf('#') !== 0);
 
   const relativeUrls = urls.filter(
-    (url) => url.search(HTTP_OR_HTTPS_REGEX) === -1 && url.search(DATA_URL_REGEX) === -1,
+    (url) => url.search(constants.HTTP_OR_HTTPS_REGEX) === -1 && url.search(constants.DATA_URL_REGEX) === -1,
   );
 
   // get array of unique urls sorted by longest first

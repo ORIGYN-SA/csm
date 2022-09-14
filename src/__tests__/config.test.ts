@@ -1,6 +1,7 @@
 import rewire from 'rewire';
 import path from 'path';
-import { config, parseConfigArgs } from '../methods/config';
+import { parseConfigArgs } from '../methods/arg-parser';
+import { config } from '../methods/config';
 import { ConfigArgs } from '../types/config';
 
 const BUILD_FOLDER = '../../lib';
@@ -17,7 +18,7 @@ const inputConfigArgs =
 describe('stage module', () => {
   describe('getArgValue', () => {
     test('should return string value of string object key e', () => {
-      const configModule = rewire(`${BUILD_FOLDER}/methods/config`);
+      const configModule = rewire(`${BUILD_FOLDER}/methods/arg-parser`);
       const getArgValue = configModule.__get__('getArgValue');
 
       const expected = 'local';
@@ -27,7 +28,7 @@ describe('stage module', () => {
     });
 
     test('should return string value of string object key environment', () => {
-      const configModule = rewire(`${BUILD_FOLDER}/methods/config`);
+      const configModule = rewire(`${BUILD_FOLDER}/methods/arg-parser`);
       const getArgValue = configModule.__get__('getArgValue');
 
       const expected = 'local';
