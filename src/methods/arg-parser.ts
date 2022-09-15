@@ -1,4 +1,6 @@
 import { AssetTypeMap, ConfigArgs } from '../types/config';
+import { MintArgs } from '../types/mint';
+import { StageArgs } from '../types/stage';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const nftCanisterId = getArgValue(argv, ['-i', '--nftCanisterId']);
@@ -35,9 +37,25 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
   } else if (!args.namespace) {
     throw 'Missing namespace argument (-n).';
   } else if (!args.folderPath) {
-    throw 'Missing folder argument (-f) with the path to the folder containing the NFT assets.';
+    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
   } else if (!args.assetMappings) {
     throw 'Missing NFT argument/s (-m) with a comma delimited list of asset type to file name mappings.';
+  }
+
+  return args;
+}
+
+export function parseStageArgs(argv: string[]): StageArgs {
+  const args: StageArgs = {
+    folderPath: getArgValue(argv, ['-f', '--folderPath']),
+    seedFilePath: getArgValue(argv, ['-s', '--seedFilePath']),
+  };
+
+  // validate args
+  if (!args.folderPath) {
+    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
+  } else if (!args.seedFilePath) {
+    throw 'Missing seed file path argument (-s)';
   }
 
   return args;

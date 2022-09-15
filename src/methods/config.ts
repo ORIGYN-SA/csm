@@ -27,12 +27,14 @@ export function config(args: ConfigArgs): string {
 
   console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
+  settings.totalNftCount = settings.nftQuantities?.length ? settings.totalNftCount : settings.nftDefinitionCount;
+
   // build config summary
   const summary: ConfigSummary = {
     totalFilesFound: Object.keys(settings.fileMap).length,
     totalFileSize: `${settings.totalFileSize} (${utils.formatBytes(settings.totalFileSize)})`,
     totalNftDefinitionCount: settings.nftDefinitionCount,
-    totalNftCount: settings.nftQuantities ? settings.totalNftCount : settings.nftDefinitionCount,
+    totalNftCount: settings.totalNftCount,
   };
 
   const outputFilePath = path.join(settings.stageFolder, constants.CONFIG_FILE_NAME);
@@ -41,7 +43,7 @@ export function config(args: ConfigArgs): string {
   console.log('Creating config file with metadata...');
   fse.ensureDirSync(path.dirname(outputFilePath));
 
-  const configFileData = buildConfigFileData(args, summary, collectionMetadata, nftsMetadata);
+  const configFileData = buildConfigFileData(settings, summary, collectionMetadata, nftsMetadata);
   fs.writeFileSync(outputFilePath, JSON.stringify(configFileData, null, 2));
   console.log('Config file with metadata created');
 
@@ -763,9 +765,14 @@ function createClassesForResourceReferences(
   return resourceReferences;
 }
 
-function buildConfigFileData(args: ConfigArgs, summary: ConfigSummary, collection: Meta, nfts: Meta[]): ConfigFile {
+function buildConfigFileData(
+  settings: ConfigSettings,
+  summary: ConfigSummary,
+  collection: Meta,
+  nfts: Meta[],
+): ConfigFile {
   return {
-    args,
+    settings,
     summary,
     collection,
     nfts: [

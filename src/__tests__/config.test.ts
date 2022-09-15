@@ -13,9 +13,9 @@ const inputArgvLongNames =
   '["/Users/jt/.nvm/versions/node/v16.15.1/bin/node","/Users/jt/test/origyn_nft_reference/projects/csm.js","config","--environment","local","--collectionId","simple","--collectionDisplayName","Simple","--tokenPrefix","simple_","--nftCanisterId","rrkah-fqaaa-aaaaa-aaaaq-cai","--creatorPrincipal","6i6da-t3dfv-vteyg-v5agl-tpgrm-63p4y-t5nmm-gi7nl-o72zu-jd3sc-7qe","--namespace","ogy.simple","--folderPath","./projects/simple-video/assets","--assetMappings","primary:mike.png, experience:Origynator_Card_Mike_Schwartz_Small.mp4, preview:index.html","--soulbound","false","--nftQuantities","3"]';
 
 const inputConfigArgs =
-  '{"environment":"local","collectionId":"bayc","collectionDisplayName":"BAYC","tokenPrefix":"bayc-","nftCanisterId":"aaaaa-bbbbb-ccccc-ddddd-cai","creatorPrincipal":"11111-22222-33333-44444-55555-66666-77777-88888-99999-11111-222","namespace":"com.bayc.ape","folderPath":"/Users/jt/test/origyn_nft_reference/projects/bayc-csm/__temp","assetMappings":"primary:ape*.png, preview:index.html, hidden:mystery-ape.gif","nftOwnerId":"aaaaa-bbbbb-ccccc-ddddd-eeeee-fffff-ggggg-iiiii-jjjjj-kkkkk-lll","soulbound":"false","nftQuantities":""}';
+  '{"environment":"local","collectionId":"bayc","collectionDisplayName":"BAYC","tokenPrefix":"bayc-","nftCanisterId":"rrkah-fqaaa-aaaaa-aaaaq-cai","creatorPrincipal":"6i6da-t3dfv-vteyg-v5agl-tpgrm-63p4y-t5nmm-gi7nl-o72zu-jd3sc-7qe","namespace":"com.bayc.ape","folderPath":"/Users/jt/test/origyn_nft_reference/projects/bayc-csm/__temp","assetMappings":"primary:ape*.png, preview:index.html, hidden:mystery-ape.gif","nftOwnerId":"6i6da-t3dfv-vteyg-v5agl-tpgrm-63p4y-t5nmm-gi7nl-o72zu-jd3sc-7qe","soulbound":"false","nftQuantities":""}';
 
-describe('stage module', () => {
+xdescribe('config module', () => {
   describe('getArgValue', () => {
     test('should return string value of string object key e', () => {
       const configModule = rewire(`${BUILD_FOLDER}/methods/arg-parser`);
