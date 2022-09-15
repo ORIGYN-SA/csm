@@ -18,15 +18,21 @@
 - [Meta](modules.md#meta)
 - [MetadataClass](modules.md#metadataclass)
 - [MetadataProperty](modules.md#metadataproperty)
+- [MintArgs](modules.md#mintargs)
 - [NatValue](modules.md#natvalue)
 - [PrincipalValue](modules.md#principalvalue)
+- [StageArgs](modules.md#stageargs)
 - [TextValue](modules.md#textvalue)
 - [ThawedArrayValue](modules.md#thawedarrayvalue)
 
 ### Functions
 
 - [config](modules.md#config)
+- [mint](modules.md#mint)
 - [parseConfigArgs](modules.md#parseconfigargs)
+- [parseMintArgs](modules.md#parsemintargs)
+- [parseStageArgs](modules.md#parsestageargs)
+- [stage](modules.md#stage)
 
 ## Type Aliases
 
@@ -45,7 +51,7 @@
 
 #### Defined in
 
-[types/config.ts:59](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L59)
+[types/config.ts:59](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L59)
 
 ___
 
@@ -61,7 +67,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L16)
+[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L16)
 
 ___
 
@@ -88,7 +94,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L3)
+[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L3)
 
 ___
 
@@ -100,14 +106,14 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `args` | [`ConfigArgs`](modules.md#configargs) |
 | `collection` | [`Meta`](modules.md#meta) |
 | `nfts` | [`Meta`](modules.md#meta)[] |
+| `settings` | [`ConfigSettings`](modules.md#configsettings) |
 | `summary` | [`ConfigSummary`](modules.md#configsummary) |
 
 #### Defined in
 
-[types/config.ts:73](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L73)
+[types/config.ts:73](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L73)
 
 ___
 
@@ -134,7 +140,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:33](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L33)
+[types/config.ts:33](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L33)
 
 ___
 
@@ -153,7 +159,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:66](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L66)
+[types/config.ts:66](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L66)
 
 ___
 
@@ -172,7 +178,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:48](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L48)
+[types/config.ts:48](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L48)
 
 ___
 
@@ -186,7 +192,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:55](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/config.ts#L55)
+[types/config.ts:55](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L55)
 
 ___
 
@@ -203,7 +209,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L3)
+[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L3)
 
 ___
 
@@ -221,7 +227,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L38)
+[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L38)
 
 ___
 
@@ -237,7 +243,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L34)
+[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L34)
 
 ___
 
@@ -255,7 +261,26 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L28)
+[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L28)
+
+___
+
+### MintArgs
+
+Ƭ **MintArgs**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `batchSize?` | `string` |
+| `folderPath` | `string` |
+| `range?` | `string` |
+| `seedFilePath` | `string` |
+
+#### Defined in
+
+[types/mint.ts:1](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/mint.ts#L1)
 
 ___
 
@@ -271,7 +296,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L12)
+[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L12)
 
 ___
 
@@ -287,7 +312,24 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L20)
+[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L20)
+
+___
+
+### StageArgs
+
+Ƭ **StageArgs**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `folderPath` | `string` |
+| `seedFilePath` | `string` |
+
+#### Defined in
+
+[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/stage.ts#L1)
 
 ___
 
@@ -303,7 +345,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L8)
+[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L8)
 
 ___
 
@@ -320,7 +362,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/types/metadata.ts#L24)
+[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L24)
 
 ## Functions
 
@@ -340,7 +382,27 @@ ___
 
 #### Defined in
 
-[methods/config.ts:245](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/methods/config.ts#L245)
+[methods/config.ts:12](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/config.ts#L12)
+
+___
+
+### mint
+
+▸ **mint**(`args`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `args` | [`MintArgs`](modules.md#mintargs) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[methods/mint.ts:10](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/mint.ts#L10)
 
 ___
 
@@ -360,4 +422,64 @@ ___
 
 #### Defined in
 
-[methods/config.ts:42](https://github.com/ORIGYN-SA/csm/blob/72a08e3/src/methods/config.ts#L42)
+[methods/arg-parser.ts:5](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L5)
+
+___
+
+### parseMintArgs
+
+▸ **parseMintArgs**(`argv`): [`MintArgs`](modules.md#mintargs)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `argv` | `string`[] |
+
+#### Returns
+
+[`MintArgs`](modules.md#mintargs)
+
+#### Defined in
+
+[methods/arg-parser.ts:64](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L64)
+
+___
+
+### parseStageArgs
+
+▸ **parseStageArgs**(`argv`): [`StageArgs`](modules.md#stageargs)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `argv` | `string`[] |
+
+#### Returns
+
+[`StageArgs`](modules.md#stageargs)
+
+#### Defined in
+
+[methods/arg-parser.ts:48](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L48)
+
+___
+
+### stage
+
+▸ **stage**(`args`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `args` | [`StageArgs`](modules.md#stageargs) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[methods/stage.ts:11](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/stage.ts#L11)
