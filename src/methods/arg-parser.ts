@@ -61,6 +61,27 @@ export function parseStageArgs(argv: string[]): StageArgs {
   return args;
 }
 
+export function parseMintArgs(argv: string[]): MintArgs {
+  const args: MintArgs = {
+    folderPath: getArgValue(argv, ['-f', '--folderPath']),
+    seedFilePath: getArgValue(argv, ['-s', '--seedFilePath']),
+    range: getArgValue(argv, ['-r', '--range']),
+    batchSize: getArgValue(argv, ['-b', '--batchSize']),
+  };
+
+  // validate args
+  if (!args.folderPath) {
+    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
+  } else if (!args.seedFilePath) {
+    throw 'Missing seed file path argument (-s)';
+  } else if (!args.range) {
+    throw 'Missing mint range argument (-r)';
+  } else if (!args.batchSize) {
+    throw 'Missing batch size argument (-b)';
+  }
+
+  return args;
+}
 export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
   // parses (with validation):
   // 'primary:index#.html, experience:index#.html, preview:preview#.png'
