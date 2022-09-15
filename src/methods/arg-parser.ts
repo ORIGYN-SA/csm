@@ -94,7 +94,6 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      console.log('m', m);
       if (m.length != 2) {
         const err = `Invalid syntax for mapping asset types to file names. ${m}`;
         throw err;

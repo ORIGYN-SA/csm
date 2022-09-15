@@ -3,6 +3,7 @@ import path from 'path';
 import { parseConfigArgs } from '../methods/arg-parser';
 import { config } from '../methods/config';
 import { ConfigArgs } from '../types/config';
+// import { registerLogger } from '../methods/logger';
 
 const BUILD_FOLDER = '../../lib';
 const inputArgvShortNames =
@@ -90,6 +91,10 @@ xdescribe('config module', () => {
 
   describe('config', () => {
     test('should write config file', () => {
+      // registerLogger((message: string) => {
+      //   console.log(message);
+      // });
+
       const args = JSON.parse(inputConfigArgs);
       const expected = path.join(args.folderPath, '..', '__staged', 'full_def.json');
 

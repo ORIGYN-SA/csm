@@ -4,13 +4,15 @@ import { getActor } from './actor';
 import { Principal } from '@dfinity/principal';
 import { formatBytes, wait } from '../utils';
 import { ConfigFile } from '../types/config';
-import { StageArgs } from '../types/stage';
+import { Metrics, StageArgs } from '../types/stage';
 import { LibraryFile, TextValue } from '../types/metadata';
+import { AnyActor } from '../types/actor';
+import { log } from './logger';
 import * as constants from '../constants';
 
 export async function stage(args: StageArgs) {
-  console.log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
-  console.log('Started (stage subcommand)');
+  log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
+  log('Started (stage subcommand)');
 
   // validate args
   if (!args.folderPath) {
@@ -34,17 +36,17 @@ export async function stage(args: StageArgs) {
   // nfts and collections have the same metadata structure
   // the difference is that collections have an empty string for the id
   // so the library assets/files can be shared by multiple NFTs
-  const metrics = { totalFileSize: 0 };
+  const metrics: Metrics = { totalFileSize: 0 };
   const items = [config.collection, ...config.nfts];
   for (const item of items) {
     var tokenId = (item?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
 
     // Stage NFT
-    console.log(`\n${constants.LINE_DIVIDER_SECTION}`);
-    console.log(`\nStaging metadata for ${tokenId ? 'NFT ' + tokenId : 'Collection'}\n`);
+    log(`\n${constants.LINE_DIVIDER_SECTION}`);
+    log(`\nStaging metadata for ${tokenId ? 'NFT ' + tokenId : 'Collection'}\n`);
     const metadataToStage = deserializeConfig(item.meta);
     const stageResult = await actor.stage_nft_origyn(metadataToStage);
-    console.log(stageResult);
+    log(JSON.stringify(stageResult));
 
     // *** Stage Library Assets (as chunks)
     for (const asset of item.library) {
@@ -52,10 +54,10 @@ export async function stage(args: StageArgs) {
     }
   }
 
-  console.log(`\nTotal Staged File Size: ${metrics.totalFileSize} (${formatBytes(metrics.totalFileSize)})\n`);
+  log(`\nTotal Staged File Size: ${metrics.totalFileSize} (${formatBytes(metrics.totalFileSize)})\n`);
 
-  console.log('\nFinished (stage subcommand)\n');
-  console.log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
+  log('\nFinished (stage subcommand)\n');
+  log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
 }
 
 function deserializeConfig(config) {
@@ -84,19 +86,25 @@ function deserializeConfig(config) {
   return config;
 }
 
-async function stageLibraryAsset(actor, stageFolder: string, libraryAsset: LibraryFile, tokenId, metrics) {
-  console.log(`\n${constants.LINE_DIVIDER_SECTION}`);
-  console.log(`\nStaging asset: ${libraryAsset.library_id}`);
-  console.log(`\nFile path: ${libraryAsset.library_file}`);
+async function stageLibraryAsset(
+  actor: AnyActor,
+  stageFolder: string,
+  libraryAsset: LibraryFile,
+  tokenId: string,
+  metrics: Metrics,
+) {
+  log(`\n${constants.LINE_DIVIDER_SECTION}`);
+  log(`\nStaging asset: ${libraryAsset.library_id}`);
+  log(`\nFile path: ${libraryAsset.library_file}`);
 
   const fileData = fs.readFileSync(path.join(stageFolder, libraryAsset.library_file));
 
   // slice file buffer into chunks of bytes that fit into the chunk size
   const fileSize = fileData.length;
   const chunkCount = Math.ceil(fileSize / constants.MAX_CHUNK_SIZE);
-  console.log('max chunk size', constants.MAX_CHUNK_SIZE);
-  console.log('file size', fileSize);
-  console.log('chunk count', chunkCount);
+  log(`max chunk size ${constants.MAX_CHUNK_SIZE}`);
+  log(`file size ${fileSize}`);
+  log(`chunk count ${chunkCount}`);
 
   for (let i = 0; i < chunkCount; i++) {
     // give the canister a 3 second break after every 10 chunks
@@ -109,17 +117,25 @@ async function stageLibraryAsset(actor, stageFolder: string, libraryAsset: Libra
   }
 }
 
-async function uploadChunk(actor, libraryId, tokenId, fileData, chunkNumber, metrics, retries = 0) {
+async function uploadChunk(
+  actor: AnyActor,
+  libraryId: string,
+  tokenId: string,
+  fileData: Buffer,
+  chunkNumber: number,
+  metrics: Metrics,
+  retries = 0,
+) {
   const start = chunkNumber * constants.MAX_CHUNK_SIZE;
   const end = start + constants.MAX_CHUNK_SIZE > fileData.length ? fileData.length : start + constants.MAX_CHUNK_SIZE;
 
   const chunk = fileData.slice(start, end);
 
-  console.log(`\nchunk ${chunkNumber}:`);
-  console.log('start', start);
-  console.log('end', end);
-  console.log('size', chunk.length);
-  console.log('array size', Array.from(chunk).length);
+  log(`\nchunk ${chunkNumber}:`);
+  log(`start ${start}`);
+  log(`end ${end}`);
+  log(`size ${chunk.length}`);
+  log(`array size ${Array.from(chunk).length}`);
 
   try {
     // *** Stage Library Asset
@@ -130,19 +146,17 @@ async function uploadChunk(actor, libraryId, tokenId, fileData, chunkNumber, met
       chunk: chunkNumber,
       content: Array.from(chunk),
     });
-    console.log(`result ${JSON.stringify(result)}`);
+    log(`result ${JSON.stringify(result)}`);
     metrics.totalFileSize += chunk.length;
-    console.log(`Cumulative staged file size: ${metrics.totalFileSize} (${formatBytes(metrics.totalFileSize)})`);
+    log(`Cumulative staged file size: ${metrics.totalFileSize} (${formatBytes(metrics.totalFileSize)})`);
   } catch (ex) {
     if (retries >= 5) {
-      console.log(
+      log(
         `\nMax retries of ${constants.MAX_CHUNK_UPLOAD_RETRIES} has been reached for ${libraryId} chunk #${chunkNumber}.\n`,
       );
     } else {
-      console.log(ex);
-      console.log(
-        '\n*** Caught the above error while staging a library asset chunk. Waiting 3 seconds, then trying again.\n',
-      );
+      log(JSON.stringify(ex));
+      log('\n*** Caught the above error while staging a library asset chunk. Waiting 3 seconds, then trying again.\n');
       await wait(3000);
       retries++;
       await uploadChunk(actor, libraryId, tokenId, fileData, chunkNumber, metrics, retries);

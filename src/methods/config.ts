@@ -7,6 +7,8 @@ import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, Fi
 import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
 import { parseAssetTypeMapPatterns } from './arg-parser';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
+import { log } from './logger';
+
 import * as constants from '../constants';
 
 export function config(args: ConfigArgs): string {
@@ -17,15 +19,15 @@ export function config(args: ConfigArgs): string {
     throw `Invalid config settings: ${err}`;
   }
 
-  console.log(constants.LINE_DIVIDER_SECTION);
-  console.log('\nCreating metadata for the collection\n');
+  log(constants.LINE_DIVIDER_SECTION);
+  log('\nCreating metadata for the collection\n');
   const collectionMetadata = configureCollectionMetadata(settings);
 
-  console.log(constants.LINE_DIVIDER_SECTION);
-  console.log('\nCreating metadata for the NFTs\n');
+  log(constants.LINE_DIVIDER_SECTION);
+  log('\nCreating metadata for the NFTs\n');
   const nftsMetadata = configureNftsMetadata(settings);
 
-  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
+  log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
   settings.totalNftCount = settings.nftQuantities?.length ? settings.totalNftCount : settings.nftDefinitionCount;
 
@@ -40,24 +42,24 @@ export function config(args: ConfigArgs): string {
   const outputFilePath = path.join(settings.stageFolder, constants.CONFIG_FILE_NAME);
 
   // output definition file
-  console.log('Creating config file with metadata...');
+  log('Creating config file with metadata...');
   fse.ensureDirSync(path.dirname(outputFilePath));
 
   const configFileData = buildConfigFileData(settings, summary, collectionMetadata, nftsMetadata);
   fs.writeFileSync(outputFilePath, JSON.stringify(configFileData, null, 2));
-  console.log('Config file with metadata created');
+  log('Config file with metadata created');
 
-  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
+  log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
-  console.log('Config Summary:\n');
-  console.log(`Total Files Found: ${summary.totalFilesFound}`);
-  console.log(`Total File Size: ${summary.totalFileSize}`);
-  console.log(`Total NFT Definition Count: ${summary.totalNftDefinitionCount}`);
-  console.log(`Total NFT Count: ${summary.totalNftCount}`);
-  console.log(`Metadata File: '${outputFilePath}'`);
+  log('Config Summary:\n');
+  log(`Total Files Found: ${summary.totalFilesFound}`);
+  log(`Total File Size: ${summary.totalFileSize}`);
+  log(`Total NFT Definition Count: ${summary.totalNftDefinitionCount}`);
+  log(`Total NFT Count: ${summary.totalNftCount}`);
+  log(`Metadata File: '${outputFilePath}'`);
 
-  console.log('\nFinished (config subcommand)\n');
-  console.log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
+  log('\nFinished (config subcommand)\n');
+  log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
 
   return outputFilePath;
 }
@@ -284,7 +286,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
     const urls: string[] = getExternalUrls(path.resolve(settings.stageFolder, filePath));
 
     if (urls.length) {
-      console.log(`Found External URLs in file: "${filePath}"`, JSON.stringify(urls, null, 2));
+      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
 
       throw (
         '\nExternal URL references (http/https) must be replaced with local ' +
@@ -366,7 +368,7 @@ function configureNftsMetadata(settings: ConfigSettings): Meta[] {
     // defaults to 1 NFT per NFT definition
     const nftQuantity = settings.nftQuantities?.[i] || 1;
 
-    console.log(`\nCreating metadata for ${nftQuantity} NFTs from NFT definition ${i}`);
+    log(`\nCreating metadata for ${nftQuantity} NFTs from NFT definition ${i}`);
 
     for (let j = 0; j < nftQuantity; j++) {
       const nftMetadata = configureNftMetadata(settings, nftIndex);
@@ -404,7 +406,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     const urls: string[] = getExternalUrls(filePath);
 
     if (urls.length) {
-      console.log(`Found External URLs in file: "${filePath}"`, JSON.stringify(urls, null, 2));
+      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
 
       throw (
         '\nExternal URL references (http/https) must be replaced with local ' +
@@ -537,7 +539,7 @@ function createClassForResource(
   const mimeType = mime.lookup(fileNameLower);
   if (!mimeType) {
     const err = `Could not find mime type for file: ${filePath}`;
-    console.log(err);
+    log(err);
     throw err;
   }
 
@@ -783,14 +785,14 @@ function buildConfigFileData(
 }
 
 function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
-  console.log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
-  console.log('Replacing relative URLs with NFT URLs in file:\n', filePath);
+  log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
+  log(`Replacing relative URLs with NFT URLs in file:\n${filePath}`);
 
   let contents: string = fs.readFileSync(filePath).toString();
   const matches = findUrls(filePath, contents);
 
-  console.log(`\nregex matches ${matches.length}\n`);
-  console.log(JSON.stringify(matches, null, 2));
+  log(`\nregex matches ${matches.length}\n`);
+  log(JSON.stringify(matches, null, 2));
 
   if (matches.length === 0) {
     return;
@@ -822,7 +824,7 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
   // for example: 0.html would replace 10.html if not sorted
   const uniqueRelUrls = Array.from(new Set(relativeUrls)).sort((a, b) => b.length - a.length);
 
-  console.log('\nuniqueRelUrls', uniqueRelUrls);
+  log(`\nuniqueRelUrls\n${JSON.stringify(uniqueRelUrls)}`);
 
   for (const relUrl of uniqueRelUrls) {
     let relFilePathLower = path
@@ -834,8 +836,8 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       contents = (contents as any).replaceAll(`"${relUrl}"`, `"${resourceUrl}"`);
       contents = (contents as any).replaceAll(`'${relUrl}'`, `'${resourceUrl}'`);
 
-      console.log(`\n*** REPLACED ${relUrl}`);
-      console.log(`WITH ${resourceUrl}`);
+      log(`\n*** REPLACED ${relUrl}`);
+      log(`WITH ${resourceUrl}`);
     } else {
       relFilePathLower = path
         .relative(settings.stageFolder, path.resolve(settings.collectionFolder, relUrl))
@@ -846,8 +848,8 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
         contents = (contents as any).replaceAll(`"${relUrl}"`, `"${resourceUrl}"`);
         contents = (contents as any).replaceAll(`'${relUrl}'`, `'${resourceUrl}'`);
 
-        console.log(`\n*** REPLACED ${relUrl}`);
-        console.log(`WITH ${resourceUrl}`);
+        log(`\n*** REPLACED ${relUrl}`);
+        log(`WITH ${resourceUrl}`);
       } else {
         const err = `Could not find file ${relFilePathLower} referenced in ${filePath}`;
         throw err;

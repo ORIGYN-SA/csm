@@ -8,3 +8,4 @@ export * from './types/mint';
 export * from './methods/config';
 export * from './methods/stage';
 export * from './methods/mint';
+export { registerLogger, unregisterLogger } from './methods/logger';
