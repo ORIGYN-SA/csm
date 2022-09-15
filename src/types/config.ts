@@ -71,7 +71,7 @@ export type ConfigSummary = {
 };
 
 export type ConfigFile = {
-  args: ConfigArgs;
+  settings: ConfigSettings;
   summary: ConfigSummary;
   collection: Meta;
   nfts: Meta[];
