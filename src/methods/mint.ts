@@ -5,11 +5,12 @@ import { Principal } from '@dfinity/principal';
 import { ConfigFile } from '../types/config';
 import { MintArgs } from '../types/mint';
 import { TextValue } from '../types/metadata';
+import { log } from './logger';
 import * as constants from '../constants';
 
 export async function mint(args: MintArgs) {
-  console.log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
-  console.log('Started (mint subcommand)');
+  log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
+  log('Started (mint subcommand)');
 
   // *** validate args
   let mintRange: number[] | null = null;
@@ -58,16 +59,16 @@ export async function mint(args: MintArgs) {
     });
 
     const tokenIds = nftsToMint.map((nft) => nft[0]).join(', ');
-    console.log(`\n${constants.LINE_DIVIDER_SECTION}`);
-    console.log(`\nMinting ${nftsToMint.length} NFTs '${tokenIds}'`);
+    log(`\n${constants.LINE_DIVIDER_SECTION}`);
+    log(`\nMinting ${nftsToMint.length} NFTs '${tokenIds}'`);
 
     let result = await actor.mint_batch_nft_origyn(nftsToMint);
 
-    console.log(result);
+    log(JSON.stringify(result));
 
-    console.log(`\nSuccessfully minted ${nftsToMint.length} NFTs.\n`);
+    log(`\nSuccessfully minted ${nftsToMint.length} NFTs.\n`);
   }
 
-  console.log('\nFinished (mint subcommand)\n');
-  console.log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
+  log('\nFinished (mint subcommand)\n');
+  log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
 }

@@ -6,8 +6,9 @@ import hdkey from 'hdkey';
 import { mnemonicToSeed } from 'bip39';
 import { idlFactory } from '../idl/origyn_nft_reference.did';
 import { Secp256k1KeyIdentity } from '@dfinity/identity';
+import { AnyActor } from '../types/actor';
 
-export async function getActor(isProd: boolean, seedFile: string, canisterId: string) {
+export async function getActor(isProd: boolean, seedFile: string, canisterId: string): Promise<AnyActor> {
   const identity = await getIdentity(seedFile);
 
   const agent = getAgent(isProd ? 'https://boundary.ic0.app' : 'http://localhost:8000', identity);
@@ -15,7 +16,7 @@ export async function getActor(isProd: boolean, seedFile: string, canisterId: st
     agent.fetchRootKey();
   }
 
-  const actor = Actor.createActor(idlFactory, {
+  const actor: AnyActor = Actor.createActor(idlFactory, {
     agent: agent,
     canisterId: Principal.fromText(canisterId),
   });
@@ -23,7 +24,7 @@ export async function getActor(isProd: boolean, seedFile: string, canisterId: st
   return actor;
 }
 
-async function getIdentity(seedFile: string) {
+async function getIdentity(seedFile: string): Promise<Secp256k1KeyIdentity> {
   const phrase = fs.readFileSync(seedFile, { encoding: 'utf8', flag: 'r' }).trim();
 
   if ((phrase || '').split(' ').length !== 12) {

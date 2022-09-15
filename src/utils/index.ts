@@ -2,6 +2,7 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import crypto from 'crypto';
 import path from 'path';
+import { log } from '../methods/logger';
 import * as constants from '../constants';
 
 const ignoredFolders = ['node_modules', '.vscode', '.idea', '.vessel'];
@@ -9,9 +10,9 @@ const ignoredFiles = ['.ds_store', '.gitignore'];
 
 export function wait(ms: number) {
   return new Promise((resolve) => {
-    console.log(`\nWaiting ${ms / 1000} seconds...`);
+    log(`\nWaiting ${ms / 1000} seconds...`);
     setTimeout(() => {
-      console.log('Wait time complete.\n');
+      log('Wait time complete.\n');
       resolve(ms);
     }, ms);
   });
@@ -67,8 +68,8 @@ export function getExternalUrls(filePath: string): string[] {
   let contents: string = fs.readFileSync(filePath).toString();
   const matches = findUrls(filePath, contents);
 
-  console.log(`\nregex matches ${matches.length}`);
-  console.log(JSON.stringify(matches, null, 2));
+  log(`\nregex matches ${matches.length}`);
+  log(JSON.stringify(matches, null, 2));
 
   if (matches.length === 0) {
     return [];

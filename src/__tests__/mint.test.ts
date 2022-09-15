@@ -1,5 +1,6 @@
 import { mint } from '../methods/mint';
 import { MintArgs } from '../types/mint';
+// import { registerLogger } from '../methods/logger';
 
 const TEN_MINUTE_TIMEOUT = 10 * 60 * 1000;
 
@@ -11,6 +12,10 @@ describe('mint module', () => {
     test(
       'should complete without throwing an error',
       async () => {
+        // registerLogger((message: string) => {
+        //   console.log(message);
+        // });
+
         const args = JSON.parse(inputMintArgs) as MintArgs;
         await expect(mint(args)).resolves.not.toThrowError();
       },
