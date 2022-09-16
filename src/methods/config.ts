@@ -282,18 +282,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   );
 
   // Ensure there are no external URL references (http/https)
-  for (const filePath of filesWithUrls) {
-    const urls: string[] = getExternalUrls(path.resolve(settings.stageFolder, filePath));
-
-    if (urls.length) {
-      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
-
-      throw (
-        '\nExternal URL references (http/https) must be replaced with local ' +
-        'relative file references so they can be uploaded to the NFT canister.\n'
-      );
-    }
-  }
+  // validateNoExternalUrls(settings.stageFolder, filesWithUrls);
 
   for (const filePath of filesWithUrls) {
     replaceRelativeUrls(settings, filePath);
@@ -360,6 +349,22 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   };
 }
 
+function validateNoExternalUrls(stageFolder: string, files: string[]) {
+  // Ensure there are no external URL references (http/https)
+  for (const filePath of files) {
+    const urls: string[] = getExternalUrls(path.resolve(stageFolder, filePath));
+
+    if (urls.length) {
+      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
+
+      throw (
+        '\nExternal URL references (http/https) must be replaced with local ' +
+        'relative file references so they can be uploaded to the NFT canister.\n'
+      );
+    }
+  }
+}
+
 function configureNftsMetadata(settings: ConfigSettings): Meta[] {
   let nftIndex = 0;
   let nfts: Meta[] = [];
@@ -402,18 +407,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   const filesWithUrls = files.filter((f) => ['.html', '.htm', '.css'].includes(path.extname(f).toLowerCase()));
 
   // Ensure there are no external URL references (http/https)
-  for (const filePath of filesWithUrls) {
-    const urls: string[] = getExternalUrls(filePath);
-
-    if (urls.length) {
-      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
-
-      throw (
-        '\nExternal URL references (http/https) must be replaced with local ' +
-        'relative file references so they can be uploaded to the NFT canister.\n'
-      );
-    }
-  }
+  // validateNoExternalUrls(settings.stageFolder, filesWithUrls);
 
   for (const filePath of filesWithUrls) {
     replaceRelativeUrls(settings, filePath);

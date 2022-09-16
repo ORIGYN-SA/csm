@@ -74,10 +74,6 @@ export function parseMintArgs(argv: string[]): MintArgs {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
   } else if (!args.seedFilePath) {
     throw 'Missing seed file path argument (-s)';
-  } else if (!args.range) {
-    throw 'Missing mint range argument (-r)';
-  } else if (!args.batchSize) {
-    throw 'Missing batch size argument (-b)';
   }
 
   return args;
@@ -114,7 +110,7 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
 }
 
 function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
-  const index = argv.findIndex((arg) => argNames.includes(arg.toLocaleLowerCase()));
+  const index = argv.findIndex((arg) => argNames.map((n) => n.toLowerCase()).includes(arg.toLocaleLowerCase()));
   if (index > -1 && argv.length - 1 > index) {
     const value = argv[index + 1];
     if (!value.startsWith('-')) {
