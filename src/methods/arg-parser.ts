@@ -17,6 +17,7 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
+    useProxy: getArgValue(argv, ['-u', '--useProxy'], 'false'),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
   };
