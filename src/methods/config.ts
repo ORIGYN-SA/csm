@@ -14,10 +14,6 @@ import * as constants from '../constants';
 export function config(args: ConfigArgs): string {
   // config object
   let settings = initConfigSettings(args) as any;
-  const err = validateConfigSettings(settings);
-  if (err) {
-    throw `Invalid config settings: ${err}`;
-  }
 
   log(constants.LINE_DIVIDER_SECTION);
   log('\nCreating metadata for the collection\n');
@@ -78,7 +74,24 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   const subFolders = getSubFolders(stageFolder);
   let collectionFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.COLLECTION_FOLDER) || '';
 
+  if (!collectionFolder) {
+    const error = `Expected to find a '${constants.COLLECTION_FOLDER}' folder at ${path.relative(
+      stageFolder,
+      path.join(args.folderPath, constants.COLLECTION_FOLDER),
+    )}`;
+    throw error;
+  }
+
   let nftsFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.NFTS_FOLDER) || '';
+
+  if (!nftsFolder) {
+    const error = `Expected to find an '${constants.NFTS_FOLDER}' folder at ${path.relative(
+      stageFolder,
+      path.join(args.folderPath, constants.NFTS_FOLDER),
+    )}`;
+    throw error;
+  }
+
   let nftFolderNames: string[] = [];
   if (nftsFolder) {
     nftFolderNames = getSubFolders(nftsFolder)
@@ -88,6 +101,23 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   }
 
   const nftDefinitionCount = nftFolderNames.length;
+  if (nftDefinitionCount === 0) {
+    const error = `No NFT definitions found. Please create a folder under the '${constants.NFTS_FOLDER}' folder for each NFT definition and name it with the index of the NFT starting with 0.`;
+    throw error;
+  }
+
+  for (let i = 0; i < nftDefinitionCount; i++) {
+    if (i !== parseInt(nftFolderNames[i])) {
+      const error = `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 0. Missing folder ${i}.'`;
+      throw error;
+    }
+  }
+
+  if (nftQuantities?.length && nftDefinitionCount != nftQuantities.length) {
+    const error = `Error: Count mismatch: ${nftDefinitionCount} NFT folders and ${nftQuantities.length} quantities (-q arg).`;
+    throw error;
+  }
+
   let totalNftCount = 0;
   if (nftQuantities.length) {
     // get the total NFT count - needed in metadata of NFT
@@ -110,7 +140,6 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     stageFolder,
     collectionFolder,
     nftsFolder,
-    nftFolderNames,
     nftDefinitionCount,
     nftQuantities,
     totalNftCount,
@@ -126,48 +155,19 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   return settings;
 }
 
-function validateConfigSettings(settings: ConfigSettings): string {
-  if (!settings.collectionFolder) {
-    return `\nExpected to find a '${constants.COLLECTION_FOLDER}' folder at ${path.relative(
-      settings.stageFolder,
-      path.join(settings.args.folderPath, constants.COLLECTION_FOLDER),
-    )}\n`;
-  }
-
-  if (!settings.nftsFolder) {
-    return `\nExpected to find an '${constants.NFTS_FOLDER}' folder at ${path.relative(
-      settings.stageFolder,
-      path.join(settings.args.folderPath, constants.NFTS_FOLDER),
-    )}\n`;
-  }
-
-  for (let i = 0; i < settings.nftDefinitionCount; i++) {
-    if (i !== parseInt(settings.nftFolderNames[i])) {
-      return `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 0. Missing folder ${i}.'`;
-    }
-  }
-
-  if (settings.nftDefinitionCount === 0) {
-    return `No NFT definitions found. Please create a folder under the '${constants.NFTS_FOLDER}' folder for each NFT definition and name it with the index of the NFT starting with 0.`;
-  }
-
-  if (settings.nftQuantities?.length && settings.nftDefinitionCount != settings.nftQuantities.length) {
-    return `\nError: Count mismatch: ${settings.nftDefinitionCount} NFT folders and ${settings.nftQuantities.length} quantities (-q arg).\n`;
-  }
-
-  return '';
-}
-
 function getResourceUrl(settings: ConfigSettings, resourceName: string, tokenId: string = ''): string {
   let rootUrl = '';
   switch ((settings.args.environment || '').toLowerCase()) {
     case 'l':
     case 'local':
     case 'localhost':
-      // url points to local canister (port 8000) but does not buffer videos
-      //rootUrl = `http://${settings.args.nftCanisterId}.localhost:8000`;
-      // url points to icx-proxy (port 3000) to buffer videos
-      rootUrl = `http://localhost:3000/-/${settings.args.nftCanisterId}`;
+      if (settings.args.useProxy === 'true') {
+        // url points to icx-proxy (port 3000) to buffer videos
+        rootUrl = `http://localhost:3000/-/${settings.args.nftCanisterId}`;
+      } else {
+        // url points to local canister (port 8000) but does not buffer videos
+        rootUrl = `http://${settings.args.nftCanisterId}.localhost:8000`;
+      }
       break;
     case 'p':
     case 'prod':

@@ -1,32 +1,31 @@
 import { LibraryFile, Meta } from './metadata';
 
 export type ConfigArgs = {
-  /** environment */
   environment: string;
-  /** collection id */
   collectionId: string;
-  /** display name of collection */
   collectionDisplayName: string;
-  /** token prefix */
   tokenPrefix: string;
-  /** id of canister */
   nftCanisterId: string;
-  /** principal id of creator */
   creatorPrincipal: string;
-  /** namespace for NFT resources */
   namespace: string;
-  /** folder path */
   folderPath: string;
-  /** mappings (string with comma delimited list of 'asset_type:file_name, ...') */
+  // string with comma delimited list of 'asset_type:file_name, ...'
+  // supports the * wildcard character
+  // example: 'primary:nft*.png,experience:index.html,hidden:hidden.jpg'
   assetMappings: string;
 
   //optional args, but will map to empty strings
 
-  /** owner of NFTs (if empty, defaults to NFT canister id) */
+  // if empty, defaults to NFT canister id
   nftOwnerId: string;
-  /** soulbound (if empty, default to 'false') */
+  // indicates if the resource urls should point at the local icx-proxy (port 3000)
+  // if empty, defaults to 'false'
+  useProxy: string;
+  // if empty, defaults to 'false'
   soulbound: string;
-  /** quantity */
+  // string with comma delimited list of 'nft_def_number:quantity, ...'
+  // example: '0:3,1:3,2:5,3:10'
+  // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
 };
 
@@ -36,7 +35,6 @@ export type ConfigSettings = {
   stageFolder: string;
   collectionFolder: string;
   nftsFolder: string;
-  nftFolderNames: string[];
   nftDefinitionCount: number;
   nftQuantities: number[];
   totalNftCount: number;
