@@ -1,8 +1,9 @@
 /**
  * Credit:
- * This code has combined code from 2 sources:
+ * This module has combined code from multiple sources:
  * https://github.com/krpeacock/node-identity-pem
- * https://github.com/ZenVoich/mops/blob/4bf6487deb7e4d3b83eabcd2c7323d9eb231e5a5/cli/pem.js
+ * https://forum.dfinity.org/t/using-dfinity-agent-in-node-js/6169/41
+ * https://forum.dfinity.org/t/using-dfinity-agent-in-node-js/6169/55
  */
 
 import fs from 'fs';
@@ -21,21 +22,19 @@ export async function getIdentity(keyFilePath: string): Promise<Identity> {
 
   if (fileExt === '.pem') {
     if (contents.indexOf('BEGIN EC PRIVATE KEY') > -1) {
-      console.log('Secp256k1 Key Identity');
       const rawBuffer = Uint8Array.from(contents as any).buffer;
       const privateKey = Uint8Array.from(sha256(rawBuffer as any, { asBytes: true }));
       const identity = Secp256k1KeyIdentity.fromSecretKey(privateKey);
-      log(`Loaded identity ${identity.getPrincipal()} from .pem file ${keyFilePath}.`);
+      log(`Loaded Secp256k1 identity ${identity.getPrincipal()} from .pem file ${keyFilePath}.`);
       return identity;
     } else if (contents.indexOf('BEGIN PRIVATE KEY')) {
-      console.log('Ed25519 Key Identity');
       var buf = pemfile.decode(contents);
       if (buf.length != 85) {
         throw 'expecting byte length 85 but got ' + buf.length;
       }
       let privateKey = Buffer.concat([buf.slice(16, 48), buf.slice(53, 85)]);
       const identity = Ed25519KeyIdentity.fromSecretKey(privateKey);
-      console.log(identity.getPrincipal().toText());
+      log(`Loaded Ed25519 identity ${identity.getPrincipal()} from .pem file ${keyFilePath}.`);
       return identity;
     } else {
       throw 'Could not recognize the private key type.';
@@ -46,7 +45,7 @@ export async function getIdentity(keyFilePath: string): Promise<Identity> {
     const root = hdkey.fromMasterSeed(seed);
     const addrnode = root.derive("m/44'/223'/0'/0/0");
     const identity = Secp256k1KeyIdentity.fromSecretKey(addrnode.privateKey);
-    log(`Loaded identity ${identity.getPrincipal()} from key phrase file ${keyFilePath}.`);
+    log(`Loaded identity ${identity.getPrincipal()} from seed phrase file ${keyFilePath}.`);
     return identity;
   } else {
     log(`Invalid seed phrase file ${keyFilePath}`);
