@@ -48,13 +48,13 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 export function parseStageArgs(argv: string[]): StageArgs {
   const args: StageArgs = {
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
-    seedFilePath: getArgValue(argv, ['-s', '--seedFilePath']),
+    keyFilePath: getArgValue(argv, ['-k', '--keyFilePath']),
   };
 
   // validate args
   if (!args.folderPath) {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
-  } else if (!args.seedFilePath) {
+  } else if (!args.keyFilePath) {
     throw 'Missing seed file path argument (-s)';
   }
 
@@ -64,7 +64,7 @@ export function parseStageArgs(argv: string[]): StageArgs {
 export function parseMintArgs(argv: string[]): MintArgs {
   const args: MintArgs = {
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
-    seedFilePath: getArgValue(argv, ['-s', '--seedFilePath']),
+    keyFilePath: getArgValue(argv, ['-k', '--keyFilePath']),
     range: getArgValue(argv, ['-r', '--range']),
     batchSize: getArgValue(argv, ['-b', '--batchSize']),
   };
@@ -72,7 +72,7 @@ export function parseMintArgs(argv: string[]): MintArgs {
   // validate args
   if (!args.folderPath) {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
-  } else if (!args.seedFilePath) {
+  } else if (!args.keyFilePath) {
     throw 'Missing seed file path argument (-s)';
   }
 

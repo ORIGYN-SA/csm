@@ -45,7 +45,7 @@ export async function mint(args: MintArgs) {
   const config = JSON.parse(json) as ConfigFile;
 
   const isProd = (config.settings.args.environment?.[0] || '').toLowerCase() !== 'l';
-  const actor = await getActor(isProd, args.seedFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const actor = await getActor(isProd, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Mint NFTs
   mintRange = mintRange || [0, config.nfts.length - 1];
