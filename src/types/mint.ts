@@ -1,6 +1,6 @@
 export type MintArgs = {
   folderPath: string;
-  seedFilePath: string;
+  keyFilePath: string;
   range?: string;
   batchSize?: string;
 };

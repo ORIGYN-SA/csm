@@ -33,5 +33,3 @@ Start by importing the `csm` in your code.
 ```js
 import { config, stage, mint } from '@origyn-sa/csm';
 ```
-
-TODO: Provide usage instructions.

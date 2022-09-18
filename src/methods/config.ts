@@ -164,7 +164,10 @@ function getResourceUrl(settings: ConfigSettings, resourceName: string, tokenId:
     case 'l':
     case 'local':
     case 'localhost':
-      rootUrl = `http://${settings.args.nftCanisterId}.localhost:8000`;
+      // url points to local canister (port 8000) but does not buffer videos
+      //rootUrl = `http://${settings.args.nftCanisterId}.localhost:8000`;
+      // url points to icx-proxy (port 3000) to buffer videos
+      rootUrl = `http://localhost:3000/-/${settings.args.nftCanisterId}`;
       break;
     case 'p':
     case 'prod':

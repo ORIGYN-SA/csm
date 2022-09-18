@@ -30,7 +30,7 @@ export async function stage(args: StageArgs) {
   const config = JSON.parse(json) as ConfigFile;
 
   const isProd = (config.settings.args.environment?.[0] || '').toLowerCase() !== 'l';
-  const actor = await getActor(isProd, args.seedFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const actor = await getActor(isProd, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Stage NFTs and Library Assets
   // nfts and collections have the same metadata structure

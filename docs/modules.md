@@ -15,9 +15,11 @@
 - [FileInfo](modules.md#fileinfo)
 - [FileInfoMap](modules.md#fileinfomap)
 - [LibraryFile](modules.md#libraryfile)
+- [LoggerCallback](modules.md#loggercallback)
 - [Meta](modules.md#meta)
 - [MetadataClass](modules.md#metadataclass)
 - [MetadataProperty](modules.md#metadataproperty)
+- [Metrics](modules.md#metrics)
 - [MintArgs](modules.md#mintargs)
 - [NatValue](modules.md#natvalue)
 - [PrincipalValue](modules.md#principalvalue)
@@ -28,11 +30,14 @@
 ### Functions
 
 - [config](modules.md#config)
+- [getIdentity](modules.md#getidentity)
 - [mint](modules.md#mint)
 - [parseConfigArgs](modules.md#parseconfigargs)
 - [parseMintArgs](modules.md#parsemintargs)
 - [parseStageArgs](modules.md#parsestageargs)
+- [registerLogger](modules.md#registerlogger)
 - [stage](modules.md#stage)
+- [unregisterLogger](modules.md#unregisterlogger)
 
 ## Type Aliases
 
@@ -51,7 +56,7 @@
 
 #### Defined in
 
-[types/config.ts:59](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L59)
+[types/config.ts:59](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L59)
 
 ___
 
@@ -67,7 +72,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L16)
+[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L16)
 
 ___
 
@@ -94,7 +99,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L3)
+[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L3)
 
 ___
 
@@ -113,7 +118,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:73](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L73)
+[types/config.ts:73](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L73)
 
 ___
 
@@ -140,7 +145,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:33](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L33)
+[types/config.ts:33](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L33)
 
 ___
 
@@ -159,7 +164,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:66](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L66)
+[types/config.ts:66](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L66)
 
 ___
 
@@ -178,7 +183,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:48](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L48)
+[types/config.ts:48](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L48)
 
 ___
 
@@ -192,7 +197,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:55](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/config.ts#L55)
+[types/config.ts:55](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L55)
 
 ___
 
@@ -209,7 +214,31 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L3)
+[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L3)
+
+___
+
+### LoggerCallback
+
+Ƭ **LoggerCallback**: (`log`: `string`) => `void`
+
+#### Type declaration
+
+▸ (`log`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `log` | `string` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[types/logger.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/logger.ts#L1)
 
 ___
 
@@ -227,7 +256,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L38)
+[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L38)
 
 ___
 
@@ -243,7 +272,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L34)
+[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L34)
 
 ___
 
@@ -261,7 +290,23 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L28)
+[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L28)
+
+___
+
+### Metrics
+
+Ƭ **Metrics**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `totalFileSize` | `number` |
+
+#### Defined in
+
+[types/stage.ts:6](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/stage.ts#L6)
 
 ___
 
@@ -275,12 +320,12 @@ ___
 | :------ | :------ |
 | `batchSize?` | `string` |
 | `folderPath` | `string` |
+| `keyFilePath` | `string` |
 | `range?` | `string` |
-| `seedFilePath` | `string` |
 
 #### Defined in
 
-[types/mint.ts:1](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/mint.ts#L1)
+[types/mint.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/mint.ts#L1)
 
 ___
 
@@ -296,7 +341,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L12)
+[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L12)
 
 ___
 
@@ -312,7 +357,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L20)
+[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L20)
 
 ___
 
@@ -325,11 +370,11 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `folderPath` | `string` |
-| `seedFilePath` | `string` |
+| `keyFilePath` | `string` |
 
 #### Defined in
 
-[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/stage.ts#L1)
+[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/stage.ts#L1)
 
 ___
 
@@ -345,7 +390,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L8)
+[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L8)
 
 ___
 
@@ -362,7 +407,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/types/metadata.ts#L24)
+[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L24)
 
 ## Functions
 
@@ -382,7 +427,27 @@ ___
 
 #### Defined in
 
-[methods/config.ts:12](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/config.ts#L12)
+[methods/config.ts:14](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/config.ts#L14)
+
+___
+
+### getIdentity
+
+▸ **getIdentity**(`keyFilePath`): `Promise`<`Identity`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `keyFilePath` | `string` |
+
+#### Returns
+
+`Promise`<`Identity`\>
+
+#### Defined in
+
+methods/identity.ts:11
 
 ___
 
@@ -402,7 +467,7 @@ ___
 
 #### Defined in
 
-[methods/mint.ts:10](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/mint.ts#L10)
+[methods/mint.ts:11](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/mint.ts#L11)
 
 ___
 
@@ -422,7 +487,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:5](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L5)
+[methods/arg-parser.ts:5](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L5)
 
 ___
 
@@ -442,7 +507,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:64](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L64)
+[methods/arg-parser.ts:64](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L64)
 
 ___
 
@@ -462,7 +527,27 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:48](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/arg-parser.ts#L48)
+[methods/arg-parser.ts:48](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L48)
+
+___
+
+### registerLogger
+
+▸ **registerLogger**(`callback`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `callback` | [`LoggerCallback`](modules.md#loggercallback) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[methods/logger.ts:5](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/logger.ts#L5)
 
 ___
 
@@ -482,4 +567,18 @@ ___
 
 #### Defined in
 
-[methods/stage.ts:11](https://github.com/ORIGYN-SA/csm/blob/40b8f83/src/methods/stage.ts#L11)
+[methods/stage.ts:13](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/stage.ts#L13)
+
+___
+
+### unregisterLogger
+
+▸ **unregisterLogger**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[methods/logger.ts:9](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/logger.ts#L9)
