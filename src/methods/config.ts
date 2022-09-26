@@ -155,36 +155,29 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   return settings;
 }
 
-function getResourceUrl(settings: ConfigSettings, resourceName: string, tokenId: string = ''): string {
-  let rootUrl = '';
-  switch ((settings.args.environment || '').toLowerCase()) {
-    case 'l':
-    case 'local':
-    case 'localhost':
-      if (settings.args.useProxy === 'true') {
-        // url points to icx-proxy (port 3000) to buffer videos
-        rootUrl = `http://localhost:3000/-/${settings.args.nftCanisterId}`;
-      } else {
-        // url points to local canister (port 8000) but does not buffer videos
-        rootUrl = `http://${settings.args.nftCanisterId}.localhost:8000`;
-      }
-      break;
-    case 'p':
-    case 'prod':
-    case 'production':
-      rootUrl = `https://exos.origyn.network/-/${settings.args.collectionId}`;
-      break;
-    default: // dev, stage, etc.
-      rootUrl = `https://exos.origyn.network/-/${settings.args.nftCanisterId}`;
-      break;
-  }
+function getResourceUrl(resourceName: string, tokenId: string = ''): string {
+  // Relative URLs can be tested with the proper root URL:
+
+  // Localhost without proxy, without phonebook:
+  // http://{canister-id}.localhost:8000/
+  // Localhost with proxy, without phonebook:
+  // http://localhost:3000/-/{canister-id}/
+  // Localhost with proxy, with phonebook:
+  // http://localhost:3000/-/{collection-id}/
+
+  // Mainnet without proxy, without phonebook (fully decentralized):
+  // https://rrkah-fqaaa-aaaaa-aaaaq-cai.raw.ic0.app/
+  // Mainnet with proxy, without phonebook:
+  // https://exos.origyn.network/-/{canister-id}/
+  // Mainnet with proxy, with phonebook:
+  // https://exos.origyn.network/-/{collection-id}/
 
   if (tokenId) {
-    // https://rrkah-fqaaa-aaaaa-aaaaq-cai.raw.ic0.app/-/bayc-01/-/com.bayc.ape.0.primary
-    return `${rootUrl}/-/${tokenId}/-/${resourceName}`.toLowerCase();
+    // Example: https://rrkah-fqaaa-aaaaa-aaaaq-cai.raw.ic0.app/-/bayc-01/-/com.bayc.ape.0.primary
+    return `-/${tokenId}/-/${resourceName}`.toLowerCase();
   } else {
-    // https://frfol-iqaaa-aaaaj-acogq-cai.raw.ic0.app/collection/-/ledger
-    return `${rootUrl}/collection/-/${resourceName}`.toLowerCase();
+    // Example: https://frfol-iqaaa-aaaaj-acogq-cai.raw.ic0.app/collection/-/ledger
+    return `collection/-/${resourceName}`.toLowerCase();
   }
 }
 
@@ -212,7 +205,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
       title = `${libraryId} dApp`;
     }
 
-    const resourceUrl = `${getResourceUrl(settings, libraryId)}`.toLowerCase();
+    const resourceUrl = `${getResourceUrl(libraryId)}`.toLowerCase();
     const relativeFilePath = path.relative(settings.stageFolder, filePath);
 
     fileInfoMap[relativeFilePath.toLowerCase()] = {
@@ -243,7 +236,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
       for (const filePath of nftFiles) {
         const libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();
 
-        const resourceUrl = `${getResourceUrl(settings, libraryId, tokenId)}`;
+        const resourceUrl = `${getResourceUrl(libraryId, tokenId)}`;
 
         // find the asset type of this file (primary, preview, experience, hidden)
         let nftAssetType = '';

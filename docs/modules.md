@@ -56,7 +56,7 @@
 
 #### Defined in
 
-[types/config.ts:59](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L59)
+[types/config.ts:53](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L53)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L16)
+[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L16)
 
 ___
 
@@ -82,24 +82,23 @@ ___
 
 #### Type declaration
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `assetMappings` | `string` | mappings (string with comma delimited list of 'asset_type:file_name, ...') |
-| `collectionDisplayName` | `string` | display name of collection |
-| `collectionId` | `string` | collection id |
-| `creatorPrincipal` | `string` | principal id of creator |
-| `environment` | `string` | environment |
-| `folderPath` | `string` | folder path |
-| `namespace` | `string` | namespace for NFT resources |
-| `nftCanisterId` | `string` | id of canister |
-| `nftOwnerId` | `string` | owner of NFTs (if empty, defaults to NFT canister id) |
-| `nftQuantities` | `string` | quantity |
-| `soulbound` | `string` | soulbound (if empty, default to 'false') |
-| `tokenPrefix` | `string` | token prefix |
+| Name | Type |
+| :------ | :------ |
+| `assetMappings` | `string` |
+| `collectionDisplayName` | `string` |
+| `collectionId` | `string` |
+| `creatorPrincipal` | `string` |
+| `folderPath` | `string` |
+| `namespace` | `string` |
+| `nftCanisterId` | `string` |
+| `nftOwnerId` | `string` |
+| `nftQuantities` | `string` |
+| `soulbound` | `string` |
+| `tokenPrefix` | `string` |
 
 #### Defined in
 
-[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L3)
+[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L3)
 
 ___
 
@@ -118,7 +117,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:73](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L73)
+[types/config.ts:67](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L67)
 
 ___
 
@@ -136,7 +135,6 @@ ___
 | `collectionLibraries` | [`LibraryFile`](modules.md#libraryfile)[] |
 | `fileMap` | [`FileInfoMap`](modules.md#fileinfomap) |
 | `nftDefinitionCount` | `number` |
-| `nftFolderNames` | `string`[] |
 | `nftQuantities` | `number`[] |
 | `nftsFolder` | `string` |
 | `stageFolder` | `string` |
@@ -145,7 +143,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:33](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L33)
+[types/config.ts:28](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L28)
 
 ___
 
@@ -164,7 +162,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:66](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L66)
+[types/config.ts:60](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L60)
 
 ___
 
@@ -183,7 +181,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:48](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L48)
+[types/config.ts:42](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L42)
 
 ___
 
@@ -197,7 +195,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:55](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/config.ts#L55)
+[types/config.ts:49](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/config.ts#L49)
 
 ___
 
@@ -214,7 +212,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L3)
+[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L3)
 
 ___
 
@@ -238,7 +236,7 @@ ___
 
 #### Defined in
 
-[types/logger.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/logger.ts#L1)
+[types/logger.ts:1](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/logger.ts#L1)
 
 ___
 
@@ -256,7 +254,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L38)
+[types/metadata.ts:38](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L38)
 
 ___
 
@@ -272,7 +270,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L34)
+[types/metadata.ts:34](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L34)
 
 ___
 
@@ -290,7 +288,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L28)
+[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L28)
 
 ___
 
@@ -306,26 +304,17 @@ ___
 
 #### Defined in
 
-[types/stage.ts:6](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/stage.ts#L6)
+[types/stage.ts:7](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/stage.ts#L7)
 
 ___
 
 ### MintArgs
 
-Ƭ **MintArgs**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `batchSize?` | `string` |
-| `folderPath` | `string` |
-| `keyFilePath` | `string` |
-| `range?` | `string` |
+Ƭ **MintArgs**: [`StageArgs`](modules.md#stageargs) & { `batchSize?`: `string` ; `range?`: `string`  }
 
 #### Defined in
 
-[types/mint.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/mint.ts#L1)
+[types/mint.ts:3](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/mint.ts#L3)
 
 ___
 
@@ -341,7 +330,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L12)
+[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L12)
 
 ___
 
@@ -357,7 +346,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L20)
+[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L20)
 
 ___
 
@@ -369,12 +358,13 @@ ___
 
 | Name | Type |
 | :------ | :------ |
+| `environment` | `string` |
 | `folderPath` | `string` |
 | `keyFilePath` | `string` |
 
 #### Defined in
 
-[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/stage.ts#L1)
+[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/stage.ts#L1)
 
 ___
 
@@ -390,7 +380,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L8)
+[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L8)
 
 ___
 
@@ -407,7 +397,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/types/metadata.ts#L24)
+[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/types/metadata.ts#L24)
 
 ## Functions
 
@@ -427,7 +417,7 @@ ___
 
 #### Defined in
 
-[methods/config.ts:14](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/config.ts#L14)
+[methods/config.ts:14](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/config.ts#L14)
 
 ___
 
@@ -447,7 +437,7 @@ ___
 
 #### Defined in
 
-methods/identity.ts:11
+[methods/identity.ts:19](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/identity.ts#L19)
 
 ___
 
@@ -467,7 +457,7 @@ ___
 
 #### Defined in
 
-[methods/mint.ts:11](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/mint.ts#L11)
+[methods/mint.ts:11](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/mint.ts#L11)
 
 ___
 
@@ -487,7 +477,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:5](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L5)
+[methods/arg-parser.ts:5](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/arg-parser.ts#L5)
 
 ___
 
@@ -507,7 +497,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:64](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L64)
+[methods/arg-parser.ts:64](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/arg-parser.ts#L64)
 
 ___
 
@@ -527,7 +517,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:48](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/arg-parser.ts#L48)
+[methods/arg-parser.ts:45](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/arg-parser.ts#L45)
 
 ___
 
@@ -547,7 +537,7 @@ ___
 
 #### Defined in
 
-[methods/logger.ts:5](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/logger.ts#L5)
+[methods/logger.ts:5](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/logger.ts#L5)
 
 ___
 
@@ -567,7 +557,7 @@ ___
 
 #### Defined in
 
-[methods/stage.ts:13](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/stage.ts#L13)
+[methods/stage.ts:13](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/stage.ts#L13)
 
 ___
 
@@ -581,4 +571,4 @@ ___
 
 #### Defined in
 
-[methods/logger.ts:9](https://github.com/ORIGYN-SA/csm/blob/26965cb/src/methods/logger.ts#L9)
+[methods/logger.ts:9](https://github.com/ORIGYN-SA/csm/blob/3ce6252/src/methods/logger.ts#L9)

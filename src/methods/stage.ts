@@ -14,7 +14,11 @@ export async function stage(args: StageArgs) {
   log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
   log('Started (stage subcommand)');
 
-  // validate args
+  // *** validate args
+  if (!['local', 'ic'].includes(args.environment)) {
+    const err = `Invalid environment (-e): "${args.environment}". Valid values are "local" (localhost) and "ic" (mainnet).`;
+  }
+
   if (!args.folderPath) {
     throw 'Missing folder argument (-f) with the path to the folder containing the NFT assets.';
   }
@@ -29,8 +33,8 @@ export async function stage(args: StageArgs) {
   const json = fs.readFileSync(configFilePath).toString();
   const config = JSON.parse(json) as ConfigFile;
 
-  const isProd = (config.settings.args.environment?.[0] || '').toLowerCase() !== 'l';
-  const actor = await getActor(isProd, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const isLocal = args.environment === 'local';
+  const actor = await getActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Stage NFTs and Library Assets
   // nfts and collections have the same metadata structure

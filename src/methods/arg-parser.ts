@@ -6,7 +6,6 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
   const nftCanisterId = getArgValue(argv, ['-i', '--nftCanisterId']);
 
   const args: ConfigArgs = {
-    environment: getArgValue(argv, ['-e', '--environment']),
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
     collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
     tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
@@ -17,15 +16,12 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
-    useProxy: getArgValue(argv, ['-u', '--useProxy'], 'false'),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
   };
 
   // validate args
-  if (!args.environment) {
-    throw 'Missing environment argument (-e).';
-  } else if (!args.collectionId) {
+  if (!args.collectionId) {
     throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
   } else if (!args.collectionDisplayName) {
     throw 'Missing collection display name argument (-d).';
@@ -48,12 +44,15 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
 export function parseStageArgs(argv: string[]): StageArgs {
   const args: StageArgs = {
+    environment: getArgValue(argv, ['-e', '--environment']),
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     keyFilePath: getArgValue(argv, ['-k', '--keyFilePath']),
   };
 
   // validate args
-  if (!args.folderPath) {
+  if (!args.environment) {
+    throw 'Missing environment argument (-e).';
+  } else if (!args.folderPath) {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
   } else if (!args.keyFilePath) {
     throw 'Missing seed file path argument (-s)';
@@ -64,14 +63,19 @@ export function parseStageArgs(argv: string[]): StageArgs {
 
 export function parseMintArgs(argv: string[]): MintArgs {
   const args: MintArgs = {
+    environment: getArgValue(argv, ['-e', '--environment']),
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     keyFilePath: getArgValue(argv, ['-k', '--keyFilePath']),
+
+    // optional
     range: getArgValue(argv, ['-r', '--range']),
     batchSize: getArgValue(argv, ['-b', '--batchSize']),
   };
 
   // validate args
-  if (!args.folderPath) {
+  if (!args.environment) {
+    throw 'Missing environment argument (-e).';
+  } else if (!args.folderPath) {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
   } else if (!args.keyFilePath) {
     throw 'Missing seed file path argument (-s)';
