@@ -1,7 +1,6 @@
 import { LibraryFile, Meta } from './metadata';
 
 export type ConfigArgs = {
-  environment: string;
   collectionId: string;
   collectionDisplayName: string;
   tokenPrefix: string;
@@ -18,9 +17,6 @@ export type ConfigArgs = {
 
   // if empty, defaults to NFT canister id
   nftOwnerId: string;
-  // indicates if the resource urls should point at the local icx-proxy (port 3000)
-  // if empty, defaults to 'false'
-  useProxy: string;
   // if empty, defaults to 'false'
   soulbound: string;
   // string with comma delimited list of 'nft_def_number:quantity, ...'

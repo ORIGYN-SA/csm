@@ -1,4 +1,5 @@
 export type StageArgs = {
+  environment: string;
   folderPath: string;
   keyFilePath: string;
 };

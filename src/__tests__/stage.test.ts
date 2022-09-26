@@ -5,7 +5,7 @@ import { StageArgs } from '../types/stage';
 const TEN_MINUTE_TIMEOUT = 10 * 60 * 1000;
 
 const inputStageArgs =
-  '{"folderPath":"/Users/jt/test/origyn_nft_reference/projects/bayc-csm/__temp","keyFilePath":"/Users/jt/test/origyn_nft_reference/seed.txt"}';
+  '{"environment":"local","folderPath":"/Users/jt/test/origyn_nft_reference/projects/bayc-csm/__temp","keyFilePath":"/Users/jt/test/origyn_nft_reference/seed.txt"}';
 
 describe('stage module', () => {
   describe('stage', () => {

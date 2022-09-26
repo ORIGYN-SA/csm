@@ -5,11 +5,11 @@ import { idlFactory } from '../idl/origyn_nft_reference.did';
 import { AnyActor } from '../types/actor';
 import { getIdentity } from './identity';
 
-export async function getActor(isProd: boolean, keyFilePath: string, canisterId: string): Promise<AnyActor> {
+export async function getActor(isLocal: boolean, keyFilePath: string, canisterId: string): Promise<AnyActor> {
   const identity = await getIdentity(keyFilePath);
 
-  const agent = getAgent(isProd ? 'https://boundary.ic0.app' : 'http://localhost:8000', identity);
-  if (!isProd) {
+  const agent = getAgent(isLocal ? 'http://localhost:8000' : 'https://boundary.ic0.app', identity);
+  if (isLocal) {
     agent.fetchRootKey();
   }
 

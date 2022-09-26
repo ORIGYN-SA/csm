@@ -13,6 +13,10 @@ export async function mint(args: MintArgs) {
   log('Started (mint subcommand)');
 
   // *** validate args
+  if (!['local', 'ic'].includes(args.environment)) {
+    const err = `Invalid environment (-e): "${args.environment}". Valid values are "local" (localhost) and "ic" (mainnet).`;
+  }
+
   let mintRange: number[] | null = null;
   if (args.range) {
     const ranges = args.range.split('-');
@@ -44,8 +48,8 @@ export async function mint(args: MintArgs) {
   const json = fs.readFileSync(configFilePath).toString();
   const config = JSON.parse(json) as ConfigFile;
 
-  const isProd = (config.settings.args.environment?.[0] || '').toLowerCase() !== 'l';
-  const actor = await getActor(isProd, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const isLocal = args.environment === 'local';
+  const actor = await getActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Mint NFTs
   mintRange = mintRange || [0, config.nfts.length - 1];
