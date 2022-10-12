@@ -1,6 +1,7 @@
 export type StageArgs = {
+  environment: string;
   folderPath: string;
-  seedFilePath: string;
+  keyFilePath: string;
 };
 
 export type Metrics = {
