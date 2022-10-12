@@ -1,6 +1,6 @@
-export type MintArgs = {
-  folderPath: string;
-  seedFilePath: string;
+import { StageArgs } from './stage';
+
+export type MintArgs = StageArgs & {
   range?: string;
   batchSize?: string;
 };
