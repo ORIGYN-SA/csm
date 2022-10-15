@@ -823,25 +823,25 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
 
     if (settings.fileMap[relFilePathLower]) {
       const resourceUrl = settings.fileMap[relFilePathLower].resourceUrl;
-      contents = (contents as any).replaceAll(`"${relUrl}"`, `"${resourceUrl}"`);
-      contents = (contents as any).replaceAll(`'${relUrl}'`, `'${resourceUrl}'`);
+      contents = (contents as any).replaceAll(`"${relUrl}"`, `"/${resourceUrl}"`);
+      contents = (contents as any).replaceAll(`'${relUrl}'`, `'/${resourceUrl}'`);
 
       log(`\n*** REPLACED ${relUrl}`);
       log(`WITH ${resourceUrl}`);
     } else {
-      relFilePathLower = path
-        .relative(settings.stageFolder, path.resolve(settings.collectionFolder, relUrl))
+      const relCollFilePathLower = path
+        .relative(settings.stageFolder, path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl))
         .toLowerCase();
 
-      if (settings.fileMap[relFilePathLower]) {
-        const resourceUrl = settings.fileMap[relFilePathLower].resourceUrl;
-        contents = (contents as any).replaceAll(`"${relUrl}"`, `"${resourceUrl}"`);
-        contents = (contents as any).replaceAll(`'${relUrl}'`, `'${resourceUrl}'`);
+      if (settings.fileMap[relCollFilePathLower]) {
+        const resourceUrl = settings.fileMap[relCollFilePathLower].resourceUrl;
+        contents = (contents as any).replaceAll(`"${relUrl}"`, `"/${resourceUrl}"`);
+        contents = (contents as any).replaceAll(`'${relUrl}'`, `'/${resourceUrl}'`);
 
         log(`\n*** REPLACED ${relUrl}`);
         log(`WITH ${resourceUrl}`);
       } else {
-        const err = `Could not find file ${relFilePathLower} referenced in ${filePath}`;
+        const err = `Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}`;
         throw err;
       }
     }
