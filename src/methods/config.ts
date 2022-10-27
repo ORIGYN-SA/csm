@@ -468,6 +468,178 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: true,
   });
 
+  function createPrimRoyalties(settings: ConfigSettings):MetadataProperty {
+    return {
+      name: "default_royalty_primary",
+      value: {
+          Array: {
+              thawed: [
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.broker"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.05 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  },
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.node"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.005 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  }
+              ]
+          }
+      },
+      immutable: false
+  }
+  }
+  
+  const primaryRoyalties = createPrimRoyalties(settings);
+  
+  properties.push(primaryRoyalties);
+  
+   function createSecRoyalties(settings: ConfigSettings): MetadataProperty {
+    return {
+      name: "default_royalty_secondary",
+      value: {
+          Array: {
+              thawed: [
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.broker"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.05 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  },
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.node"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.005 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  },
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.originator"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.05 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  },
+                  {
+                      Class: [
+                          {
+                              name: "tag",
+                              value: {
+                                  Text: "com.origyn.royalty.custom"
+                              },
+                              immutable: true
+                          },
+                          {
+                              name: "rate",
+                              value: { "Float": 0.05 },
+                              immutable: true
+                          },
+                          {
+                              name: "account",
+                              value: {
+                                  Principal: settings.args.creatorPrincipal
+                              },
+                              immutable: false
+                          }
+                      ]
+                  }
+              ]
+          }
+      },
+      "immutable": false
+  }
+  };
+  
+  const secondaryRoyalties = createSecRoyalties(settings);
+  
+  properties.push(secondaryRoyalties);
+
   const appsAttribute = createAppsAttribute(settings);
 
   properties.push(appsAttribute);

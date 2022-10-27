@@ -13,6 +13,10 @@ export type NatValue = {
   Nat: number;
 };
 
+export type FloatValue = {
+  Float: number;
+}
+
 export type BoolValue = {
   Bool: boolean;
 };
@@ -27,7 +31,7 @@ export type ThawedArrayValue = {
 
 export type MetadataProperty = {
   name: string;
-  value: TextValue | NatValue | BoolValue | PrincipalValue | ThawedArrayValue | MetadataClass;
+  value: TextValue | NatValue | BoolValue | PrincipalValue | ThawedArrayValue | MetadataClass | FloatValue;
   immutable: boolean;
 };
 
