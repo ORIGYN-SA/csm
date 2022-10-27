@@ -21,20 +21,16 @@ export async function getIdentity(keyFilePath: string): Promise<Identity> {
   const contents = fs.readFileSync(keyFilePath).toString();
   const fileExt = path.extname(keyFilePath).toLowerCase();
 
-  if (fileExt === '.pem') {
-    if (contents.indexOf('BEGIN PRIVATE KEY')) {
-      // Try to load Ed25519 private key
-      var buf = pemfile.decode(contents);
-      if (buf.length != 85) {
-        throw 'expecting byte length 85 but got ' + buf.length;
-      }
-      let privateKey = Buffer.concat([buf.slice(16, 48), buf.slice(53, 85)]);
-      const identity = Ed25519KeyIdentity.fromSecretKey(privateKey);
-      log(`Loaded Ed25519 identity ${identity.getPrincipal()} from .pem file ${keyFilePath}.`);
-      return identity;
-    } else {
-      throw 'Could not recognize the private key type.';
+  if (fileExt === '.pem' && contents.indexOf('BEGIN PRIVATE KEY') > -1) {
+    // Try to load Ed25519 private key
+    var buf = pemfile.decode(contents);
+    if (buf.length != 85) {
+      throw 'expecting byte length 85 but got ' + buf.length;
     }
+    let privateKey = Buffer.concat([buf.slice(16, 48), buf.slice(53, 85)]);
+    const identity = Ed25519KeyIdentity.fromSecretKey(privateKey);
+    log(`Loaded Ed25519 identity ${identity.getPrincipal()} from .pem file ${keyFilePath}.`);
+    return identity;
   } else if ((contents || '').split(' ').length === 12) {
     // Try to load Secp256k1 seed file
     let seed: Buffer = await mnemonicToSeed(contents);
