@@ -485,7 +485,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.05 },
+                              value: { Float: settings.args.brokerRoyalty || 0.05 },
                               immutable: true
                           },
                           {
@@ -508,7 +508,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.005 },
+                              value: { Float: 0.005 },
                               immutable: true
                           },
                           {
@@ -548,7 +548,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.05 },
+                              value: { Float: settings.args.brokerRoyalty || 0.05 },
                               immutable: true
                           },
                           {
@@ -571,7 +571,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.005 },
+                              value: { Float: 0.005 },
                               immutable: true
                           },
                           {
@@ -594,7 +594,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.05 },
+                              value: { Float: settings.args.origynatorRoyalty || 0.05 },
                               immutable: true
                           },
                           {
@@ -617,7 +617,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
                           },
                           {
                               name: "rate",
-                              value: { "Float": 0.05 },
+                              value: { Float: settings.args.customRoyalty || 0.05 },
                               immutable: true
                           },
                           {
@@ -632,7 +632,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
               ]
           }
       },
-      "immutable": false
+      immutable: false
   }
   };
   

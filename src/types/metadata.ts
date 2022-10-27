@@ -14,7 +14,7 @@ export type NatValue = {
 };
 
 export type FloatValue = {
-  Float: number;
+  Float: number | string;
 }
 
 export type BoolValue = {
