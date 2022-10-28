@@ -25,8 +25,6 @@ export function config(args: ConfigArgs): string {
 
   log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
-  settings.totalNftCount = settings.nftQuantities?.length ? settings.totalNftCount : settings.nftDefinitionCount;
-
   // build config summary
   const summary: ConfigSummary = {
     totalFilesFound: Object.keys(settings.fileMap).length,
@@ -126,6 +124,8 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
       totalNftCount += nftQuantities[i] || 1;
     }
   }
+
+  totalNftCount = nftQuantities?.length ? totalNftCount : nftDefinitionCount;
 
   if (collectionFolder) {
     collectionFolder = path.relative(stageFolder, collectionFolder);
