@@ -15,6 +15,9 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
+    brokerRoyalty: getArgValue(argv, [ '--brokerRoyalty']),
+    customRoyalty: getArgValue(argv, [ '--customRoyalty']),
+    origynatorRoyalty: getArgValue(argv, [ '--origynatorRoyalty']),
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
