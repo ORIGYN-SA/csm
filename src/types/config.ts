@@ -8,6 +8,10 @@ export type ConfigArgs = {
   creatorPrincipal: string;
   namespace: string;
   folderPath: string;
+  brokerRoyalty: string | number
+  customRoyalty: string | number,
+  origynatorRoyalty: string| number,
+ 
   // string with comma delimited list of 'asset_type:file_name, ...'
   // supports the * wildcard character
   // example: 'primary:nft*.png,experience:index.html,hidden:hidden.jpg'

@@ -25,8 +25,6 @@ export function config(args: ConfigArgs): string {
 
   log(`\n${constants.LINE_DIVIDER_SECTION}\n`);
 
-  settings.totalNftCount = settings.nftQuantities?.length ? settings.totalNftCount : settings.nftDefinitionCount;
-
   // build config summary
   const summary: ConfigSummary = {
     totalFilesFound: Object.keys(settings.fileMap).length,
@@ -126,6 +124,8 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
       totalNftCount += nftQuantities[i] || 1;
     }
   }
+
+  totalNftCount = nftQuantities?.length ? totalNftCount : nftDefinitionCount;
 
   if (collectionFolder) {
     collectionFolder = path.relative(stageFolder, collectionFolder);
@@ -467,6 +467,178 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     },
     immutable: true,
   });
+
+  function createPrimRoyalties(settings: ConfigSettings): MetadataProperty {
+    return {
+      name: 'default_royalty_primary',
+      value: {
+        Array: {
+          thawed: [
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.broker',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: settings.args.brokerRoyalty || 0.05 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.node',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: 0.005 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+          ],
+        },
+      },
+      immutable: false,
+    };
+  }
+
+  const primaryRoyalties = createPrimRoyalties(settings);
+
+  properties.push(primaryRoyalties);
+
+  function createSecRoyalties(settings: ConfigSettings): MetadataProperty {
+    return {
+      name: 'default_royalty_secondary',
+      value: {
+        Array: {
+          thawed: [
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.broker',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: settings.args.brokerRoyalty || 0.05 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.node',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: 0.005 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.originator',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: settings.args.origynatorRoyalty || 0.05 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+            {
+              Class: [
+                {
+                  name: 'tag',
+                  value: {
+                    Text: 'com.origyn.royalty.custom',
+                  },
+                  immutable: true,
+                },
+                {
+                  name: 'rate',
+                  value: { Float: settings.args.customRoyalty || 0.05 },
+                  immutable: true,
+                },
+                {
+                  name: 'account',
+                  value: {
+                    Principal: settings.args.creatorPrincipal,
+                  },
+                  immutable: false,
+                },
+              ],
+            },
+          ],
+        },
+      },
+      immutable: false,
+    };
+  }
+
+  const secondaryRoyalties = createSecRoyalties(settings);
+
+  properties.push(secondaryRoyalties);
 
   const appsAttribute = createAppsAttribute(settings);
 
@@ -830,7 +1002,10 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       log(`WITH ${resourceUrl}`);
     } else {
       const relCollFilePathLower = path
-        .relative(settings.stageFolder, path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl))
+        .relative(
+          settings.stageFolder,
+          path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl),
+        )
         .toLowerCase();
 
       if (settings.fileMap[relCollFilePathLower]) {

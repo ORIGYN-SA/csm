@@ -2,16 +2,6 @@
 
 JavaScript library for configuring, staging and minting Origyn NFTs from a local directory.
 
-### Getting Started
-
-In order to have a complete installation of the required packages, you will need to setup a [personal access token](https://github.com/settings/tokens) with the `repo` and `read:packages` scopes.
-
-Run the following to login and provide your access token as the password:
-
-```
-npm login --registry=https://npm.pkg.github.com --scope=@origyn-sa
-```
-
 ### Installation
 
 ```
@@ -34,3 +24,4 @@ Start by importing the `csm` in your code.
 import { config, stage, mint } from '@origyn-sa/csm';
 ```
 
+For a full example see https://github.com/ORIGYN-SA/minting-starter.
