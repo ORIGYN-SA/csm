@@ -6,7 +6,7 @@ export const STAGE_FOLDER = '__staged';
 export const COLLECTION_FOLDER = 'collection';
 export const DAAPS_FOLDER = 'dapps';
 export const NFTS_FOLDER = 'nfts';
-export const CONFIG_FILE_NAME = 'full_def.json';
+export const CONFIG_FILE_NAME = 'metadata.json';
 
 // HTML and CSS attributes can use double or single quotes
 // however, neither are allowed in URLs, so there
