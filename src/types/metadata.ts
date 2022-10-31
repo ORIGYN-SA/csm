@@ -14,7 +14,7 @@ export type NatValue = {
 };
 
 export type FloatValue = {
-  Float: number | string;
+  Float: number;
 }
 
 export type BoolValue = {
@@ -25,13 +25,17 @@ export type PrincipalValue = {
   Principal: string;
 };
 
+export type FrozenArrayValue = {
+  Array: { frozen: MetadataClass[] | PrincipalValue[] };
+};
+
 export type ThawedArrayValue = {
   Array: { thawed: MetadataClass[] | PrincipalValue[] };
 };
 
 export type MetadataProperty = {
   name: string;
-  value: TextValue | NatValue | BoolValue | PrincipalValue | ThawedArrayValue | MetadataClass | FloatValue;
+  value: BoolValue | NatValue | FloatValue | TextValue | PrincipalValue | FrozenArrayValue | ThawedArrayValue | MetadataClass;
   immutable: boolean;
 };
 
