@@ -104,9 +104,9 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     throw error;
   }
 
-  for (let i = 0; i < nftDefinitionCount; i++) {
-    if (i !== parseInt(nftFolderNames[i])) {
-      const error = `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 0. Missing folder ${i}.'`;
+  for (let i = 1; i <= nftDefinitionCount; i++) {
+    if (i !== parseInt(nftFolderNames[i - 1])) {
+      const error = `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 1. Missing folder ${i}.'`;
       throw error;
     }
   }
@@ -119,9 +119,9 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   let totalNftCount = 0;
   if (nftQuantities.length) {
     // get the total NFT count - needed in metadata of NFT
-    for (let i = 0; i < nftDefinitionCount; i++) {
+    for (let i = 1; i <= nftDefinitionCount; i++) {
       // default to one if no quantities specified
-      totalNftCount += nftQuantities[i] || 1;
+      totalNftCount += nftQuantities[i - 1] || 1;
     }
   }
 
@@ -216,10 +216,10 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
     };
   }
 
-  let nftIndex = 0;
-  for (let i = 0; i < settings.nftDefinitionCount; i++) {
+  let nftIndex = 1;
+  for (let i = 1; i <= settings.nftDefinitionCount; i++) {
     // defaults to 1 NFT per NFT definition
-    const nftQuantity = settings.nftQuantities?.[i] || 1;
+    const nftQuantity = settings.nftQuantities?.[i - 1] || 1;
 
     const nftFolder = path.join(settings.stageFolder, constants.NFTS_FOLDER, `${i}`);
 
@@ -362,12 +362,12 @@ function validateNoExternalUrls(stageFolder: string, files: string[]) {
 }
 
 function configureNftsMetadata(settings: ConfigSettings): Meta[] {
-  let nftIndex = 0;
+  let nftIndex = 1;
   let nfts: Meta[] = [];
 
-  for (let i = 0; i < settings.nftDefinitionCount; i++) {
+  for (let i = 1; i <= settings.nftDefinitionCount; i++) {
     // defaults to 1 NFT per NFT definition
-    const nftQuantity = settings.nftQuantities?.[i] || 1;
+    const nftQuantity = settings.nftQuantities?.[i - 1] || 1;
 
     log(`\nCreating metadata for ${nftQuantity} NFTs from NFT definition ${i}`);
 
@@ -468,181 +468,9 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: true,
   });
 
-  function createPrimRoyalties(settings: ConfigSettings): MetadataProperty {
-    return {
-      name: 'default_royalty_primary',
-      value: {
-        Array: {
-          thawed: [
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.broker',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: settings.args.brokerRoyalty || 0.05 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.node',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: 0.005 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      immutable: false,
-    };
-  }
-
-  const primaryRoyalties = createPrimRoyalties(settings);
-
-  properties.push(primaryRoyalties);
-
-  function createSecRoyalties(settings: ConfigSettings): MetadataProperty {
-    return {
-      name: 'default_royalty_secondary',
-      value: {
-        Array: {
-          thawed: [
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.broker',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: settings.args.brokerRoyalty || 0.05 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.node',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: 0.005 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.originator',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: settings.args.origynatorRoyalty || 0.05 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-            {
-              Class: [
-                {
-                  name: 'tag',
-                  value: {
-                    Text: 'com.origyn.royalty.custom',
-                  },
-                  immutable: true,
-                },
-                {
-                  name: 'rate',
-                  value: { Float: settings.args.customRoyalty || 0.05 },
-                  immutable: true,
-                },
-                {
-                  name: 'account',
-                  value: {
-                    Principal: settings.args.creatorPrincipal,
-                  },
-                  immutable: false,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      immutable: false,
-    };
-  }
-
-  const secondaryRoyalties = createSecRoyalties(settings);
-
-  properties.push(secondaryRoyalties);
-
-  const appsAttribute = createAppsAttribute(settings);
-
-  properties.push(appsAttribute);
+  properties.push(createPrimaryRoyalties(settings));
+  properties.push(createSecondaryRoyalties(settings));
+  properties.push(createAppsAttribute(settings));
 
   return {
     meta: {
@@ -651,6 +479,172 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
       },
     },
     library: libraries,
+  };
+}
+
+function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
+  return {
+    name: 'default_royalty_primary',
+    value: {
+      Array: {
+        thawed: [
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.broker',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: {
+                  Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty),
+                },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.node',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: { Float: 0.005 },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+        ],
+      },
+    },
+    immutable: false,
+  };
+}
+
+function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
+  return {
+    name: 'default_royalty_secondary',
+    value: {
+      Array: {
+        thawed: [
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.broker',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: { Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty) },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.node',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: { Float: 0.005 },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.originator',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: { Float: settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty) },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+          {
+            Class: [
+              {
+                name: 'tag',
+                value: {
+                  Text: 'com.origyn.royalty.custom',
+                },
+                immutable: true,
+              },
+              {
+                name: 'rate',
+                value: { Float: settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty) },
+                immutable: true,
+              },
+              {
+                name: 'account',
+                value: {
+                  Principal: settings.args.creatorPrincipal,
+                },
+                immutable: false,
+              },
+            ],
+          },
+        ],
+      },
+    },
+    immutable: false,
   };
 }
 
