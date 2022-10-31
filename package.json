@@ -1,6 +1,6 @@
 {
   "name": "@origyn-sa/csm",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "JavaScript library for configuring, staging and minting Origyn NFTs from a local directory.",
   "keywords": [
     "csm",
