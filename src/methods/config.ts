@@ -315,7 +315,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.nftCanisterId, !immutable));
+  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, !immutable));
   // attribs.push(
   //     createBoolAttrib('is_soulbound', settings.args.soulbound, !immutable)
   // );
@@ -454,7 +454,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.nftCanisterId, !immutable));
+  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, !immutable));
   properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true', !immutable));
 
   // build classes that point to uploaded resources
@@ -560,7 +560,9 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
               },
               {
                 name: 'rate',
-                value: { Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty) },
+                value: { 
+                  Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)
+                },
                 immutable: true,
               },
               {
@@ -606,7 +608,9 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
               },
               {
                 name: 'rate',
-                value: { Float: settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty) },
+                value: {
+                  Float: settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty)
+                },
                 immutable: true,
               },
               {
@@ -629,7 +633,9 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
               },
               {
                 name: 'rate',
-                value: { Float: settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty) },
+                value: {
+                  Float: settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty)
+                },
                 immutable: true,
               },
               {
