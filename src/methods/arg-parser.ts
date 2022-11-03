@@ -3,22 +3,22 @@ import { MintArgs } from '../types/mint';
 import { StageArgs } from '../types/stage';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
-  const nftCanisterId = getArgValue(argv, ['-i', '--nftCanisterId']);
+  const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
 
   const args: ConfigArgs = {
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
     collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
     tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
-    nftCanisterId,
-    creatorPrincipal: getArgValue(argv, ['-p', '--creatorPrincipal']),
+    nftCanisterId: getArgValue(argv, ['-i', '--nftCanisterId']),
+    creatorPrincipal,
     namespace: getArgValue(argv, ['-n', '--namespace']),
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
-    brokerRoyalty: getArgValue(argv, [ '--brokerRoyalty']),
-    customRoyalty: getArgValue(argv, [ '--customRoyalty']),
-    origynatorRoyalty: getArgValue(argv, [ '--origynatorRoyalty']),
-    nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], nftCanisterId),
+    brokerRoyalty: getArgValue(argv, [ '--brokerRoyalty'], '0.05'),
+    customRoyalty: getArgValue(argv, [ '--customRoyalty'], '0.05'),
+    origynatorRoyalty: getArgValue(argv, [ '--origynatorRoyalty'], '0.05'),
+    nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
   };
