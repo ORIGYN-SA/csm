@@ -1,7 +1,6 @@
 export const LINE_DIVIDER_SUBCOMMAND = '**************************************';
 export const LINE_DIVIDER_SECTION = '--------------------------------------';
 
-export const IMMUTABLE = true;
 export const STAGE_FOLDER = '__staged';
 export const COLLECTION_FOLDER = 'collection';
 export const DAAPS_FOLDER = 'dapps';
