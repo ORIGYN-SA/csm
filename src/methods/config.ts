@@ -707,15 +707,15 @@ function createClassForResource(
 
   return {
     Class: [
-      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId, constants.IMMUTABLE),
-      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`, constants.IMMUTABLE),
-      createTextAttrib('location_type', 'canister', constants.IMMUTABLE),
-      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl, constants.IMMUTABLE),
-      createTextAttrib('content_type', mimeType, constants.IMMUTABLE),
-      createTextAttrib('content_hash', utils.getFileHash(filePath), constants.IMMUTABLE),
-      createNatAttrib('size', fileSize, constants.IMMUTABLE),
-      createNatAttrib('sort', sort, constants.IMMUTABLE),
-      createTextAttrib('read', 'public', !constants.IMMUTABLE),
+      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId, false),
+      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`, false),
+      createTextAttrib('location_type', 'canister', false),
+      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl, false),
+      createTextAttrib('content_type', mimeType, false),
+      createTextAttrib('content_hash', utils.getFileHash(filePath), false),
+      createNatAttrib('size', fileSize, false),
+      createNatAttrib('sort', sort, false),
+      createTextAttrib('read', 'public', false),
     ],
   };
 }
@@ -911,15 +911,15 @@ function createClassesForResourceReferences(
 
     resourceReferences.push({
       Class: [
-        createTextAttrib('library_id', libraryId, constants.IMMUTABLE),
-        createTextAttrib('title', title, constants.IMMUTABLE),
-        createTextAttrib('location_type', locationType, constants.IMMUTABLE),
-        createTextAttrib('location', (location as TextValue).Text, constants.IMMUTABLE),
-        createTextAttrib('content_type', (contentType as TextValue).Text, constants.IMMUTABLE),
-        createTextAttrib('content_hash', (contentHash as TextValue).Text, constants.IMMUTABLE),
-        createNatAttrib('size', (size as NatValue).Nat, constants.IMMUTABLE),
-        createNatAttrib('sort', (sort as NatValue).Nat, constants.IMMUTABLE),
-        createTextAttrib('read', 'public', !constants.IMMUTABLE),
+        createTextAttrib('library_id', libraryId, false),
+        createTextAttrib('title', title, false),
+        createTextAttrib('location_type', locationType, false),
+        createTextAttrib('location', (location as TextValue).Text, false),
+        createTextAttrib('content_type', (contentType as TextValue).Text, false),
+        createTextAttrib('content_hash', (contentHash as TextValue).Text, false),
+        createNatAttrib('size', (size as NatValue).Nat, false),
+        createNatAttrib('sort', (sort as NatValue).Nat, false),
+        createTextAttrib('read', 'public', false),
       ],
     });
   }
