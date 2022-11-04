@@ -299,10 +299,9 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   // Creates metadata representing a collection
 
   const properties: MetadataProperty[] = [];
-  const immutable = true;
 
   // The id for a collection is an empty string
-  properties.push(createTextAttrib('id', '', immutable));
+  properties.push(createTextAttrib('id', '', false));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
@@ -310,14 +309,14 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
       createTextAttrib(
         `${settings.args.namespace}.${assetType}`,
         `${settings.args.namespace}.${mappings[assetType]}`,
-        immutable,
+        false,
       ),
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, !immutable));
+  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, false));
   // attribs.push(
-  //     createBoolAttrib('is_soulbound', settings.args.soulbound, !immutable)
+  //     createBoolAttrib('is_soulbound', settings.args.soulbound, false)
   // );
 
   // build classes that point to uploaded resources
@@ -328,7 +327,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
     value: {
       Array: { thawed: [...resourceReferences] },
     },
-    immutable: true,
+    immutable: false,
   });
 
   const appsAttribute = createAppsAttribute(settings);
@@ -443,19 +442,18 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   // Creates metadata representing a single NFT
 
   const properties: MetadataProperty[] = [];
-  const immutable = true;
 
-  properties.push(createTextAttrib('id', tokenId, immutable));
+  properties.push(createTextAttrib('id', tokenId, false));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
     properties.push(
-      createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`, immutable),
+      createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`, false),
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, !immutable));
-  properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true', !immutable));
+  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, false));
+  properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true', false));
 
   // build classes that point to uploaded resources
   const resourceRefs = createClassesForResourceReferences(settings, resources, libraries);
@@ -465,7 +463,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     value: {
       Array: { thawed: [...resourceRefs] },
     },
-    immutable: true,
+    immutable: false,
   });
 
   properties.push(createPrimaryRoyalties(settings));
@@ -495,14 +493,14 @@ function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.broker',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: {
                   Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty),
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
@@ -520,12 +518,12 @@ function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.node',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: { Float: 0.005 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
@@ -556,14 +554,14 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.broker',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: { 
                   Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
@@ -581,12 +579,12 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.node',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: { Float: 0.005 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
@@ -604,14 +602,14 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.originator',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: {
                   Float: settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty)
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
@@ -629,14 +627,14 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Text: 'com.origyn.royalty.custom',
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'rate',
                 value: {
                   Float: settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty)
                 },
-                immutable: true,
+                immutable: false,
               },
               {
                 name: 'account',
