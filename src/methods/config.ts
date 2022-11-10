@@ -307,7 +307,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   for (let assetType in mappings) {
     properties.push(
       createTextAttrib(
-        `${settings.args.namespace}.${assetType}`,
+        `${assetType}_asset`,
         `${settings.args.namespace}.${mappings[assetType]}`,
         false,
       ),
@@ -448,7 +448,11 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
     properties.push(
-      createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`, false),
+      createTextAttrib(
+        `${assetType}_asset`,
+        `${settings.args.namespace}.${assetTypeMap[assetType]}`,
+        false,
+      ),
     );
   }
 
