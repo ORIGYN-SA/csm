@@ -301,7 +301,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   const properties: MetadataProperty[] = [];
 
   // The id for a collection is an empty string
-  properties.push(createTextAttrib('id', '', false));
+  properties.push(createTextAttrib('id', ''));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
@@ -309,12 +309,11 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
       createTextAttrib(
         `${assetType}_asset`,
         `${settings.args.namespace}.${mappings[assetType]}`,
-        false,
       ),
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, false));
+  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
   // attribs.push(
   //     createBoolAttrib('is_soulbound', settings.args.soulbound, false)
   // );
@@ -443,7 +442,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 
   const properties: MetadataProperty[] = [];
 
-  properties.push(createTextAttrib('id', tokenId, false));
+  properties.push(createTextAttrib('id', tokenId));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
@@ -451,13 +450,12 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
       createTextAttrib(
         `${assetType}_asset`,
         `${settings.args.namespace}.${assetTypeMap[assetType]}`,
-        false,
       ),
     );
   }
 
-  properties.push(createTextAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal, false));
-  properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true', false));
+  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
+  properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
 
   // build classes that point to uploaded resources
   const resourceRefs = createClassesForResourceReferences(settings, resources, libraries);
@@ -492,50 +490,16 @@ function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
         thawed: [
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.broker',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: {
-                  Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty),
-                },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.broker'),
+              createFloatAttrib('rate', settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.node',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: { Float: 0.005 },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.node'),
+              createFloatAttrib('rate', 0.005),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
         ],
@@ -553,100 +517,30 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
         thawed: [
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.broker',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: { 
-                  Float: settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)
-                },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.broker'),
+              createFloatAttrib('rate', settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.node',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: { Float: 0.005 },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.node'),
+              createFloatAttrib('rate', 0.005),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.originator',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: {
-                  Float: settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty)
-                },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.originator'),
+              createFloatAttrib('rate', settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty)),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
           {
             Class: [
-              {
-                name: 'tag',
-                value: {
-                  Text: 'com.origyn.royalty.custom',
-                },
-                immutable: false,
-              },
-              {
-                name: 'rate',
-                value: {
-                  Float: settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty)
-                },
-                immutable: false,
-              },
-              {
-                name: 'account',
-                value: {
-                  Principal: settings.args.creatorPrincipal,
-                },
-                immutable: false,
-              },
+              createTextAttrib('tag', 'com.origyn.royalty.custom'),
+              createFloatAttrib('rate', settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty)),
+              createPrincipalAttrib('account', settings.args.creatorPrincipal),
             ],
           },
         ],
@@ -711,15 +605,15 @@ function createClassForResource(
 
   return {
     Class: [
-      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId, false),
-      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`, false),
-      createTextAttrib('location_type', 'canister', false),
-      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl, false),
-      createTextAttrib('content_type', mimeType, false),
-      createTextAttrib('content_hash', utils.getFileHash(filePath), false),
-      createNatAttrib('size', fileSize, false),
-      createNatAttrib('sort', sort, false),
-      createTextAttrib('read', 'public', false),
+      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId),
+      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`),
+      createTextAttrib('location_type', 'canister'),
+      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl),
+      createTextAttrib('content_type', mimeType),
+      createTextAttrib('content_hash', utils.getFileHash(filePath)),
+      createNatAttrib('size', fileSize),
+      createNatAttrib('sort', sort),
+      createTextAttrib('read', 'public'),
     ],
   };
 }
@@ -733,7 +627,7 @@ function createLibrary(settings: ConfigSettings, filePath: string): LibraryFile 
   };
 }
 
-function createTextAttrib(name: string, value: string, immutable: boolean): MetadataProperty {
+function createTextAttrib(name: string, value: string, immutable: boolean = false): MetadataProperty {
   return {
     name,
     value: { Text: value },
@@ -741,7 +635,15 @@ function createTextAttrib(name: string, value: string, immutable: boolean): Meta
   };
 }
 
-function createBoolAttrib(name: string, value: boolean, immutable: boolean): MetadataProperty {
+function createPrincipalAttrib(name: string, value: string, immutable: boolean = false): MetadataProperty {
+  return {
+    name,
+    value: { Principal: value },
+    immutable,
+  };
+}
+
+function createBoolAttrib(name: string, value: boolean, immutable: boolean = false): MetadataProperty {
   return {
     name,
     value: { Bool: value },
@@ -749,10 +651,18 @@ function createBoolAttrib(name: string, value: boolean, immutable: boolean): Met
   };
 }
 
-function createNatAttrib(name: string, value: number, immutable: boolean): MetadataProperty {
+function createNatAttrib(name: string, value: number, immutable: boolean = false): MetadataProperty {
   return {
     name,
     value: { Nat: value },
+    immutable,
+  };
+}
+
+function createFloatAttrib(name: string, value: number, immutable: boolean = false): MetadataProperty {
+  return {
+    name,
+    value: { Float: value },
     immutable,
   };
 }
@@ -915,15 +825,15 @@ function createClassesForResourceReferences(
 
     resourceReferences.push({
       Class: [
-        createTextAttrib('library_id', libraryId, false),
-        createTextAttrib('title', title, false),
-        createTextAttrib('location_type', locationType, false),
-        createTextAttrib('location', (location as TextValue).Text, false),
-        createTextAttrib('content_type', (contentType as TextValue).Text, false),
-        createTextAttrib('content_hash', (contentHash as TextValue).Text, false),
-        createNatAttrib('size', (size as NatValue).Nat, false),
-        createNatAttrib('sort', (sort as NatValue).Nat, false),
-        createTextAttrib('read', 'public', false),
+        createTextAttrib('library_id', libraryId),
+        createTextAttrib('title', title),
+        createTextAttrib('location_type', locationType),
+        createTextAttrib('location', (location as TextValue).Text),
+        createTextAttrib('content_type', (contentType as TextValue).Text),
+        createTextAttrib('content_hash', (contentHash as TextValue).Text),
+        createNatAttrib('size', (size as NatValue).Nat),
+        createNatAttrib('sort', (sort as NatValue).Nat),
+        createTextAttrib('read', 'public'),
       ],
     });
   }
