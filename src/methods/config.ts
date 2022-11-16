@@ -302,6 +302,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // The id for a collection is an empty string
   properties.push(createTextAttrib('id', ''));
+  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
@@ -313,13 +314,15 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
     );
   }
 
-  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
   // attribs.push(
   //     createBoolAttrib('is_soulbound', settings.args.soulbound, false)
   // );
 
   // build classes that point to uploaded resources
   const resourceReferences = createClassesForResourceReferences(settings, resources, settings.collectionLibraries);
+  
+  properties.push(createPrimaryRoyalties(settings));
+  properties.push(createSecondaryRoyalties(settings));
 
   properties.push({
     name: 'library',
@@ -443,6 +446,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   const properties: MetadataProperty[] = [];
 
   properties.push(createTextAttrib('id', tokenId));
+  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
@@ -454,7 +458,6 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     );
   }
 
-  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
   properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
 
   // build classes that point to uploaded resources
@@ -468,8 +471,6 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: false,
   });
 
-  properties.push(createPrimaryRoyalties(settings));
-  properties.push(createSecondaryRoyalties(settings));
   properties.push(createAppsAttribute(settings));
 
   return {
