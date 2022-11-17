@@ -27,19 +27,23 @@ export type ConfigArgs = {
   // example: '0:3,1:3,2:5,3:10'
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
-  brokerPrincipal: string;
 
   nodePrincipal: string;
 
   originatorPrincipal: string;
 
+  customPrincipal: string;
+
   networkPrincipal: string;
 
-  customPrincipal: string;
 
   primaryBrokerRate: string;
 
   primaryNodeRate: string;
+
+  primaryOriginatorRate: string;
+
+  primaryCustomRate: string;
 
   primaryNetworkRate: string;
 

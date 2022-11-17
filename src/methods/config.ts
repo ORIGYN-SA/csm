@@ -323,6 +323,12 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   
   properties.push(createOrigynNode(settings))
   properties.push(createOrigynOrigynator(settings))
+  properties.push(createOrigynNetwork(settings))
+
+  if (settings.args.customPrincipal) {
+    properties.push(createOrigynCustom(settings))
+  }
+
   properties.push(createPrimaryRoyalties(settings));
   properties.push(createSecondaryRoyalties(settings));
 
@@ -486,41 +492,55 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 }
 
 function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
+
+  let royalties = [
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
+        createFloatAttribTrue('rate', Number(settings.args.primaryBrokerRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.node'),
+        createFloatAttribTrue('rate', Number(settings.args.primaryNodeRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.network'),
+        createFloatAttribTrue('rate', Number(settings.args.primaryNetworkRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.originator'),
+        createFloatAttribTrue('rate', Number(settings.args.primaryOriginatorRate)),
+      ],
+    },
+  ];
+
+
+
+  if (settings.args.primaryCustomRate) {
+    let custom = {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.custom'),
+        createFloatAttribTrue('rate', Number(settings.args.primaryCustomRate)),
+      ],
+    };
+
+    royalties.push(custom);
+  }
+
   return {
     name: 'com.origyn.royalties.primary.default',
     value: {
       Array: {
-        frozen: [
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
-              createFloatAttribTrue('rate', Number(settings.args.primaryBrokerRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.node'),
-              createFloatAttribTrue('rate', Number(settings.args.primaryNodeRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.network'),
-              createFloatAttribTrue('rate', Number(settings.args.primaryNetworkRate)),
-            ],
-          },
-        ],
+        frozen: royalties
       },
     },
     immutable: false,
-  };
-}
-
-function createOrigynBroker(settings: ConfigSettings): MetadataProperty {
-  return {
-    name: 'com.origyn.broker',
-    value: { Principal: settings.args.brokerPrincipal },
-    immutable: true,
   };
 }
 
@@ -550,55 +570,57 @@ function createOrigynNetwork( settings: ConfigSettings): MetadataProperty {
 
 function createOrigynCustom( settings: ConfigSettings): MetadataProperty {
   return {
-    name: 'com.origyn.custom',
+    name: 'com.origyn.network',
     value: { Principal: settings.args.customPrincipal },
     immutable: true,
   };
 }
 
 function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
+
+  let royalties = [
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
+        createFloatAttribTrue('rate', Number(settings.args.secondaryBrokerRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.node'),
+        createFloatAttribTrue('rate', Number(settings.args.secondaryNodeRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.originator'),
+        createFloatAttribTrue('rate', Number(settings.args.secondaryOriginatorRate)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.network'),
+        createFloatAttribTrue('rate', Number(settings.args.secondaryNetworkRate)),
+      ],
+    },
+  ];
+
+  if (settings.args.secondaryCustomRate) {
+    let custom = {
+      Class: [
+        createTextAttribTrue('tag', 'com.origyn.royalty.custom'),
+        createFloatAttribTrue('rate', Number(settings.args.secondaryCustomRate)),
+      ],
+    };
+    
+    royalties.push(custom);
+  }
+
   return {
     name: 'com.origyn.royalties.secondary.default',
     value: {
       Array: {
-        frozen: [
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryBrokerRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.node'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryNodeRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.originator'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryOriginatorRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.custom'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryCustomRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryBrokerRate)),
-            ],
-          },
-          {
-            Class: [
-              createTextAttribTrue('tag', 'com.origyn.royalty.network'),
-              createFloatAttribTrue('rate', Number(settings.args.secondaryNetworkRate)),
-            ],
-          },
-        ],
+        frozen: royalties
       },
     },
     immutable: false,

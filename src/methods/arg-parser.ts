@@ -4,6 +4,8 @@ import { StageArgs } from '../types/stage';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
+  
+  const OrigynGovCanisterId: string = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
   const args: ConfigArgs = {
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
@@ -21,30 +23,32 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
-    
-    brokerPrincipal: getArgValue(argv, ['--brokerPrincipal'], '{principal-id}'),
 
-    nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], '{principal-id}'),
+    nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], OrigynGovCanisterId),
 
-    originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], '{principal-id}'),
+    customPrincipal: getArgValue(argv, ['--customPrincipal']),
 
-    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], '{principal-id}'),
+    originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
 
-    customPrincipal: getArgValue(argv, ['--customPrincipal'], '{principal-id}'),
+    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], OrigynGovCanisterId),
 
-    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.06'),
+    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
 
-    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.07777'),
+    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.035'),
+
+    primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate'], '0.01'),
 
     primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
 
-    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.01'),
+    primaryCustomRate: getArgValue(argv, ['--primaryCustomRate']),
 
-    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.02'),
+    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
 
-    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.03333333333'),
+    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
 
-    secondaryCustomRate: getArgValue(argv, ['--secondaryCustomRate'], '0.05'),
+    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
+
+    secondaryCustomRate: getArgValue(argv, ['--secondaryCustomRate']),
 
     secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
   };
