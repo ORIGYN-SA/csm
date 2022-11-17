@@ -304,6 +304,17 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   properties.push(createTextAttrib('id', ''));
   properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
+  properties.push(createOrigynNode(settings))
+  properties.push(createOrigynOrigynator(settings))
+  properties.push(createOrigynNetwork(settings))
+
+  if (settings.args.customPrincipal) {
+    properties.push(createOrigynCustom(settings))
+  }
+
+  properties.push(createPrimaryRoyalties(settings));
+  properties.push(createSecondaryRoyalties(settings));
+
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
     properties.push(
@@ -320,17 +331,6 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // build classes that point to uploaded resources
   const resourceReferences = createClassesForResourceReferences(settings, resources, settings.collectionLibraries);
-  
-  properties.push(createOrigynNode(settings))
-  properties.push(createOrigynOrigynator(settings))
-  properties.push(createOrigynNetwork(settings))
-
-  if (settings.args.customPrincipal) {
-    properties.push(createOrigynCustom(settings))
-  }
-
-  properties.push(createPrimaryRoyalties(settings));
-  properties.push(createSecondaryRoyalties(settings));
 
   properties.push({
     name: 'library',
