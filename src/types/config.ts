@@ -8,9 +8,6 @@ export type ConfigArgs = {
   creatorPrincipal: string;
   namespace: string;
   folderPath: string;
-  brokerRoyalty: string;
-  customRoyalty: string;
-  origynatorRoyalty: string;
 
   // string with comma delimited list of 'asset_type:file_name, ...'
   // supports the * wildcard character
