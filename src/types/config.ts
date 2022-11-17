@@ -11,7 +11,7 @@ export type ConfigArgs = {
   brokerRoyalty: string;
   customRoyalty: string;
   origynatorRoyalty: string;
- 
+
   // string with comma delimited list of 'asset_type:file_name, ...'
   // supports the * wildcard character
   // example: 'primary:nft*.png,experience:index.html,hidden:hidden.jpg'
@@ -27,6 +27,31 @@ export type ConfigArgs = {
   // example: '0:3,1:3,2:5,3:10'
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
+  brokerPrincipal: string;
+
+  nodePrincipal: string;
+
+  originatorPrincipal: string;
+
+  networkPrincipal: string;
+
+  customPrincipal: string;
+
+  primaryBrokerRate: string;
+
+  primaryNodeRate: string;
+
+  primaryNetworkRate: string;
+
+  secondaryBrokerRate: string;
+
+  secondaryNodeRate: string;
+
+  secondaryOriginatorRate: string;
+
+  secondaryCustomRate: string;
+
+  secondaryNetworkRate: string;
 };
 
 export type ConfigSettings = {

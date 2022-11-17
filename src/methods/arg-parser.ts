@@ -15,12 +15,37 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
     //optional args
-    brokerRoyalty: getArgValue(argv, [ '--brokerRoyalty'], '0.05'),
-    customRoyalty: getArgValue(argv, [ '--customRoyalty'], '0.05'),
-    origynatorRoyalty: getArgValue(argv, [ '--origynatorRoyalty'], '0.05'),
+    brokerRoyalty: getArgValue(argv, ['--brokerRoyalty'], '0.05'),
+    customRoyalty: getArgValue(argv, ['--customRoyalty'], '0.05'),
+    origynatorRoyalty: getArgValue(argv, ['--origynatorRoyalty'], '0.05'),
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
+    brokerPrincipal: getArgValue(argv, ['--brokerPrincipal'], '{principal-id}'),
+
+    nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], '{principal-id}'),
+
+    originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], '{principal-id}'),
+
+    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], '{principal-id}'),
+
+    customPrincipal: getArgValue(argv, ['--customPrincipal'], '{principal-id}'),
+
+    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.06'),
+
+    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.07777'),
+
+    primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
+
+    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.01'),
+
+    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.02'),
+
+    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.03333333333'),
+
+    secondaryCustomRate: getArgValue(argv, ['--secondaryCustomRate'], '0.05'),
+
+    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
   };
 
   // validate args
