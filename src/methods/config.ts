@@ -516,6 +516,14 @@ function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
   };
 }
 
+function createOrigynBroker(settings: ConfigSettings): MetadataProperty {
+  return {
+    name: 'com.origyn.broker',
+    value: { Principal: settings.args.brokerPrincipal },
+    immutable: true,
+  };
+}
+
 function createOrigynNode(settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.node',
@@ -528,6 +536,22 @@ function createOrigynOrigynator( settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.origynator',
     value: { Principal: settings.args.originatorPrincipal },
+    immutable: true,
+  };
+}
+
+function createOrigynNetwork( settings: ConfigSettings): MetadataProperty {
+  return {
+    name: 'com.origyn.network',
+    value: { Principal: settings.args.networkPrincipal },
+    immutable: true,
+  };
+}
+
+function createOrigynCustom( settings: ConfigSettings): MetadataProperty {
+  return {
+    name: 'com.origyn.custom',
+    value: { Principal: settings.args.customPrincipal },
     immutable: true,
   };
 }

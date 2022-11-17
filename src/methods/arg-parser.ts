@@ -21,6 +21,7 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
+    
     brokerPrincipal: getArgValue(argv, ['--brokerPrincipal'], '{principal-id}'),
 
     nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], '{principal-id}'),
