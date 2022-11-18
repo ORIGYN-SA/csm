@@ -1,4 +1,4 @@
-import { AssetTypeMap, ConfigArgs } from '../types/config';
+import { AssetTypeMap, ConfigArgs, CustomPrimaryRatesTypes, CustomSecondaryRatesTypes } from '../types/config';
 import { MintArgs } from '../types/mint';
 import { StageArgs } from '../types/stage';
 
@@ -38,17 +38,19 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
     primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
 
-    primaryCustomRate: getArgValue(argv, ['--primaryCustomRate']),
-
     secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
 
     secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
 
     secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
 
-    secondaryCustomRate: getArgValue(argv, ['--secondaryCustomRate']),
-
     secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
+
+    // custom royalties
+    primaryCustomRates: getArgValue(argv, ['--primaryCustomRates']),
+
+    secondaryCustomRates: getArgValue(argv, ['--secondaryCustomRates']),
+
   };
 
   // validate args
@@ -115,10 +117,8 @@ export function parseMintArgs(argv: string[]): MintArgs {
   return args;
 }
 export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
-  // parses (with validation):
-  // 'primary:index#.html, experience:index#.html, preview:preview#.png'
-  // to:
-  // { primary: 'index#.html', experience: 'index#.html', preview: 'preview#.png' }
+
+ // --assetType "primary:nft*.png, preview:preview*.png"
 
   const assetTypeMapPatterns = {};
 
@@ -126,13 +126,15 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 2) {
+      if (m.length != 2) { 
         const err = `Invalid syntax for mapping asset types to file names. ${m}`;
         throw err;
       }
 
       const assetType = m[0].trim().toLowerCase();
       const fileName = m[1].trim();
+
+
 
       if (!['primary', 'preview', 'experience', 'hidden'].includes(assetType)) {
         const err = `Invalid asset type '${assetType}'. Valid types are: 'primary', 'preview', 'experience' and 'hidden'.`;
@@ -143,6 +145,32 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     });
 
   return assetTypeMapPatterns;
+}
+
+export function parseCustomPrimaryRates(patterns: string) : CustomPrimaryRatesTypes {
+
+  let customPrimaryRates = {};
+
+  patterns
+    .split(/\s?,\s?/)
+    .map((n) => n.split(/\s?:\s?/))
+    .forEach((m) => {
+      if (m.length != 3) { 
+        const err = `Invalid syntax for custom rates. ${m}`;
+        throw err;
+      }
+
+      const customName = m[0].trim().toLowerCase();
+      const rate = m[1].trim();
+      const principalId = m[2].trim();
+
+      customPrimaryRates = {
+        customName: customName,
+        rate: rate,
+        principal: principalId
+    }})
+
+  return customPrimaryRates 
 }
 
 function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {

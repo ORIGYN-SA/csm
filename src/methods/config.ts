@@ -5,7 +5,7 @@ import * as utils from '../utils';
 import mime from 'mime-types';
 import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap } from '../types/config';
 import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
-import { parseAssetTypeMapPatterns } from './arg-parser';
+import { parseAssetTypeMapPatterns, parseCustomPrimaryRates } from './arg-parser';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
 import { log } from './logger';
 
@@ -308,10 +308,6 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   properties.push(createOrigynOrigynator(settings))
   properties.push(createOrigynNetwork(settings))
 
-  if (settings.args.customPrincipal) {
-    properties.push(createOrigynCustom(settings))
-  }
-
   properties.push(createPrimaryRoyalties(settings));
   properties.push(createSecondaryRoyalties(settings));
 
@@ -491,47 +487,50 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   };
 }
 
-function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
+function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
 
   let royalties = [
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
-        createFloatAttribTrue('rate', Number(settings.args.primaryBrokerRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.broker'),
+        createFloatAttrib('rate', Number(settings.args.primaryBrokerRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.node'),
-        createFloatAttribTrue('rate', Number(settings.args.primaryNodeRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.node'),
+        createFloatAttrib('rate', Number(settings.args.primaryNodeRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.network'),
-        createFloatAttribTrue('rate', Number(settings.args.primaryNetworkRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.network'),
+        createFloatAttrib('rate', Number(settings.args.primaryNetworkRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.originator'),
-        createFloatAttribTrue('rate', Number(settings.args.primaryOriginatorRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.originator'),
+        createFloatAttrib('rate', Number(settings.args.primaryOriginatorRate)),
       ],
     },
   ];
 
+  const customPrimary: any = parseCustomPrimaryRates(settings.args.primaryCustomRates)
 
-
-  if (settings.args.primaryCustomRate) {
+  if (settings.args.primaryCustomRates) {
     let custom = {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.custom'),
-        createFloatAttribTrue('rate', Number(settings.args.primaryCustomRate)),
+        createTextAttrib('tag', customPrimary.customName),
+        createFloatAttrib('rate', Number(customPrimary.rate)),
+        createPrincipalAttrib('account', customPrimary.principal)
       ],
     };
-
+    
     royalties.push(custom);
   }
+
+
 
   return {
     name: 'com.origyn.royalties.primary.default',
@@ -548,7 +547,7 @@ function createOrigynNode(settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.node',
     value: { Principal: settings.args.nodePrincipal },
-    immutable: true,
+    immutable: false,
   };
 }
 
@@ -556,7 +555,7 @@ function createOrigynOrigynator( settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.origynator',
     value: { Principal: settings.args.originatorPrincipal },
-    immutable: true,
+    immutable: false,
   };
 }
 
@@ -564,15 +563,7 @@ function createOrigynNetwork( settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.network',
     value: { Principal: settings.args.networkPrincipal },
-    immutable: true,
-  };
-}
-
-function createOrigynCustom( settings: ConfigSettings): MetadataProperty {
-  return {
-    name: 'com.origyn.network',
-    value: { Principal: settings.args.customPrincipal },
-    immutable: true,
+    immutable: false,
   };
 }
 
@@ -581,35 +572,38 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
   let royalties = [
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.broker'),
-        createFloatAttribTrue('rate', Number(settings.args.secondaryBrokerRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.broker'),
+        createFloatAttrib('rate', Number(settings.args.secondaryBrokerRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.node'),
-        createFloatAttribTrue('rate', Number(settings.args.secondaryNodeRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.node'),
+        createFloatAttrib('rate', Number(settings.args.secondaryNodeRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.originator'),
-        createFloatAttribTrue('rate', Number(settings.args.secondaryOriginatorRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.originator'),
+        createFloatAttrib('rate', Number(settings.args.secondaryOriginatorRate)),
       ],
     },
     {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.network'),
-        createFloatAttribTrue('rate', Number(settings.args.secondaryNetworkRate)),
+        createTextAttrib('tag', 'com.origyn.royalty.network'),
+        createFloatAttrib('rate', Number(settings.args.secondaryNetworkRate)),
       ],
     },
   ];
 
-  if (settings.args.secondaryCustomRate) {
+  const customPrimary: any = parseCustomPrimaryRates(settings.args.secondaryCustomRates)
+
+  if (settings.args.secondaryCustomRates) {
     let custom = {
       Class: [
-        createTextAttribTrue('tag', 'com.origyn.royalty.custom'),
-        createFloatAttribTrue('rate', Number(settings.args.secondaryCustomRate)),
+        createTextAttrib('tag', customPrimary.customName),
+        createFloatAttrib('rate', Number(customPrimary.rate)),
+        createPrincipalAttrib('account', customPrimary.principal)
       ],
     };
     

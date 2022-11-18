@@ -40,8 +40,6 @@ export type ConfigArgs = {
 
   primaryOriginatorRate: string;
 
-  primaryCustomRate: string;
-
   primaryNetworkRate: string;
 
   secondaryBrokerRate: string;
@@ -50,9 +48,11 @@ export type ConfigArgs = {
 
   secondaryOriginatorRate: string;
 
-  secondaryCustomRate: string;
-
   secondaryNetworkRate: string;
+
+  primaryCustomRates: string;
+
+  secondaryCustomRates: string;
 };
 
 export type ConfigSettings = {
@@ -86,6 +86,18 @@ export type AssetTypeMap = {
   experience?: string;
   hidden?: string;
 };
+
+export type CustomPrimaryRatesTypes = {
+  customName?: string;
+  principalId?: string;
+  rate?: string
+}
+
+export type CustomSecondaryRatesTypes = {
+  customName?: string;
+  principal?: string;
+  rate?: string;
+}
 
 export type ConfigSummary = {
   totalFilesFound: number;
