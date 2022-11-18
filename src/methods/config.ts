@@ -5,7 +5,7 @@ import * as utils from '../utils';
 import mime from 'mime-types';
 import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap } from '../types/config';
 import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
-import { parseAssetTypeMapPatterns, parseCustomPrimaryRates } from './arg-parser';
+import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
 import { log } from './logger';
 
@@ -516,7 +516,7 @@ function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
     },
   ];
 
-  const customPrimary: any = parseCustomPrimaryRates(settings.args.primaryCustomRates)
+  const customPrimary: any = parseCustomRates(settings.args.primaryCustomRates)
 
   if (settings.args.primaryCustomRates) {
     let custom = {
@@ -596,7 +596,7 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
     },
   ];
 
-  const customPrimary: any = parseCustomPrimaryRates(settings.args.secondaryCustomRates)
+  const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates)
 
   if (settings.args.secondaryCustomRates) {
     let custom = {
