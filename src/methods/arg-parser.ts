@@ -147,9 +147,9 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
   return assetTypeMapPatterns;
 }
 
-export function parseCustomPrimaryRates(patterns: string) : CustomPrimaryRatesTypes {
+export function parseCustomRates(patterns: string) : CustomPrimaryRatesTypes {
 
-  let customPrimaryRates = {};
+  let customRates = {};
 
   patterns
     .split(/\s?,\s?/)
@@ -164,13 +164,13 @@ export function parseCustomPrimaryRates(patterns: string) : CustomPrimaryRatesTy
       const rate = m[1].trim();
       const principalId = m[2].trim();
 
-      customPrimaryRates = {
+      customRates = {
         customName: customName,
         rate: rate,
         principal: principalId
     }})
 
-  return customPrimaryRates 
+  return customRates 
 }
 
 function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
