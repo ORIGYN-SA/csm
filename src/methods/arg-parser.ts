@@ -162,11 +162,11 @@ export function parseCustomRates(patterns: string) : CustomPrimaryRatesTypes {
       const rate = m[1].trim();
       const principalId = m[2].trim();
 
-      customRates = [
-        ...customName,
-        ...rate,
-        ...principalId
-    ]})
+      customRates = [{
+        customName: customName,
+        rate: rate,
+        principal: principalId
+    }]})
 
   return customRates 
 }

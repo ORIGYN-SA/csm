@@ -304,21 +304,16 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   properties.push(createTextAttrib('id', ''));
   properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
-  properties.push(createOrigynNode(settings))
-  properties.push(createOrigynOrigynator(settings))
-  properties.push(createOrigynNetwork(settings))
+  properties.push(createOrigynNode(settings));
+  properties.push(createOrigynOrigynator(settings));
+  properties.push(createOrigynNetwork(settings));
 
   properties.push(createPrimaryRoyalties(settings));
   properties.push(createSecondaryRoyalties(settings));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
-    properties.push(
-      createTextAttrib(
-        `${assetType}_asset`,
-        `${settings.args.namespace}.${mappings[assetType]}`,
-      ),
-    );
+    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${mappings[assetType]}`));
   }
 
   // attribs.push(
@@ -454,12 +449,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
-    properties.push(
-      createTextAttrib(
-        `${assetType}_asset`,
-        `${settings.args.namespace}.${assetTypeMap[assetType]}`,
-      ),
-    );
+    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`));
   }
 
   properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
@@ -487,8 +477,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   };
 }
 
-function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
-
+function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
   let royalties = [
     {
       Class: [
@@ -516,30 +505,25 @@ function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
     },
   ];
 
-  
-
   if (settings.args.primaryCustomRates) {
-
-    const customPrimary: any = parseCustomRates(settings.args.primaryCustomRates)
+    const customPrimary: any = parseCustomRates(settings.args.primaryCustomRates);
 
     let custom = {
       Class: [
         createTextAttrib('tag', `${'com.origyn.royalty.'}${customPrimary.customName}`),
         createFloatAttrib('rate', Number(customPrimary.rate)),
-        createPrincipalAttrib('account', customPrimary.principal)
+        createPrincipalAttrib('account', customPrimary.principal),
       ],
     };
-    
+
     royalties.push(custom);
   }
-
-
 
   return {
     name: 'com.origyn.royalties.primary.default',
     value: {
       Array: {
-        frozen: royalties
+        frozen: royalties,
       },
     },
     immutable: false,
@@ -554,7 +538,7 @@ function createOrigynNode(settings: ConfigSettings): MetadataProperty {
   };
 }
 
-function createOrigynOrigynator( settings: ConfigSettings): MetadataProperty {
+function createOrigynOrigynator(settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.origynator',
     value: { Principal: settings.args.originatorPrincipal },
@@ -562,7 +546,7 @@ function createOrigynOrigynator( settings: ConfigSettings): MetadataProperty {
   };
 }
 
-function createOrigynNetwork( settings: ConfigSettings): MetadataProperty {
+function createOrigynNetwork(settings: ConfigSettings): MetadataProperty {
   return {
     name: 'com.origyn.network',
     value: { Principal: settings.args.networkPrincipal },
@@ -571,7 +555,6 @@ function createOrigynNetwork( settings: ConfigSettings): MetadataProperty {
 }
 
 function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
-
   let royalties = [
     {
       Class: [
@@ -599,28 +582,27 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
     },
   ];
 
-
-
   if (settings.args.secondaryCustomRates) {
+    const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates);
 
-    const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates)
-    
-    let custom = {
-      Class: [
-        createTextAttrib('tag', `${'com.origyn.royalty.'}${customPrimary.customName}`),
-        createFloatAttrib('rate', Number(customPrimary.rate)),
-        createPrincipalAttrib('account', customPrimary.principal)
-      ],
-    };
-    
-    royalties.push(custom);
+    customPrimary.forEach((array) => {
+      let custom = {
+        Class: [
+          createTextAttrib('tag', `${'com.origyn.royalty.'}${array.customName}`),
+          createFloatAttrib('rate', Number(array.rate)),
+          createPrincipalAttrib('account', array.principal),
+        ],
+      };
+
+      royalties.push(custom);
+    });
   }
 
   return {
     name: 'com.origyn.royalties.secondary.default',
     value: {
       Array: {
-        frozen: royalties
+        frozen: royalties,
       },
     },
     immutable: false,
