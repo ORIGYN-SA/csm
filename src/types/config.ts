@@ -29,8 +29,6 @@ export type ConfigArgs = {
 
   originatorPrincipal: string;
 
-  customPrincipal: string;
-
   networkPrincipal: string;
 
 

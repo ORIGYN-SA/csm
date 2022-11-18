@@ -24,8 +24,6 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
     nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], OrigynGovCanisterId),
 
-    customPrincipal: getArgValue(argv, ['--customPrincipal']),
-
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
 
     networkPrincipal: getArgValue(argv, ['--networkPrincipal'], OrigynGovCanisterId),
