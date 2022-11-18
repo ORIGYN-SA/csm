@@ -524,9 +524,9 @@ function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
 
     let custom = {
       Class: [
-        createTextAttrib('tag', customPrimary.customName),
+        createTextAttrib('tag', `${'com.origyn.royalty.'}${customPrimary.customName}`),
         createFloatAttrib('rate', Number(customPrimary.rate)),
-        createPrincipalAttrib('account', `${'com.origyn.royalty.'}${customPrimary.principal}`)
+        createPrincipalAttrib('account', customPrimary.principal)
       ],
     };
     
@@ -604,12 +604,12 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
   if (settings.args.secondaryCustomRates) {
 
     const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates)
-
+    
     let custom = {
       Class: [
-        createTextAttrib('tag', customPrimary.customName),
+        createTextAttrib('tag', `${'com.origyn.royalty.'}${customPrimary.customName}`),
         createFloatAttrib('rate', Number(customPrimary.rate)),
-        createPrincipalAttrib('account', `${'com.origyn.royalty.'}${customPrimary.principal}`)
+        createPrincipalAttrib('account', customPrimary.principal)
       ],
     };
     
