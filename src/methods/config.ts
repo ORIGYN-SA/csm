@@ -516,9 +516,12 @@ function createPrimaryRoyalties(settings: ConfigSettings ): MetadataProperty {
     },
   ];
 
-  const customPrimary: any = parseCustomRates(settings.args.primaryCustomRates)
+  
 
   if (settings.args.primaryCustomRates) {
+
+    const customPrimary: any = parseCustomRates(settings.args.primaryCustomRates)
+
     let custom = {
       Class: [
         createTextAttrib('tag', customPrimary.customName),
@@ -596,9 +599,12 @@ function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
     },
   ];
 
-  const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates)
+
 
   if (settings.args.secondaryCustomRates) {
+
+    const customPrimary: any = parseCustomRates(settings.args.secondaryCustomRates)
+    
     let custom = {
       Class: [
         createTextAttrib('tag', customPrimary.customName),
