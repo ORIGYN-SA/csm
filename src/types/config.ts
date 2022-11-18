@@ -85,16 +85,10 @@ export type AssetTypeMap = {
   hidden?: string;
 };
 
-export type CustomPrimaryRatesTypes = {
-  customName?: string;
-  principalId?: string;
-  rate?: string
-}
-
-export type CustomSecondaryRatesTypes = {
-  customName?: string;
-  principal?: string;
-  rate?: string;
+export type CustomRate = {
+  customName: string;
+  principalId: string;
+  rate: string
 }
 
 export type ConfigSummary = {

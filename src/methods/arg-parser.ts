@@ -1,10 +1,10 @@
-import { AssetTypeMap, ConfigArgs, CustomPrimaryRatesTypes, CustomSecondaryRatesTypes } from '../types/config';
+import { AssetTypeMap, ConfigArgs, CustomRate} from '../types/config';
 import { MintArgs } from '../types/mint';
 import { StageArgs } from '../types/stage';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
-  
+
   const OrigynGovCanisterId: string = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
   const args: ConfigArgs = {
@@ -48,7 +48,6 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     primaryCustomRates: getArgValue(argv, ['--primaryCustomRates']),
 
     secondaryCustomRates: getArgValue(argv, ['--secondaryCustomRates']),
-
   };
 
   // validate args
@@ -115,8 +114,7 @@ export function parseMintArgs(argv: string[]): MintArgs {
   return args;
 }
 export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
-
- // --assetType "primary:nft*.png, preview:preview*.png"
+  // --assetType "primary:nft*.png, preview:preview*.png"
 
   const assetTypeMapPatterns = {};
 
@@ -124,15 +122,13 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 2) { 
+      if (m.length != 2) {
         const err = `Invalid syntax for mapping asset types to file names. ${m}`;
         throw err;
       }
 
       const assetType = m[0].trim().toLowerCase();
       const fileName = m[1].trim();
-
-
 
       if (!['primary', 'preview', 'experience', 'hidden'].includes(assetType)) {
         const err = `Invalid asset type '${assetType}'. Valid types are: 'primary', 'preview', 'experience' and 'hidden'.`;
@@ -145,15 +141,14 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
   return assetTypeMapPatterns;
 }
 
-export function parseCustomRates(patterns: string) : CustomPrimaryRatesTypes {
-
-  let customRates = {};
+export function parseCustomRates(patterns: string): CustomRate[] {
+  let customRates: CustomRate[] = [];
 
   patterns
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 3) { 
+      if (m.length != 3) {
         const err = `Invalid syntax for custom rates. ${m}`;
         throw err;
       }
@@ -162,13 +157,20 @@ export function parseCustomRates(patterns: string) : CustomPrimaryRatesTypes {
       const rate = m[1].trim();
       const principalId = m[2].trim();
 
-      customRates = [{
+      if (!principalId || !rate || !customName) {
+        const err = 'Custom rate, principal or name not provided!';
+        throw err;
+      }
+
+      const customRate = {
         customName: customName,
         rate: rate,
-        principal: principalId
-    }]})
+        principalId: principalId,
+      };
+      customRates.push(customRate);
+    });
 
-  return customRates 
+  return customRates;
 }
 
 function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
