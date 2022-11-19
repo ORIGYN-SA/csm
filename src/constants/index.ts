@@ -6,6 +6,8 @@ export const COLLECTION_FOLDER = 'collection';
 export const DAAPS_FOLDER = 'dapps';
 export const NFTS_FOLDER = 'nfts';
 export const CONFIG_FILE_NAME = 'metadata.json';
+export const COM_ORIGYN_NS = 'com.origyn';
+export const GOV_CANISTER_ID = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
 // HTML and CSS attributes can use double or single quotes
 // however, neither are allowed in URLs, so there

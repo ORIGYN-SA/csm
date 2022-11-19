@@ -1,6 +1,7 @@
-import { AssetTypeMap, ConfigArgs } from '../types/config';
+import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate} from '../types/config';
 import { MintArgs } from '../types/mint';
 import { StageArgs } from '../types/stage';
+import { GOV_CANISTER_ID } from '../constants';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
@@ -9,18 +10,38 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
     collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
     tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
+    tokenWords: getArgValue(argv, ['-w', '--tokenWords']),
+    minWords: getArgValue(argv, ['--minWords'], "3"),
+    maxWords: getArgValue(argv, ['--maxWords'], "3"),
     nftCanisterId: getArgValue(argv, ['-i', '--nftCanisterId']),
     creatorPrincipal,
     namespace: getArgValue(argv, ['-n', '--namespace']),
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
+
     //optional args
-    brokerRoyalty: getArgValue(argv, [ '--brokerRoyalty'], '0.05'),
-    customRoyalty: getArgValue(argv, [ '--customRoyalty'], '0.05'),
-    origynatorRoyalty: getArgValue(argv, [ '--origynatorRoyalty'], '0.05'),
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
+
+    // payees (for royalties)
+    originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
+    nodePrincipal: getArgValue(argv, ['--nodePrincipal'], GOV_CANISTER_ID),
+    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], GOV_CANISTER_ID),
+    
+    // primary royalties
+    primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate'], '0.01'),
+    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
+    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.035'),
+    primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
+    primaryCustomRates: getArgValue(argv, ['--primaryCustomRates']),
+
+    // secondary royalties
+    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
+    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
+    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
+    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
+    secondaryCustomRates: getArgValue(argv, ['--secondaryCustomRates']),
   };
 
   // validate args
@@ -28,8 +49,8 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
   } else if (!args.collectionDisplayName) {
     throw 'Missing collection display name argument (-d).';
-  } else if (!args.tokenPrefix) {
-    throw 'Missing token prefix argument (-t).';
+  } else if (!args.tokenPrefix && !args.tokenWords) {
+    throw 'Missing token prefix argument (-t) or token words (-w).';
   } else if (!args.nftCanisterId) {
     throw 'Missing canister id argument (-i).';
   } else if (!args.creatorPrincipal) {
@@ -86,11 +107,9 @@ export function parseMintArgs(argv: string[]): MintArgs {
 
   return args;
 }
+
 export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
-  // parses (with validation):
-  // 'primary:index#.html, experience:index#.html, preview:preview#.png'
-  // to:
-  // { primary: 'index#.html', experience: 'index#.html', preview: 'preview#.png' }
+  // --assetType "primary:nft*.png, preview:preview*.png"
 
   const assetTypeMapPatterns = {};
 
@@ -115,6 +134,36 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     });
 
   return assetTypeMapPatterns;
+}
+
+export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
+  let customRates: CustomRoyaltyRate[] = [];
+  if (!patterns) {
+    return customRates;
+  }
+
+  patterns
+    .split(/\s?,\s?/)
+    .map((n) => n.split(/\s?:\s?/))
+    .forEach((m) => {
+      if (m.length != 3) {
+        const err = `Invalid syntax for custom rates. ${m}`;
+        throw err;
+      }
+
+      const customName = m[0].trim().toLowerCase();
+      const rate = m[1].trim();
+      const principalId = m[2].trim();
+
+      if (!principalId || !rate || !customName) {
+        const err = 'Custom rate, principal or name not provided!';
+        throw err;
+      }
+
+      customRates.push({ customName, rate, principalId });
+    });
+
+  return customRates;
 }
 
 function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
