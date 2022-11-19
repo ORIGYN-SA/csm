@@ -4,6 +4,9 @@ export type ConfigArgs = {
   collectionId: string;
   collectionDisplayName: string;
   tokenPrefix: string;
+  tokenWords: string;
+  minWords: string;
+  maxWords: string;
   nftCanisterId: string;
   creatorPrincipal: string;
   namespace: string;
@@ -47,6 +50,7 @@ export type ConfigSettings = {
   stageFolder: string;
   collectionFolder: string;
   nftsFolder: string;
+  tokenIds: string[];
   nftDefinitionCount: number;
   nftQuantities: number[];
   totalNftCount: number;
