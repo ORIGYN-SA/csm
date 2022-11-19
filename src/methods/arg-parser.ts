@@ -10,6 +10,9 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
     collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
     tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
+    tokenWords: getArgValue(argv, ['-w', '--tokenWords']),
+    minWords: getArgValue(argv, ['--minWords'], "3"),
+    maxWords: getArgValue(argv, ['--maxWords'], "3"),
     nftCanisterId: getArgValue(argv, ['-i', '--nftCanisterId']),
     creatorPrincipal,
     namespace: getArgValue(argv, ['-n', '--namespace']),
@@ -46,8 +49,8 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
   } else if (!args.collectionDisplayName) {
     throw 'Missing collection display name argument (-d).';
-  } else if (!args.tokenPrefix) {
-    throw 'Missing token prefix argument (-t).';
+  } else if (!args.tokenPrefix && !args.tokenWords) {
+    throw 'Missing token prefix argument (-t) or token words (-w).';
   } else if (!args.nftCanisterId) {
     throw 'Missing canister id argument (-i).';
   } else if (!args.creatorPrincipal) {
@@ -104,6 +107,7 @@ export function parseMintArgs(argv: string[]): MintArgs {
 
   return args;
 }
+
 export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
   // --assetType "primary:nft*.png, preview:preview*.png"
 

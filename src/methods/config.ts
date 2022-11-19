@@ -8,7 +8,7 @@ import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue
 import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
 import { log } from './logger';
-
+import { getTokenIds } from './token-ids';
 import * as constants from '../constants';
 
 export function config(args: ConfigArgs): string {
@@ -158,8 +158,48 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     }
   }
 
+  // Create an array of token IDs
+  let tokenIds: string[] = [];
+  const tokenWords = args.tokenWords?.split(',').map(w => w.trim()) || [];
+  if (tokenWords.length) {
+    if (args.minWords && !Number.parseInt(args.minWords)) {
+      throw 'minWords arg must be an integer';
+    }
+    if (args.maxWords && !Number.parseInt(args.maxWords)) {
+      throw 'maxWords arg must be an integer';
+    }
+    
+    const minWords = Number.parseInt(args.minWords);
+    const maxWords = Number.parseInt(args.maxWords);
+
+    if (minWords < 1 || minWords > 5) {
+      throw 'minWords must be an integer from 1 to 5';
+    }
+    if (maxWords < 1 || maxWords > 5) {
+      throw 'maxWords must be an integer from 1 to 5';
+    }
+    if (maxWords < minWords) {
+      throw 'maxWords must be equal to or greater than minWords';
+    }
+
+    if (tokenWords.length) {
+      tokenIds = getTokenIds(tokenWords, minWords, maxWords, totalNftCount);
+      if (tokenIds.length < totalNftCount) {
+        const err = `Not enough token words provided to generate ${totalNftCount} unique token IDs.`;
+        throw err;
+      }
+    }
+  } else if (!args.tokenPrefix) {
+    throw 'Either the tokenWords or tokenPrefix arg must be provided.';
+  } else {
+    for (let nftIndex = 1; nftIndex <= totalNftCount; nftIndex++) {
+      tokenIds.push(`${args.tokenPrefix}${nftIndex}`);
+    }
+  }
+
   const settings: ConfigSettings = {
     args,
+    tokenIds,
     assetTypeMapPatterns,
     stageFolder,
     collectionFolder,
@@ -370,24 +410,26 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   };
 }
 
-function validateNoExternalUrls(stageFolder: string, files: string[]) {
-  // Ensure there are no external URL references (http/https)
-  for (const filePath of files) {
-    const urls: string[] = getExternalUrls(path.resolve(stageFolder, filePath));
+// function validateNoExternalUrls(stageFolder: string, files: string[]) {
+//   // Ensure there are no external URL references (http/https)
+//   for (const filePath of files) {
+//     const urls: string[] = getExternalUrls(path.resolve(stageFolder, filePath));
 
-    if (urls.length) {
-      log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
+//     if (urls.length) {
+//       log(`Found External URLs in file: "${filePath}"\n${JSON.stringify(urls, null, 2)}`);
 
-      throw (
-        '\nExternal URL references (http/https) must be replaced with local ' +
-        'relative file references so they can be uploaded to the NFT canister.\n'
-      );
-    }
-  }
-}
+//       throw (
+//         '\nExternal URL references (http/https) must be replaced with local ' +
+//         'relative file references so they can be uploaded to the NFT canister.\n'
+//       );
+//     }
+//   }
+// }
+
 
 function configureNftsMetadata(settings: ConfigSettings): Meta[] {
   let nftIndex = 1;
+
   let nfts: Meta[] = [];
 
   for (let i = 1; i <= settings.nftDefinitionCount; i++) {
@@ -410,7 +452,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   const resources: MetadataClass[] = [];
   const libraries: LibraryFile[] = [];
 
-  const tokenId = `${settings.args.tokenPrefix}${nftIndex}`;
+  const tokenId = settings.tokenIds[nftIndex - 1];
   const files = flattenFiles(path.join(constants.NFTS_FOLDER, nftIndex.toString()), settings.stageFolder);
 
   // get shared collection files listed in config file
