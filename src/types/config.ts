@@ -8,10 +8,7 @@ export type ConfigArgs = {
   creatorPrincipal: string;
   namespace: string;
   folderPath: string;
-  brokerRoyalty: string;
-  customRoyalty: string;
-  origynatorRoyalty: string;
- 
+
   // string with comma delimited list of 'asset_type:file_name, ...'
   // supports the * wildcard character
   // example: 'primary:nft*.png,experience:index.html,hidden:hidden.jpg'
@@ -27,6 +24,21 @@ export type ConfigArgs = {
   // example: '0:3,1:3,2:5,3:10'
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
+
+  // royalties
+  nodePrincipal: string;
+  originatorPrincipal: string;
+  networkPrincipal: string;
+  primaryBrokerRate: string;
+  primaryNodeRate: string;
+  primaryOriginatorRate: string;
+  primaryNetworkRate: string;
+  secondaryBrokerRate: string;
+  secondaryNodeRate: string;
+  secondaryOriginatorRate: string;
+  secondaryNetworkRate: string;
+  primaryCustomRates: string;
+  secondaryCustomRates: string;
 };
 
 export type ConfigSettings = {
@@ -41,6 +53,7 @@ export type ConfigSettings = {
   fileMap: FileInfoMap;
   collectionLibraries: LibraryFile[];
   totalFileSize: number;
+  royalties: Royalties;
 };
 
 export type FileInfo = {
@@ -74,3 +87,31 @@ export type ConfigFile = {
   collection: Meta;
   nfts: Meta[];
 };
+
+export type CustomRoyaltyRate = {
+  customName: string;
+  principalId: string;
+  rate: string
+}
+
+export type RoyaltyPayees = {
+  originator: string;
+  node: string;
+  network: string;
+};
+
+export type RoyaltyRates = {
+  originator: string;
+  broker: string;
+  node: string;
+  network: string;
+  custom: CustomRoyaltyRate[]
+};
+
+export type Royalties = {
+  payees: RoyaltyPayees,
+  rates: {
+    primary: RoyaltyRates,
+    secondary: RoyaltyRates
+  }
+}

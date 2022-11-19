@@ -3,9 +3,9 @@ import fse from 'fs-extra';
 import path from 'path';
 import * as utils from '../utils';
 import mime from 'mime-types';
-import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap } from '../types/config';
+import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap, Royalties } from '../types/config';
 import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
-import { parseAssetTypeMapPatterns } from './arg-parser';
+import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
 import { log } from './logger';
 
@@ -134,6 +134,30 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     nftsFolder = path.relative(stageFolder, nftsFolder);
   }
 
+  const royalties: Royalties = {
+    payees: {
+      originator: args.originatorPrincipal,
+      node: args.nodePrincipal,
+      network: args.networkPrincipal
+    },
+    rates: {
+      primary: {
+        originator: args.primaryOriginatorRate,
+        broker: args.primaryBrokerRate,
+        node: args.primaryNodeRate,
+        network: args.primaryNetworkRate,
+        custom: parseCustomRates(args.primaryCustomRates)
+      },
+      secondary: {
+        originator: args.secondaryOriginatorRate,
+        broker: args.secondaryBrokerRate,
+        node: args.secondaryNodeRate,
+        network: args.secondaryNetworkRate,
+        custom: parseCustomRates(args.secondaryCustomRates)
+      } 
+    }
+  }
+
   const settings: ConfigSettings = {
     args,
     assetTypeMapPatterns,
@@ -146,6 +170,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     fileMap: {},
     collectionLibraries: [],
     totalFileSize: 0,
+    royalties
   };
 
   // build collection (resource library) metadata objects for all files
@@ -166,17 +191,17 @@ function getResourceUrl(resourceName: string, tokenId: string = ''): string {
   // http://localhost:3000/-/{collection-id}/
 
   // Mainnet without proxy, without phonebook (fully decentralized):
-  // https://rrkah-fqaaa-aaaaa-aaaaq-cai.raw.ic0.app/
+  // https://ap5ok-kqaaa-aaaak-acvha-cai.raw.ic0.app/
   // Mainnet with proxy, without phonebook:
-  // https://exos.origyn.network/-/{canister-id}/
+  // https://prptl.io/-/{canister-id}/
   // Mainnet with proxy, with phonebook:
-  // https://exos.origyn.network/-/{collection-id}/
+  // https://prptl.io/-/{collection-id}/
 
   if (tokenId) {
-    // Example: https://rrkah-fqaaa-aaaaa-aaaaq-cai.raw.ic0.app/-/bayc-01/-/com.bayc.ape.0.primary
+    // Example: https://ap5ok-kqaaa-aaaak-acvha-cai.raw.ic0.app/-/bm-1/-/brain.matters.nft1.html
     return `-/${tokenId}/-/${resourceName}`.toLowerCase();
   } else {
-    // Example: https://frfol-iqaaa-aaaaj-acogq-cai.raw.ic0.app/collection/-/ledger
+    // Example: https://ap5ok-kqaaa-aaaak-acvha-cai.raw.ic0.app/collection/-/ledger
     return `collection/-/${resourceName}`.toLowerCase();
   }
 }
@@ -304,14 +329,16 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   properties.push(createTextAttrib('id', ''));
   properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
+  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.originator`, settings.args.originatorPrincipal));
+  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.node`, settings.args.nodePrincipal));
+  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.network`, settings.args.networkPrincipal));
+
+  properties.push(createRoyalties(settings));
+  properties.push(createRoyalties(settings, true));
+
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
-    properties.push(
-      createTextAttrib(
-        `${assetType}_asset`,
-        `${settings.args.namespace}.${mappings[assetType]}`,
-      ),
-    );
+    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${mappings[assetType]}`));
   }
 
   // attribs.push(
@@ -320,9 +347,6 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // build classes that point to uploaded resources
   const resourceReferences = createClassesForResourceReferences(settings, resources, settings.collectionLibraries);
-  
-  properties.push(createPrimaryRoyalties(settings));
-  properties.push(createSecondaryRoyalties(settings));
 
   properties.push({
     name: 'library',
@@ -450,12 +474,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
-    properties.push(
-      createTextAttrib(
-        `${assetType}_asset`,
-        `${settings.args.namespace}.${assetTypeMap[assetType]}`,
-      ),
-    );
+    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`));
   }
 
   properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
@@ -483,68 +502,54 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   };
 }
 
-function createPrimaryRoyalties(settings: ConfigSettings): MetadataProperty {
-  return {
-    name: 'default_royalty_primary',
-    value: {
-      Array: {
-        thawed: [
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.broker'),
-              createFloatAttrib('rate', settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.node'),
-              createFloatAttrib('rate', 0.005),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-        ],
-      },
-    },
-    immutable: false,
-  };
-}
+function createRoyalties(settings: ConfigSettings, secondary: boolean = false): MetadataProperty {
 
-function createSecondaryRoyalties(settings: ConfigSettings): MetadataProperty {
+  const rates = secondary ? settings.royalties.rates.secondary : settings.royalties.rates.primary
+
+  let royalties = [
+    {
+      Class: [
+        createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.originator`),
+        createFloatAttrib('rate', Number(rates.originator)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.broker`),
+        createFloatAttrib('rate', Number(rates.broker)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.node`),
+        createFloatAttrib('rate', Number(rates.node)),
+      ],
+    },
+    {
+      Class: [
+        createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.network`),
+        createFloatAttrib('rate', Number(rates.network)),
+      ],
+    },
+  ];
+
+  if (rates.custom) {
+    rates.custom.forEach((customRate) => {
+      royalties.push({
+        Class: [
+          createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.${customRate.customName}`),
+          createFloatAttrib('rate', Number(customRate.rate)),
+          createPrincipalAttrib('account', customRate.principalId),
+        ],
+      });
+    });
+  }
+
   return {
-    name: 'default_royalty_secondary',
+    name: `${constants.COM_ORIGYN_NS}.royalties.${secondary ? 'secondary' : 'primary'}.default`,
     value: {
       Array: {
-        thawed: [
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.broker'),
-              createFloatAttrib('rate', settings.args.brokerRoyalty === '' ? 0.05 : Number(settings.args.brokerRoyalty)),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.node'),
-              createFloatAttrib('rate', 0.005),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.originator'),
-              createFloatAttrib('rate', settings.args.origynatorRoyalty === '' ? 0.05 : Number(settings.args.origynatorRoyalty)),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-          {
-            Class: [
-              createTextAttrib('tag', 'com.origyn.royalty.custom'),
-              createFloatAttrib('rate', settings.args.customRoyalty === '' ? 0.05 : Number(settings.args.customRoyalty)),
-              createPrincipalAttrib('account', settings.args.creatorPrincipal),
-            ],
-          },
-        ],
+        frozen: royalties,
       },
     },
     immutable: false,
