@@ -1,11 +1,10 @@
-import { AssetTypeMap, ConfigArgs, CustomRate} from '../types/config';
+import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate} from '../types/config';
 import { MintArgs } from '../types/mint';
 import { StageArgs } from '../types/stage';
+import { GOV_CANISTER_ID } from '../constants';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
-
-  const OrigynGovCanisterId: string = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
   const args: ConfigArgs = {
     collectionId: getArgValue(argv, ['-c', '--collectionId']),
@@ -16,37 +15,29 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     namespace: getArgValue(argv, ['-n', '--namespace']),
     folderPath: getArgValue(argv, ['-f', '--folderPath']),
     assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
-    //optional args
 
+    //optional args
     nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
 
-    nodePrincipal: getArgValue(argv, ['--brokerRoyalty'], OrigynGovCanisterId),
-
+    // payees (for royalties)
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
-
-    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], OrigynGovCanisterId),
-
-    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
-
-    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.035'),
-
+    nodePrincipal: getArgValue(argv, ['--nodePrincipal'], GOV_CANISTER_ID),
+    networkPrincipal: getArgValue(argv, ['--networkPrincipal'], GOV_CANISTER_ID),
+    
+    // primary royalties
     primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate'], '0.01'),
-
+    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
+    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.035'),
     primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
-
-    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
-
-    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
-
-    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
-
-    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
-
-    // custom royalties
     primaryCustomRates: getArgValue(argv, ['--primaryCustomRates']),
 
+    // secondary royalties
+    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
+    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
+    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
+    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
     secondaryCustomRates: getArgValue(argv, ['--secondaryCustomRates']),
   };
 
@@ -141,8 +132,11 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
   return assetTypeMapPatterns;
 }
 
-export function parseCustomRates(patterns: string): CustomRate[] {
-  let customRates: CustomRate[] = [];
+export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
+  let customRates: CustomRoyaltyRate[] = [];
+  if (!patterns) {
+    return customRates;
+  }
 
   patterns
     .split(/\s?,\s?/)
@@ -162,12 +156,7 @@ export function parseCustomRates(patterns: string): CustomRate[] {
         throw err;
       }
 
-      const customRate = {
-        customName: customName,
-        rate: rate,
-        principalId: principalId,
-      };
-      customRates.push(customRate);
+      customRates.push({ customName, rate, principalId });
     });
 
   return customRates;
