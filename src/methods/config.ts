@@ -193,7 +193,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     throw 'Either the tokenWords or tokenPrefix arg must be provided.';
   } else {
     for (let nftIndex = 1; nftIndex <= totalNftCount; nftIndex++) {
-      tokenIds.push(`${args.tokenPrefix}${nftIndex}`);
+      tokenIds.push(`${args.tokenPrefix}${nftIndex}`.toLowerCase());
     }
   }
 
@@ -296,7 +296,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
       const assetTypeMap = getAssetTypeMap(nftFiles, settings.assetTypeMapPatterns);
 
-      const tokenId = `${settings.args.tokenPrefix}${nftIndex}`.toLowerCase();
+      const tokenId = settings.tokenIds[nftIndex - 1];
 
       for (const filePath of nftFiles) {
         const libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();
