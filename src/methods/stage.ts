@@ -1,14 +1,15 @@
 import fs from 'fs';
 import path from 'path';
-import { getActor } from './actor';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE as OrigynNftCanister } from '../idl/origyn_nft_reference.did.d.js';
+import { getOrigynNftActor } from './actor.js';
 import { Principal } from '@dfinity/principal';
-import { formatBytes, wait } from '../utils';
-import { ConfigFile } from '../types/config';
-import { Metrics, StageArgs } from '../types/stage';
-import { LibraryFile, TextValue } from '../types/metadata';
-import { AnyActor } from '../types/actor';
-import { log } from './logger';
-import * as constants from '../constants';
+import { formatBytes, wait } from '../utils/index.js';
+import { ConfigFile } from '../types/config.js';
+import { Metrics, StageArgs } from '../types/stage.js';
+import { LibraryFile, TextValue } from '../types/metadata.js';
+import { log } from './logger.js';
+import * as constants from '../constants/index.js';
 
 export async function stage(args: StageArgs) {
   log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
@@ -34,7 +35,7 @@ export async function stage(args: StageArgs) {
   const config = JSON.parse(json) as ConfigFile;
 
   const isLocal = args.environment === 'local';
-  const actor = await getActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const actor = await getOrigynNftActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Stage NFTs and Library Assets
   // nfts and collections have the same metadata structure
@@ -49,6 +50,8 @@ export async function stage(args: StageArgs) {
     log(`\n${constants.LINE_DIVIDER_SECTION}`);
     log(`\nStaging metadata for ${tokenId ? 'NFT ' + tokenId : 'Collection'}\n`);
     const metadataToStage = deserializeConfig(item.meta);
+
+    //console.log(metadataToStage);
     const stageResult = await actor.stage_nft_origyn(metadataToStage);
     log(JSON.stringify(stageResult));
 
@@ -91,7 +94,7 @@ function deserializeConfig(config) {
 }
 
 async function stageLibraryAsset(
-  actor: AnyActor,
+  actor: ActorSubclass<OrigynNftCanister>,
   stageFolder: string,
   libraryAsset: LibraryFile,
   tokenId: string,
@@ -122,7 +125,7 @@ async function stageLibraryAsset(
 }
 
 async function uploadChunk(
-  actor: AnyActor,
+  actor: ActorSubclass<OrigynNftCanister>,
   libraryId: string,
   tokenId: string,
   fileData: Buffer,
@@ -147,7 +150,7 @@ async function uploadChunk(
       token_id: tokenId,
       library_id: libraryId,
       filedata: { Empty: null },
-      chunk: chunkNumber,
+      chunk: BigInt(chunkNumber),
       content: Array.from(chunk),
     });
     log(`result ${JSON.stringify(result)}`);

@@ -1,4 +1,4 @@
-import { StageArgs } from './stage';
+import { StageArgs } from './stage.js';
 
 export type MintArgs = StageArgs & {
   range?: string;

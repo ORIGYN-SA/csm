@@ -1,7 +1,8 @@
-import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate} from '../types/config';
-import { MintArgs } from '../types/mint';
-import { StageArgs } from '../types/stage';
-import { GOV_CANISTER_ID } from '../constants';
+import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate} from '../types/config.js';
+import { MintArgs } from '../types/mint.js';
+import { StageArgs } from '../types/stage.js';
+//import { GOV_CANISTER_ID } from '../constants/index.js';
+const GOV_CANISTER_ID = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
