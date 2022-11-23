@@ -7,7 +7,8 @@ import { Principal } from '@dfinity/principal';
 import { formatBytes, wait } from '../utils/index.js';
 import { ConfigFile } from '../types/config.js';
 import { Metrics, StageArgs } from '../types/stage.js';
-import { LibraryFile, TextValue } from '../types/metadata.js';
+import { LibraryFile, Meta, MetadataClass, TextValue } from '../types/metadata.js';
+import { getLibraryMetadata } from './metadata.js';
 import { log } from './logger.js';
 import * as constants from '../constants/index.js';
 
@@ -43,21 +44,21 @@ export async function stage(args: StageArgs) {
   // so the library assets/files can be shared by multiple NFTs
   const metrics: Metrics = { totalFileSize: 0 };
   const items = [config.collection, ...config.nfts];
-  for (const item of items) {
-    var tokenId = (item?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
+  for (const nftOrColl of items) {
+    var tokenId = (nftOrColl?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
 
     // Stage NFT
     log(`\n${constants.LINE_DIVIDER_SECTION}`);
     log(`\nStaging metadata for ${tokenId ? 'NFT ' + tokenId : 'Collection'}\n`);
-    const metadataToStage = deserializeConfig(item.meta);
+    const metadataToStage = deserializeConfig(nftOrColl.meta);
 
     //console.log(metadataToStage);
     const stageResult = await actor.stage_nft_origyn(metadataToStage);
     log(JSON.stringify(stageResult));
 
     // *** Stage Library Assets (as chunks)
-    for (const asset of item.library) {
-      await stageLibraryAsset(actor, config.settings.stageFolder, asset, tokenId, metrics);
+    for (const libraryFile of nftOrColl.library) {
+      await stageLibraryAsset(actor, config.settings.stageFolder, nftOrColl, libraryFile, tokenId, metrics);
     }
   }
 
@@ -96,6 +97,7 @@ function deserializeConfig(config) {
 async function stageLibraryAsset(
   actor: ActorSubclass<OrigynNftCanister>,
   stageFolder: string,
+  nftOrColl: Meta,
   libraryAsset: LibraryFile,
   tokenId: string,
   metrics: Metrics,
@@ -113,6 +115,8 @@ async function stageLibraryAsset(
   log(`file size ${fileSize}`);
   log(`chunk count ${chunkCount}`);
 
+  const libraryMetadata = getLibraryMetadata(stageFolder, nftOrColl, libraryAsset, fileSize);
+
   for (let i = 0; i < chunkCount; i++) {
     // give the canister a 3 second break after every 10 chunks
     // attempt to prevent error: IC0515: Certified state is not available yet. Please try again…
@@ -120,7 +124,8 @@ async function stageLibraryAsset(
       await wait(3000);
     }
 
-    await uploadChunk(actor, libraryAsset.library_id, tokenId, fileData, i, metrics);
+    // library metadata is only sent with the first chunk
+    await uploadChunk(actor, libraryAsset.library_id, tokenId, fileData, i, metrics, i === 0 && libraryMetadata);
   }
 }
 
@@ -131,6 +136,7 @@ async function uploadChunk(
   fileData: Buffer,
   chunkNumber: number,
   metrics: Metrics,
+  metadata?: any,
   retries = 0,
 ) {
   const start = chunkNumber * constants.MAX_CHUNK_SIZE;
@@ -149,7 +155,7 @@ async function uploadChunk(
     let result = await actor.stage_library_nft_origyn({
       token_id: tokenId,
       library_id: libraryId,
-      filedata: { Empty: null },
+      filedata: metadata ?? { Empty: null },
       chunk: BigInt(chunkNumber),
       content: Array.from(chunk),
     });
@@ -166,7 +172,7 @@ async function uploadChunk(
       log('\n*** Caught the above error while staging a library asset chunk. Waiting 3 seconds, then trying again.\n');
       await wait(3000);
       retries++;
-      await uploadChunk(actor, libraryId, tokenId, fileData, chunkNumber, metrics, retries);
+      await uploadChunk(actor, libraryId, tokenId, fileData, chunkNumber, metrics, metadata, retries);
     }
   }
 }
