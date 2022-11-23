@@ -2,8 +2,8 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import crypto from 'crypto';
 import path from 'path';
-import { log } from '../methods/logger';
-import * as constants from '../constants';
+import { log } from '../methods/logger.js';
+import * as constants from '../constants/index.js';
 
 const ignoredFolders = ['node_modules', '.vscode', '.idea', '.vessel'];
 const ignoredFiles = ['.ds_store', '.gitignore'];

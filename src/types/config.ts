@@ -1,4 +1,4 @@
-import { LibraryFile, Meta } from './metadata';
+import { LibraryFile, Meta } from './metadata.js';
 
 export type ConfigArgs = {
   collectionId: string;

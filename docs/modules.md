@@ -64,7 +64,7 @@
 
 #### Defined in
 
-[types/config.ts:74](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L74)
+[types/config.ts:74](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L74)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L20)
+[types/metadata.ts:20](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L20)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L3)
+[types/config.ts:3](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L3)
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:88](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L88)
+[types/config.ts:88](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L88)
 
 ___
 
@@ -169,7 +169,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:47](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L47)
+[types/config.ts:47](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L47)
 
 ___
 
@@ -188,7 +188,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:81](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L81)
+[types/config.ts:81](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L81)
 
 ___
 
@@ -206,7 +206,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:95](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L95)
+[types/config.ts:95](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L95)
 
 ___
 
@@ -225,7 +225,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:63](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L63)
+[types/config.ts:63](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L63)
 
 ___
 
@@ -239,7 +239,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:70](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L70)
+[types/config.ts:70](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L70)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L16)
+[types/metadata.ts:16](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L16)
 
 ___
 
@@ -272,7 +272,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L28)
+[types/metadata.ts:28](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L28)
 
 ___
 
@@ -289,7 +289,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L3)
+[types/metadata.ts:3](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L3)
 
 ___
 
@@ -313,7 +313,7 @@ ___
 
 #### Defined in
 
-[types/logger.ts:1](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/logger.ts#L1)
+[types/logger.ts:1](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/logger.ts#L1)
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:46](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L46)
+[types/metadata.ts:46](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L46)
 
 ___
 
@@ -347,7 +347,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:42](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L42)
+[types/metadata.ts:42](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L42)
 
 ___
 
@@ -365,7 +365,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:36](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L36)
+[types/metadata.ts:36](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L36)
 
 ___
 
@@ -381,7 +381,7 @@ ___
 
 #### Defined in
 
-[types/stage.ts:7](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/stage.ts#L7)
+[types/stage.ts:7](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/stage.ts#L7)
 
 ___
 
@@ -391,7 +391,7 @@ ___
 
 #### Defined in
 
-[types/mint.ts:3](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/mint.ts#L3)
+[types/mint.ts:3](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/mint.ts#L3)
 
 ___
 
@@ -407,7 +407,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L12)
+[types/metadata.ts:12](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L12)
 
 ___
 
@@ -423,7 +423,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L24)
+[types/metadata.ts:24](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L24)
 
 ___
 
@@ -442,7 +442,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:115](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L115)
+[types/config.ts:115](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L115)
 
 ___
 
@@ -460,7 +460,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:101](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L101)
+[types/config.ts:101](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L101)
 
 ___
 
@@ -480,7 +480,7 @@ ___
 
 #### Defined in
 
-[types/config.ts:107](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/config.ts#L107)
+[types/config.ts:107](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/config.ts#L107)
 
 ___
 
@@ -498,7 +498,7 @@ ___
 
 #### Defined in
 
-[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/stage.ts#L1)
+[types/stage.ts:1](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/stage.ts#L1)
 
 ___
 
@@ -514,7 +514,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L8)
+[types/metadata.ts:8](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L8)
 
 ___
 
@@ -531,7 +531,7 @@ ___
 
 #### Defined in
 
-[types/metadata.ts:32](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/types/metadata.ts#L32)
+[types/metadata.ts:32](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/types/metadata.ts#L32)
 
 ## Functions
 
@@ -551,7 +551,7 @@ ___
 
 #### Defined in
 
-[methods/config.ts:14](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/config.ts#L14)
+[methods/config.ts:14](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/config.ts#L14)
 
 ___
 
@@ -571,7 +571,7 @@ ___
 
 #### Defined in
 
-[methods/identity.ts:29](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/identity.ts#L29)
+[methods/identity.ts:29](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/identity.ts#L29)
 
 ___
 
@@ -591,7 +591,7 @@ ___
 
 #### Defined in
 
-[methods/mint.ts:11](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/mint.ts#L11)
+[methods/mint.ts:12](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/mint.ts#L12)
 
 ___
 
@@ -611,7 +611,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:6](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/arg-parser.ts#L6)
+[methods/arg-parser.ts:7](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/arg-parser.ts#L7)
 
 ___
 
@@ -631,7 +631,7 @@ ___
 
 #### Defined in
 
-[methods/identity.ts:66](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/identity.ts#L66)
+[methods/identity.ts:66](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/identity.ts#L66)
 
 ___
 
@@ -651,7 +651,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:88](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/arg-parser.ts#L88)
+[methods/arg-parser.ts:89](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/arg-parser.ts#L89)
 
 ___
 
@@ -671,7 +671,7 @@ ___
 
 #### Defined in
 
-[methods/identity.ts:84](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/identity.ts#L84)
+[methods/identity.ts:84](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/identity.ts#L84)
 
 ___
 
@@ -691,7 +691,7 @@ ___
 
 #### Defined in
 
-[methods/arg-parser.ts:69](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/arg-parser.ts#L69)
+[methods/arg-parser.ts:70](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/arg-parser.ts#L70)
 
 ___
 
@@ -711,7 +711,7 @@ ___
 
 #### Defined in
 
-[methods/logger.ts:5](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/logger.ts#L5)
+[methods/logger.ts:5](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/logger.ts#L5)
 
 ___
 
@@ -731,7 +731,7 @@ ___
 
 #### Defined in
 
-[methods/stage.ts:13](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/stage.ts#L13)
+[methods/stage.ts:14](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/stage.ts#L14)
 
 ___
 
@@ -745,4 +745,4 @@ ___
 
 #### Defined in
 
-[methods/logger.ts:9](https://github.com/ORIGYN-SA/csm/blob/2f3ffb9/src/methods/logger.ts#L9)
+[methods/logger.ts:9](https://github.com/ORIGYN-SA/csm/blob/11ed654/src/methods/logger.ts#L9)
