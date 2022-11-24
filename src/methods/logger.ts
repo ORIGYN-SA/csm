@@ -1,4 +1,4 @@
-import { LoggerCallback } from '../types/logger';
+import { LoggerCallback } from '../types/logger.js';
 
 let loggerCallback: LoggerCallback | undefined;
 

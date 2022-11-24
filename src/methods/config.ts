@@ -1,15 +1,15 @@
 import fs from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
-import * as utils from '../utils';
+import * as utils from '../utils/index.js';
 import mime from 'mime-types';
-import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap, Royalties } from '../types/config';
-import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata';
-import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser';
-import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils';
-import { log } from './logger';
-import { getTokenIds } from './token-ids';
-import * as constants from '../constants';
+import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap, Royalties } from '../types/config.js';
+import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata.js';
+import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser.js';
+import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
+import { log } from './logger.js';
+import { getTokenIds } from './token-ids.js';
+import * as constants from '../constants/index.js';
 
 export function config(args: ConfigArgs): string {
   // config object
@@ -94,7 +94,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   if (nftsFolder) {
     nftFolderNames = getSubFolders(nftsFolder)
       .map((f) => path.basename(f))
-      .filter((n) => parseInt(n) !== NaN)
+      .filter((n) => !Number.isNaN(parseInt(n)))
       .sort((a, b) => parseInt(a) - parseInt(b));
   }
 
@@ -160,7 +160,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
 
   // Create an array of token IDs
   let tokenIds: string[] = [];
-  const tokenWords = args.tokenWords?.split(',').map(w => w.trim()) || [];
+  const tokenWords = args.tokenWords?.split(',').map(w => w.trim()).filter(w => w.length) || [];
   if (tokenWords.length) {
     if (args.minWords && !Number.parseInt(args.minWords)) {
       throw 'minWords arg must be an integer';
@@ -182,18 +182,16 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
       throw 'maxWords must be equal to or greater than minWords';
     }
 
-    if (tokenWords.length) {
-      tokenIds = getTokenIds(tokenWords, minWords, maxWords, totalNftCount);
-      if (tokenIds.length < totalNftCount) {
-        const err = `Not enough token words provided to generate ${totalNftCount} unique token IDs.`;
-        throw err;
-      }
+    tokenIds = getTokenIds(tokenWords, minWords, maxWords, totalNftCount);
+    if (tokenIds.length < totalNftCount) {
+      const err = `Not enough token words provided to generate ${totalNftCount} unique token IDs.`;
+      throw err;
     }
   } else if (!args.tokenPrefix) {
     throw 'Either the tokenWords or tokenPrefix arg must be provided.';
   } else {
     for (let nftIndex = 1; nftIndex <= totalNftCount; nftIndex++) {
-      tokenIds.push(`${args.tokenPrefix}${nftIndex}`);
+      tokenIds.push(`${args.tokenPrefix}${nftIndex}`.toLowerCase());
     }
   }
 
@@ -296,7 +294,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
       const assetTypeMap = getAssetTypeMap(nftFiles, settings.assetTypeMapPatterns);
 
-      const tokenId = `${settings.args.tokenPrefix}${nftIndex}`.toLowerCase();
+      const tokenId = settings.tokenIds[nftIndex - 1];
 
       for (const filePath of nftFiles) {
         const libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();

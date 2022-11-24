@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { getActor } from './actor';
+import { getOrigynNftActor } from './actor.js';
 import { Principal } from '@dfinity/principal';
-import { ConfigFile } from '../types/config';
-import { MintArgs } from '../types/mint';
-import { TextValue } from '../types/metadata';
-import { log } from './logger';
-import * as constants from '../constants';
+import { ConfigFile } from '../types/config.js';
+import { MintArgs } from '../types/mint.js';
+import { TextValue } from '../types/metadata.js';
+import { log } from './logger.js';
+import { Account } from '../idl/origyn_nft_reference.did.d.js';
+import * as constants from '../constants/index.js';
 
 export async function mint(args: MintArgs) {
   log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
@@ -15,6 +16,7 @@ export async function mint(args: MintArgs) {
   // *** validate args
   if (!['local', 'ic'].includes(args.environment)) {
     const err = `Invalid environment (-e): "${args.environment}". Valid values are "local" (localhost) and "ic" (mainnet).`;
+    throw err;
   }
 
   let mintRange: number[] | null = null;
@@ -49,7 +51,7 @@ export async function mint(args: MintArgs) {
   const config = JSON.parse(json) as ConfigFile;
 
   const isLocal = args.environment === 'local';
-  const actor = await getActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const actor = await getOrigynNftActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
 
   // *** Mint NFTs
   mintRange = mintRange || [0, config.nfts.length - 1];
@@ -58,8 +60,9 @@ export async function mint(args: MintArgs) {
   // only mint if the token index is within the specified range
   for (let i = mintRange[0]; i <= mintRange[1]; i += batchSize) {
     const nftsToMint = config.nfts.slice(i, Math.min(i + batchSize, mintRange[1] + 1)).map((nft) => {
-      var tokenId = (nft?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
-      return [tokenId, { principal: principalText }];
+      const tokenId: string = (nft?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
+      const account: Account = { principal: principalText };
+      return [tokenId, account] as [string, Account];
     });
 
     const tokenIds = nftsToMint.map((nft) => nft[0]).join(', ');
@@ -67,7 +70,6 @@ export async function mint(args: MintArgs) {
     log(`\nMinting ${nftsToMint.length} NFTs '${tokenIds}'`);
 
     let result = await actor.mint_batch_nft_origyn(nftsToMint);
-
     log(JSON.stringify(result));
 
     log(`\nSuccessfully minted ${nftsToMint.length} NFTs.\n`);

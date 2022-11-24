@@ -13,7 +13,7 @@ import { Secp256k1KeyIdentity, Ed25519KeyIdentity } from '@dfinity/identity';
 import { mnemonicToSeed } from 'bip39';
 import hdkey from 'hdkey';
 
-import { log } from './logger';
+import { log } from './logger.js';
 
 const ED25519_KEY_INIT = '3053020101300506032b657004220420';
 const ED25519_KEY_SEPARATOR = 'a123032100';

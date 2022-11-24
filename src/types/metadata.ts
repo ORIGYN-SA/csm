@@ -1,4 +1,4 @@
-import { ConfigArgs } from './config';
+import { ConfigArgs } from './config.js';
 
 export type LibraryFile = {
   library_id: string;
