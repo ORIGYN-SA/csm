@@ -1,14 +1,14 @@
-export { parseConfigArgs, parseStageArgs, parseMintArgs } from './methods/arg-parser';
+export { parseConfigArgs, parseStageArgs, parseMintArgs } from './methods/arg-parser.js';
 
-export * from './types/metadata';
-export * from './types/config';
-export * from './types/stage';
-export * from './types/mint';
-export * from './types/logger';
+export * from './types/metadata.js';
+export * from './types/config.js';
+export * from './types/stage.js';
+export * from './types/mint.js';
+export * from './types/logger.js';
 
-export * from './methods/config';
-export * from './methods/stage';
-export * from './methods/mint';
-export * from './methods/identity';
+export * from './methods/config.js';
+export * from './methods/stage.js';
+export * from './methods/mint.js';
+export * from './methods/identity.js';
 
-export { registerLogger, unregisterLogger } from './methods/logger';
+export { registerLogger, unregisterLogger } from './methods/logger.js';
