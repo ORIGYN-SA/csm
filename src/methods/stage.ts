@@ -125,7 +125,7 @@ async function stageLibraryAsset(
     }
 
     // library metadata is only sent with the first chunk
-    await uploadChunk(actor, libraryAsset.library_id, tokenId, fileData, i, metrics, i === 0 && libraryMetadata);
+    await uploadChunk(actor, libraryAsset.library_id, tokenId, fileData, i, metrics, i === 0 ? libraryMetadata : undefined);
   }
 }
 
@@ -162,13 +162,13 @@ async function uploadChunk(
     log(`result ${JSON.stringify(result)}`);
     metrics.totalFileSize += chunk.length;
     log(`Cumulative staged file size: ${metrics.totalFileSize} (${formatBytes(metrics.totalFileSize)})`);
-  } catch (ex) {
+  } catch (ex: any) {
     if (retries >= 5) {
       log(
         `\nMax retries of ${constants.MAX_CHUNK_UPLOAD_RETRIES} has been reached for ${libraryId} chunk #${chunkNumber}.\n`,
       );
     } else {
-      log(JSON.stringify(ex));
+      log('\n' + ex.toString());
       log('\n*** Caught the above error while staging a library asset chunk. Waiting 3 seconds, then trying again.\n');
       await wait(3000);
       retries++;
