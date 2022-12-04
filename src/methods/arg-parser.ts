@@ -8,22 +8,22 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
   const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
 
   const args: ConfigArgs = {
-    collectionId: getArgValue(argv, ['-c', '--collectionId']),
-    collectionDisplayName: getArgValue(argv, ['-d', '--collectionDisplayName']),
-    tokenPrefix: getArgValue(argv, ['-t', '--tokenPrefix']),
-    tokenWords: getArgValue(argv, ['-w', '--tokenWords']),
+    collectionId: getArgValue(argv, ['--collectionId']),
+    displayName: getArgValue(argv, ['--displayName', '--collectionDisplayName']),
+    description: getArgValue(argv, ['--description', '--collectionDescription']),
+    tokenPrefix: getArgValue(argv, ['--tokenPrefix']),
+    tokenWords: getArgValue(argv, ['--tokenWords']),
     minWords: getArgValue(argv, ['--minWords'], "3"),
     maxWords: getArgValue(argv, ['--maxWords'], "3"),
-    nftCanisterId: getArgValue(argv, ['-i', '--nftCanisterId']),
+    nftCanisterId: getArgValue(argv, ['--nftCanisterId']),
     creatorPrincipal,
-    namespace: getArgValue(argv, ['-n', '--namespace']),
-    folderPath: getArgValue(argv, ['-f', '--folderPath']),
-    assetMappings: getArgValue(argv, ['-m', '--assetMappings']),
+    folderPath: getArgValue(argv, ['--folderPath']),
+    assetMappings: getArgValue(argv, ['--assetMappings']),
 
     //optional args
-    nftOwnerId: getArgValue(argv, ['-o', '--nftOwnerId'], creatorPrincipal),
-    soulbound: getArgValue(argv, ['-s', '--soulbound'], 'false'),
-    nftQuantities: getArgValue(argv, ['-q', '--nftQuantities']),
+    nftOwnerId: getArgValue(argv, ['--nftOwnerId'], creatorPrincipal),
+    soulbound: getArgValue(argv, ['--soulbound'], 'false'),
+    nftQuantities: getArgValue(argv, ['--nftQuantities']),
 
     // payees (for royalties)
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
@@ -48,7 +48,7 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
   // validate args
   if (!args.collectionId) {
     throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
-  } else if (!args.collectionDisplayName) {
+  } else if (!args.displayName) {
     throw 'Missing collection display name argument (-d).';
   } else if (!args.tokenPrefix && !args.tokenWords) {
     throw 'Missing token prefix argument (-t) or token words (-w).';
@@ -56,8 +56,6 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     throw 'Missing canister id argument (-i).';
   } else if (!args.creatorPrincipal) {
     throw 'Missing creator principal id argument (-p).';
-  } else if (!args.namespace) {
-    throw 'Missing namespace argument (-n).';
   } else if (!args.folderPath) {
     throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
   } else if (!args.assetMappings) {
@@ -167,7 +165,7 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
   return customRates;
 }
 
-function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
+export function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
   const index = argv.findIndex((arg) => argNames.map((n) => n.toLowerCase()).includes(arg.toLocaleLowerCase()));
   if (index > -1 && argv.length - 1 > index) {
     const value = argv[index + 1];
