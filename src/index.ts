@@ -1,5 +1,7 @@
 export { parseConfigArgs, parseStageArgs, parseMintArgs } from './methods/arg-parser.js';
 
+export * from './utils/prototypes.js';
+
 export * from './types/metadata.js';
 export * from './types/config.js';
 export * from './types/stage.js';

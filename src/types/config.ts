@@ -2,14 +2,14 @@ import { LibraryFile, Meta } from './metadata.js';
 
 export type ConfigArgs = {
   collectionId: string;
-  collectionDisplayName: string;
+  displayName: string;
+  description: string;
   tokenPrefix: string;
   tokenWords: string;
   minWords: string;
   maxWords: string;
   nftCanisterId: string;
   creatorPrincipal: string;
-  namespace: string;
   folderPath: string;
 
   // string with comma delimited list of 'asset_type:file_name, ...'
@@ -65,6 +65,7 @@ export type FileInfo = {
   libraryId: string;
   resourceUrl: string;
   filePath: string;
+  immutable?: boolean;
 };
 
 export type FileInfoMap = {

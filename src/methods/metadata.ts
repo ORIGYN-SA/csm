@@ -30,7 +30,7 @@ export function getAttribute(nftOrColl: MetadataClass, name: string): MetadataPr
   return nftOrColl?.Class?.find(a => a?.name === name) as MetadataProperty;
 }
 
-export function getLibraryMetadata(stageFolder: string, nftOrColl: Meta, libraryFile: LibraryFile, actualFileSize: number): MetadataClass {
+export function getLibraryMetadata(stageFolder: string, nftOrColl: Meta, libraryFile: LibraryFile, actualFileSize: bigint): MetadataClass {
   const libraryMetadata = getClassByTextAttribute(getLibraries(nftOrColl), 'library_id', libraryFile.library_id);
   if (!libraryMetadata) {
     const err = `Could not find metadata for libary ${libraryFile.library_id}`;
@@ -41,7 +41,7 @@ export function getLibraryMetadata(stageFolder: string, nftOrColl: Meta, library
   let librarySizeAttrib = getAttribute(libraryMetadata, 'size');
   if (librarySizeAttrib) {
     const libraryFileSize = (librarySizeAttrib?.value as NatValue)?.Nat || 0;
-    if (Number(libraryFileSize) !== actualFileSize) {
+    if (BigInt(libraryFileSize) !== actualFileSize) {
       log(`Warning: The size of file ${libraryFile.library_file} (${libraryFileSize}) in the metadata does not match the actual file size: ${actualFileSize}.`);
       log('The file may have been modified manually or by a post-config script since the metadata was generated.');
       log('Replacing file size in metadata with the actual size.');

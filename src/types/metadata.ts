@@ -1,4 +1,5 @@
-import { ConfigArgs } from './config.js';
+export type LocationType = 'collection' | 'canister' | 'web';
+export type AssetType = 'primary' | 'hidden' | 'experience' | 'preview';
 
 export type LibraryFile = {
   library_id: string;
@@ -10,7 +11,7 @@ export type TextValue = {
 };
 
 export type NatValue = {
-  Nat: number;
+  Nat: bigint;
 };
 
 export type FloatValue = {

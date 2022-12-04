@@ -115,7 +115,7 @@ async function stageLibraryAsset(
   log(`file size ${fileSize}`);
   log(`chunk count ${chunkCount}`);
 
-  const libraryMetadata = getLibraryMetadata(stageFolder, nftOrColl, libraryAsset, fileSize);
+  const libraryMetadata = getLibraryMetadata(stageFolder, nftOrColl, libraryAsset, BigInt(fileSize));
 
   for (let i = 0; i < chunkCount; i++) {
     // give the canister a 3 second break after every 10 chunks
