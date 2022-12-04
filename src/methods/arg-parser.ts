@@ -165,7 +165,7 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
   return customRates;
 }
 
-function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
+export function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
   const index = argv.findIndex((arg) => argNames.map((n) => n.toLowerCase()).includes(arg.toLocaleLowerCase()));
   if (index > -1 && argv.length - 1 > index) {
     const value = argv[index + 1];
