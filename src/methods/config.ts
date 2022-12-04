@@ -2,9 +2,9 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
 import * as utils from '../utils/index.js';
-import mime from 'mime-types';
+import { lookup } from 'mrmime';
 import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap, Royalties } from '../types/config.js';
-import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue } from '../types/metadata.js';
+import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue, LocationType, BoolValue } from '../types/metadata.js';
 import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser.js';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
 import { log } from './logger.js';
@@ -250,32 +250,33 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
   const collectionFiles = flattenFiles(settings.collectionFolder, settings.stageFolder);
 
   for (const filePath of collectionFiles) {
-    let libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();
+    const fileName = path.basename(filePath);
+    const fileNameLower = fileName.toLowerCase();
+    const fileNameWithoutExt = path.parse(fileNameLower).name;
+    let libraryId = fileNameLower;
 
-    let title = path.basename(filePath);
+    let title = fileName;
 
-    // dapps should not include the namespace or file extension in the url,
+    // dapps should not include the file extension in the url,
     // since the dapp menu in the UI shell currently has hard-coded names
     const relPath = path.relative(path.join(settings.stageFolder, 'collection'), filePath).toLowerCase();
     const dirName = path.dirname(relPath).toLocaleLowerCase();
     if (constants.DAAPS_FOLDER === dirName) {
-      libraryId = path.basename(filePath).toLowerCase();
-      const extPos = libraryId.lastIndexOf('.');
-      if (extPos > 0) {
-        libraryId = libraryId.substring(0, extPos);
-      }
-
-      title = `${libraryId} dApp`;
+      title = `${path.parse(fileName).name} dApp`;
+      libraryId = fileNameWithoutExt;
     }
 
+    
     const resourceUrl = `${getResourceUrl(libraryId)}`.toLowerCase();
     const relativeFilePath = path.relative(settings.stageFolder, filePath);
+    let immutable = (fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable'));
 
     fileInfoMap[relativeFilePath.toLowerCase()] = {
       title,
       libraryId,
       resourceUrl,
       filePath: relativeFilePath,
+      immutable
     };
   }
 
@@ -292,32 +293,35 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
         (f) => path.basename(f).toLowerCase() !== 'collection.json',
       );
 
-      const assetTypeMap = getAssetTypeMap(nftFiles, settings.assetTypeMapPatterns);
-
       const tokenId = settings.tokenIds[nftIndex - 1];
 
       for (const filePath of nftFiles) {
-        const libraryId = `${settings.args.namespace}.${path.basename(filePath)}`.toLowerCase();
+        const fileName = path.basename(filePath);
+        const fileNameLower = fileName.toLowerCase();
+        const fileNameWithoutExt = path.parse(fileNameLower).name;
+        let libraryId = fileNameLower;
 
-        const resourceUrl = `${getResourceUrl(libraryId, tokenId)}`;
+        let title = fileName;
 
-        // find the asset type of this file (primary, preview, experience, hidden)
-        let nftAssetType = '';
-        for (let assetType in assetTypeMap) {
-          if (assetTypeMap[assetType].toLowerCase() === path.basename(filePath).toLowerCase()) {
-            nftAssetType = assetType === 'primary' ? '' : ` ${assetType}`;
-            break;
-          }
+        // dapps should not include the file extension in the url,
+        // since the dapp menu in the UI shell currently has hard-coded names
+        const relPath = path.relative(path.join(settings.stageFolder, 'nfts', i.toString()), filePath).toLowerCase();
+        const dirName = path.dirname(relPath).toLocaleLowerCase();
+        if (constants.DAAPS_FOLDER === dirName) {
+          title = `${path.parse(fileName).name} dApp`;
+          libraryId = fileNameWithoutExt;
         }
 
-        const title = `${settings.args.collectionDisplayName} - ${nftIndex}${nftAssetType}`;
+        const resourceUrl = `${getResourceUrl(libraryId, tokenId)}`;
         const relativeFilePath = path.relative(settings.stageFolder, filePath);
+        let immutable = (fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable'));
 
         fileInfoMap[relativeFilePath.toLowerCase()] = {
           title,
           libraryId,
           resourceUrl,
           filePath: relativeFilePath,
+          immutable
         };
       }
 
@@ -361,22 +365,22 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // Creates metadata representing a collection
 
-  const properties: MetadataProperty[] = [];
+  const attribs: MetadataProperty[] = [];
 
   // The id for a collection is an empty string
-  properties.push(createTextAttrib('id', ''));
-  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
+  attribs.push(createTextAttrib('id', ''));
+  attribs.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
-  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.originator`, settings.args.originatorPrincipal));
-  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.node`, settings.args.nodePrincipal));
-  properties.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.network`, settings.args.networkPrincipal));
+  attribs.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.originator`, settings.args.originatorPrincipal));
+  attribs.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.node`, settings.args.nodePrincipal));
+  attribs.push(createPrincipalAttrib(`${constants.COM_ORIGYN_NS}.network`, settings.args.networkPrincipal));
 
-  properties.push(createRoyalties(settings));
-  properties.push(createRoyalties(settings, true));
+  attribs.push(createRoyalties(settings));
+  attribs.push(createRoyalties(settings, true));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in mappings) {
-    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${mappings[assetType]}`));
+    attribs.push(createTextAttrib(`${assetType}_asset`, `${mappings[assetType]}`));
   }
 
   // attribs.push(
@@ -386,7 +390,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   // build classes that point to uploaded resources
   const resourceReferences = createClassesForResourceReferences(settings, resources, settings.collectionLibraries);
 
-  properties.push({
+  attribs.push({
     name: 'library',
     value: {
       Array: { thawed: [...resourceReferences] },
@@ -394,14 +398,12 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
     immutable: false,
   });
 
-  const appsAttribute = createAppsAttribute(settings);
-
-  properties.push(appsAttribute);
+  attribs.push(createAppsAttribute(settings));
 
   return {
     meta: {
       metadata: {
-        Class: [...properties],
+        Class: [...attribs],
       },
     },
     library: settings.collectionLibraries,
@@ -507,22 +509,22 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 
   // Creates metadata representing a single NFT
 
-  const properties: MetadataProperty[] = [];
+  const attribs: MetadataProperty[] = [];
 
-  properties.push(createTextAttrib('id', tokenId));
-  properties.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
+  attribs.push(createTextAttrib('id', tokenId));
+  attribs.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
   for (let assetType in assetTypeMap) {
-    properties.push(createTextAttrib(`${assetType}_asset`, `${settings.args.namespace}.${assetTypeMap[assetType]}`));
+    attribs.push(createTextAttrib(`${assetType}_asset`, `${assetTypeMap[assetType]}`));
   }
 
-  properties.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
+  attribs.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
 
   // build classes that point to uploaded resources
   const resourceRefs = createClassesForResourceReferences(settings, resources, libraries);
 
-  properties.push({
+  attribs.push({
     name: 'library',
     value: {
       Array: { thawed: [...resourceRefs] },
@@ -530,12 +532,12 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: false,
   });
 
-  properties.push(createAppsAttribute(settings));
+  attribs.push(createAppsAttribute(settings));
 
   return {
     meta: {
       metadata: {
-        Class: [...properties],
+        Class: [...attribs],
       },
     },
     library: libraries,
@@ -640,7 +642,7 @@ function createClassForResource(
   const fileNameLower = path.basename(filePath).toLowerCase();
 
   // ensure the file has a valid mime type
-  const mimeType = mime.lookup(fileNameLower);
+  const mimeType = lookup(fileNameLower);
   if (!mimeType) {
     const err = `Could not find mime type for file: ${filePath}`;
     log(err);
@@ -648,20 +650,25 @@ function createClassForResource(
   }
 
   const relFilePathLower = path.relative(settings.stageFolder, filePath).toLowerCase();
+  const fileInfo = settings.fileMap[relFilePathLower];
 
-  return {
-    Class: [
-      createTextAttrib('library_id', settings.fileMap[relFilePathLower].libraryId),
-      createTextAttrib('title', `${settings.args.collectionDisplayName} ${fileNameLower}`),
-      createTextAttrib('location_type', 'canister'),
-      createTextAttrib('location', settings.fileMap[relFilePathLower].resourceUrl),
-      createTextAttrib('content_type', mimeType),
-      createTextAttrib('content_hash', utils.getFileHash(filePath)),
-      createNatAttrib('size', fileSize),
-      createNatAttrib('sort', sort),
-      createTextAttrib('read', 'public'),
-    ],
-  };
+  const attribs = [
+    createTextAttrib('library_id', fileInfo.libraryId),
+    createTextAttrib('title', `${settings.args.displayName} ${fileNameLower}`),
+    createTextAttrib('location_type', 'canister'),
+    createTextAttrib('location', fileInfo.resourceUrl),
+    createTextAttrib('content_type', mimeType),
+    createTextAttrib('content_hash', utils.getFileHash(filePath)),
+    createNatAttrib('size', BigInt(fileSize)),
+    createNatAttrib('sort', BigInt(sort)),
+    createTextAttrib('read', 'public'),
+  ];
+
+  if (fileInfo.immutable) {
+    attribs.push(createBoolAttrib('com.origyn.immutable_library', true, true));
+  }
+
+  return { Class: attribs };
 }
 
 function createLibrary(settings: ConfigSettings, filePath: string): LibraryFile {
@@ -697,7 +704,7 @@ function createBoolAttrib(name: string, value: boolean, immutable: boolean = fal
   };
 }
 
-function createNatAttrib(name: string, value: number, immutable: boolean = false): MetadataProperty {
+function createNatAttrib(name: string, value: bigint, immutable: boolean = false): MetadataProperty {
   return {
     name,
     value: { Nat: value },
@@ -723,7 +730,7 @@ function createAppsAttribute(settings: ConfigSettings): MetadataProperty {
             Class: [
               {
                 name: 'app_id',
-                value: { Text: settings.args.namespace },
+                value: { Text: 'com.origyn.csm' },
                 immutable: false,
               },
               {
@@ -788,29 +795,28 @@ function createAppsAttribute(settings: ConfigSettings): MetadataProperty {
                 value: {
                   Class: [
                     {
-                      name: `${settings.args.namespace}.name`,
-                      value: {
-                        Text: settings.args.collectionDisplayName,
-                      },
+                      name: `name`,
+                      value: { Text: settings.args.displayName },
                       immutable: false,
                     },
                     {
-                      name: `${settings.args.namespace}.total_in_collection`,
-                      value: { Nat: settings.totalNftCount },
+                      name: `description`,
+                      value: { Text: settings.args.description || `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace` },
                       immutable: false,
                     },
                     {
-                      name: `${settings.args.namespace}.collectionid`,
-                      value: {
-                        Text: settings.args.collectionId,
-                      },
+                      name: `total_in_collection`,
+                      value: { Nat: BigInt(settings.totalNftCount) },
                       immutable: false,
                     },
                     {
-                      name: `${settings.args.namespace}.creator_principal`,
-                      value: {
-                        Principal: settings.args.creatorPrincipal,
-                      },
+                      name: `collectionid`,
+                      value: { Text: settings.args.collectionId },
+                      immutable: false,
+                    },
+                    {
+                      name: `creator_principal`,
+                      value: { Principal: settings.args.creatorPrincipal },
                       immutable: false,
                     },
                   ],
@@ -841,7 +847,7 @@ function createClassesForResourceReferences(
 
     const libraryId: string = (libraryIdProperty.value as TextValue).Text;
 
-    let locationType = 'canister';
+    let locationType: LocationType = 'canister';
     let library = libraries.find((l) => l.library_id === libraryId);
     if (!library) {
       library = settings.collectionLibraries.find((l) => l.library_id === libraryId);
@@ -858,30 +864,36 @@ function createClassesForResourceReferences(
       .relative(settings.stageFolder, path.resolve(settings.stageFolder, library.library_file))
       .toLowerCase();
 
-    const title = settings.fileMap[relFilePath]?.title;
+    const fileInfo = settings.fileMap[relFilePath];
+    const title = fileInfo.title;
     const location = cls.Class.find((a) => a.name === 'location')?.value;
     const size = cls.Class.find((a) => a.name === 'size')?.value;
     const sort = cls.Class.find((a) => a.name === 'sort')?.value;
     const contentType = cls.Class.find((a) => a.name === 'content_type')?.value;
     const contentHash = cls.Class.find((a) => a.name === 'content_hash')?.value;
+    const immutableLibrary = cls.Class.find((a) => a.name === 'com.origyn.immutable_library')?.value;
 
     if (!title || !location || !size || !sort || !contentType || !contentHash) {
       throw 'Unexpected missing properties of resource class.';
     }
 
-    resourceReferences.push({
-      Class: [
-        createTextAttrib('library_id', libraryId),
-        createTextAttrib('title', title),
-        createTextAttrib('location_type', locationType),
-        createTextAttrib('location', (location as TextValue).Text),
-        createTextAttrib('content_type', (contentType as TextValue).Text),
-        createTextAttrib('content_hash', (contentHash as TextValue).Text),
-        createNatAttrib('size', (size as NatValue).Nat),
-        createNatAttrib('sort', (sort as NatValue).Nat),
-        createTextAttrib('read', 'public'),
-      ],
-    });
+    const attribs = [
+      createTextAttrib('library_id', libraryId),
+      createTextAttrib('title', title),
+      createTextAttrib('location_type', locationType),
+      createTextAttrib('location', (location as TextValue).Text),
+      createTextAttrib('content_type', (contentType as TextValue).Text),
+      createTextAttrib('content_hash', (contentHash as TextValue).Text),
+      createNatAttrib('size', locationType === 'collection' ? 0n : (size as NatValue).Nat),
+      createNatAttrib('sort', (sort as NatValue).Nat),
+      createTextAttrib('read', 'public'),
+    ];
+
+    if (immutableLibrary && (immutableLibrary as BoolValue)?.Bool) {
+      attribs.push(createBoolAttrib('com.origyn.immutable_library', true, true));
+    }
+
+    resourceReferences.push({ Class: attribs });
   }
 
   return resourceReferences;
@@ -974,8 +986,8 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
         log(`\n*** REPLACED ${relUrl}`);
         log(`WITH ${resourceUrl}`);
       } else {
-        const err = `Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}`;
-        throw err;
+        log(`\n*** NOT REPLACED ${relUrl}`);
+        log(`WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}`);
       }
     }
   }
