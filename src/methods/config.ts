@@ -532,7 +532,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: false,
   });
 
-  attribs.push(createAppsAttribute(settings));
+  attribs.push(createAppsAttribute(settings, tokenId));
 
   return {
     meta: {
@@ -720,7 +720,46 @@ function createFloatAttrib(name: string, value: number, immutable: boolean = fal
   };
 }
 
-function createAppsAttribute(settings: ConfigSettings): MetadataProperty {
+function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): MetadataProperty {
+  const dataAttributes: any[] = [];
+
+  // at the collection level, include the collection id (i.e. "bayc") which is used in the
+  // perpetualOS URL and phonebook to lookup and map to the canister id
+  if (tokenId === '') {
+    dataAttributes.push({
+      name: `collection_id`,
+      value: { Text: settings.args.collectionId },
+      immutable: false,
+    });
+  }
+
+  // the display name of all tokens will default to the collection display name and token id
+  // this can be changed in a post-config script
+  dataAttributes.push({
+    name: `display_name`,
+    value: {
+      Text: tokenId ? `${settings.args.displayName} - ${tokenId}` : settings.args.displayName
+    },
+    immutable: false,
+  });
+
+  // default all NFTs to same description as the collection
+  // this can be changed in a post-script script
+  dataAttributes.push({
+    name: `description`,
+    value: { Text: settings.args.description || `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace` },
+    immutable: false,
+  });
+
+  // provide empty array for custom properties
+  dataAttributes.push({
+    name: `custom_properties`,
+    value: {
+      Array: { thawed: [] },
+    },
+    immutable: false,
+  });
+
   return {
     name: '__apps',
     value: {
@@ -730,7 +769,7 @@ function createAppsAttribute(settings: ConfigSettings): MetadataProperty {
             Class: [
               {
                 name: 'app_id',
-                value: { Text: 'com.origyn.csm' },
+                value: { Text: 'com.origyn.metadata.general' },
                 immutable: false,
               },
               {
@@ -792,35 +831,7 @@ function createAppsAttribute(settings: ConfigSettings): MetadataProperty {
               },
               {
                 name: 'data',
-                value: {
-                  Class: [
-                    {
-                      name: `name`,
-                      value: { Text: settings.args.displayName },
-                      immutable: false,
-                    },
-                    {
-                      name: `description`,
-                      value: { Text: settings.args.description || `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace` },
-                      immutable: false,
-                    },
-                    {
-                      name: `total_in_collection`,
-                      value: { Nat: BigInt(settings.totalNftCount) },
-                      immutable: false,
-                    },
-                    {
-                      name: `collectionid`,
-                      value: { Text: settings.args.collectionId },
-                      immutable: false,
-                    },
-                    {
-                      name: `creator_principal`,
-                      value: { Principal: settings.args.creatorPrincipal },
-                      immutable: false,
-                    },
-                  ],
-                },
+                value: { Class: dataAttributes },
                 immutable: false,
               },
             ],
