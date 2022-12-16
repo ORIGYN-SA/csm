@@ -733,12 +733,13 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
     });
   }
 
-  // the display name of all tokens will default to the collection display name and token id
-  // this can be changed in a post-config script
   dataAttributes.push({
     name: `display_name`,
     value: {
-      Text: tokenId ? `${settings.args.displayName} - ${tokenId}` : settings.args.displayName
+      // if tokenId is passed, the display name for the NFT is the tokenId by default
+      // an empty tokenId means that we are building collection level metadata
+      // so provide the collection display name
+      Text: tokenId ? tokenId : settings.args.displayName
     },
     immutable: false,
   });
