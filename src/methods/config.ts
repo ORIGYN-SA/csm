@@ -3,8 +3,25 @@ import fse from 'fs-extra';
 import path from 'path';
 import * as utils from '../utils/index.js';
 import { lookup } from 'mrmime';
-import { AssetTypeMap, ConfigArgs, ConfigSummary, ConfigFile, ConfigSettings, FileInfoMap, Royalties } from '../types/config.js';
-import { LibraryFile, MetadataClass, MetadataProperty, Meta, TextValue, NatValue, LocationType, BoolValue } from '../types/metadata.js';
+import {
+  AssetTypeMap,
+  ConfigArgs,
+  ConfigSummary,
+  ConfigFile,
+  ConfigSettings,
+  FileInfoMap,
+  Royalties,
+} from '../types/config.js';
+import {
+  LibraryFile,
+  MetadataClass,
+  MetadataProperty,
+  Meta,
+  TextValue,
+  NatValue,
+  LocationType,
+  BoolValue,
+} from '../types/metadata.js';
 import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser.js';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
 import { log } from './logger.js';
@@ -138,7 +155,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     payees: {
       originator: args.originatorPrincipal,
       node: args.nodePrincipal,
-      network: args.networkPrincipal
+      network: args.networkPrincipal,
     },
     rates: {
       primary: {
@@ -146,21 +163,25 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
         broker: args.primaryBrokerRate,
         node: args.primaryNodeRate,
         network: args.primaryNetworkRate,
-        custom: parseCustomRates(args.primaryCustomRates)
+        custom: parseCustomRates(args.primaryCustomRates),
       },
       secondary: {
         originator: args.secondaryOriginatorRate,
         broker: args.secondaryBrokerRate,
         node: args.secondaryNodeRate,
         network: args.secondaryNetworkRate,
-        custom: parseCustomRates(args.secondaryCustomRates)
-      } 
-    }
-  }
+        custom: parseCustomRates(args.secondaryCustomRates),
+      },
+    },
+  };
 
   // Create an array of token IDs
   let tokenIds: string[] = [];
-  const tokenWords = args.tokenWords?.split(',').map(w => w.trim()).filter(w => w.length) || [];
+  const tokenWords =
+    args.tokenWords
+      ?.split(',')
+      .map((w) => w.trim())
+      .filter((w) => w.length) || [];
   if (tokenWords.length) {
     if (args.minWords && !Number.parseInt(args.minWords)) {
       throw 'minWords arg must be an integer';
@@ -168,7 +189,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     if (args.maxWords && !Number.parseInt(args.maxWords)) {
       throw 'maxWords arg must be an integer';
     }
-    
+
     const minWords = Number.parseInt(args.minWords);
     const maxWords = Number.parseInt(args.maxWords);
 
@@ -208,7 +229,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     fileMap: {},
     collectionLibraries: [],
     totalFileSize: 0,
-    royalties
+    royalties,
   };
 
   // build collection (resource library) metadata objects for all files
@@ -266,17 +287,16 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
       libraryId = fileNameWithoutExt;
     }
 
-    
     const resourceUrl = `${getResourceUrl(libraryId)}`.toLowerCase();
     const relativeFilePath = path.relative(settings.stageFolder, filePath);
-    let immutable = (fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable'));
+    let immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
 
     fileInfoMap[relativeFilePath.toLowerCase()] = {
       title,
       libraryId,
       resourceUrl,
       filePath: relativeFilePath,
-      immutable
+      immutable,
     };
   }
 
@@ -314,14 +334,14 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
         const resourceUrl = `${getResourceUrl(libraryId, tokenId)}`;
         const relativeFilePath = path.relative(settings.stageFolder, filePath);
-        let immutable = (fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable'));
+        let immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
 
         fileInfoMap[relativeFilePath.toLowerCase()] = {
           title,
           libraryId,
           resourceUrl,
           filePath: relativeFilePath,
-          immutable
+          immutable,
         };
       }
 
@@ -341,7 +361,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // Iterate all html and css files and replace local paths with NFT URLs
   const filesWithUrls: string[] = files.filter((f) =>
-    ['.html', '.htm', '.css'].includes(path.extname(f).toLowerCase()),
+    ['.html', '.htm', '.css', '.svg'].includes(path.extname(f).toLowerCase()),
   );
 
   // Ensure there are no external URL references (http/https)
@@ -426,7 +446,6 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 //   }
 // }
 
-
 function configureNftsMetadata(settings: ConfigSettings): Meta[] {
   let nftIndex = 1;
 
@@ -467,7 +486,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   const assetTypeMap = getAssetTypeMap([...files, ...collFiles], settings.assetTypeMapPatterns);
 
   // Iterate all html and css files and replace local paths with NFT URLs
-  const filesWithUrls = files.filter((f) => ['.html', '.htm', '.css'].includes(path.extname(f).toLowerCase()));
+  const filesWithUrls = files.filter((f) => ['.html', '.htm', '.css', '.svg'].includes(path.extname(f).toLowerCase()));
 
   // Ensure there are no external URL references (http/https)
   // validateNoExternalUrls(settings.stageFolder, filesWithUrls);
@@ -545,8 +564,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 }
 
 function createRoyalties(settings: ConfigSettings, secondary: boolean = false): MetadataProperty {
-
-  const rates = secondary ? settings.royalties.rates.secondary : settings.royalties.rates.primary
+  const rates = secondary ? settings.royalties.rates.secondary : settings.royalties.rates.primary;
 
   let royalties = [
     {
@@ -739,7 +757,7 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
       // if tokenId is passed, the display name for the NFT is the tokenId by default
       // an empty tokenId means that we are building collection level metadata
       // so provide the collection display name
-      Text: tokenId ? tokenId : settings.args.displayName
+      Text: tokenId ? tokenId : settings.args.displayName,
     },
     immutable: false,
   });
@@ -748,7 +766,11 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
   // this can be changed in a post-script script
   dataAttributes.push({
     name: `description`,
-    value: { Text: settings.args.description || `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace` },
+    value: {
+      Text:
+        settings.args.description ||
+        `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace`,
+    },
     immutable: false,
   });
 
@@ -942,28 +964,38 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
     return;
   }
 
-  let urls = matches
-    .flatMap((m) => {
-      const urls = m[1].split(',').map((v) => v.trim());
+  let urls = matches.flatMap((m) => {
+    let attribValue = m[2];
 
-      // check if srcset value with units like 200w or 1.5x
-      // and remove units so that only url remains
-      for (let i = 0; i < urls.length; i++) {
-        let srcsetUnitMatches = [...urls[i].matchAll(constants.SRCSET_VALUE_UNIT_REGEX)];
-        if (srcsetUnitMatches.length > 0) {
-          urls[i] = urls[i].substring(0, srcsetUnitMatches[srcsetUnitMatches.length - 1].index);
+    // remove srcset units so that only url remains
+    // <img srcset="image-480w.jpg 480w, image-800w.jpg 800w"
+    //   sizes="(max-width: 600px) 480px, 800px"
+    //   src="image-800w.jpg"
+    //   alt="Your description" />
+    const srcsetUrls = attribValue.split(',').map((v) => v.trim());
+    if (srcsetUrls.length > 1) {
+      for (let i = 0; i < srcsetUrls.length; i++) {
+        let units = [...srcsetUrls[i].matchAll(constants.SRCSET_VALUE_UNIT_REGEX)];
+        if (units.length > 0) {
+          srcsetUrls[i] = srcsetUrls[i].substring(0, units[units.length - 1].index);
         }
       }
 
-      return urls;
-    })
-    .filter((m) => m.indexOf('#') !== 0);
+      // remove any query string and/or fragment
+      let baseUrls = srcsetUrls.map((v) => v.split(/#|\?/)[0]).filter((v) => v.length > 0);
+      return baseUrls;
+    } else {
+      let baseUrl = attribValue.split(/#|\?/)[0];
+      return [baseUrl];
+    }
+  });
 
+  // ignore all external URLs (starting with http or https)
   const relativeUrls = urls.filter(
     (url) => url.search(constants.HTTP_OR_HTTPS_REGEX) === -1 && url.search(constants.DATA_URL_REGEX) === -1,
   );
 
-  // get array of unique urls sorted by longest first
+  // remove duplicates and sort by longest first
   // this prevents shorter strings from matching longer strings
   // for example: 0.html would replace 10.html if not sorted
   const uniqueRelUrls = Array.from(new Set(relativeUrls)).sort((a, b) => b.length - a.length);
@@ -971,38 +1003,36 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
   log(`\nuniqueRelUrls\n${JSON.stringify(uniqueRelUrls)}`);
 
   for (const relUrl of uniqueRelUrls) {
-    let relFilePathLower = path
+    // search file map for a file with the same relative path, then get the on-chain URL
+
+    // digital certificate level
+    const relFilePathLower = path
       .relative(settings.stageFolder, path.resolve(path.dirname(filePath), relUrl))
       .toLowerCase();
 
-    if (settings.fileMap[relFilePathLower]) {
-      const resourceUrl = settings.fileMap[relFilePathLower].resourceUrl;
-      contents = (contents as any).replaceAll(`"${relUrl}"`, `"/${resourceUrl}"`);
-      contents = (contents as any).replaceAll(`'${relUrl}'`, `'/${resourceUrl}'`);
+    // collection level
+    const relCollFilePathLower = path
+      .relative(settings.stageFolder, path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl))
+      .toLowerCase();
+
+    let mapping = settings.fileMap[relFilePathLower] || settings.fileMap[relCollFilePathLower];
+
+    if (mapping) {
+      const onChainUrl = mapping.resourceUrl;
+      // includes the first quote of the attribute in the search/replace to ensure the URL is not part of the content
+      // the second quote is left out because the attribute may have a query string or fragment that was removed above
+      contents = (contents as any).replaceAll(`"${relUrl}`, `"/${onChainUrl}`);
+      contents = (contents as any).replaceAll(`'${relUrl}`, `'/${onChainUrl}`);
 
       log(`\n*** REPLACED ${relUrl}`);
-      log(`WITH ${resourceUrl}`);
+      log(`WITH ${onChainUrl}`);
     } else {
-      const relCollFilePathLower = path
-        .relative(
-          settings.stageFolder,
-          path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl),
-        )
-        .toLowerCase();
-
-      if (settings.fileMap[relCollFilePathLower]) {
-        const resourceUrl = settings.fileMap[relCollFilePathLower].resourceUrl;
-        contents = (contents as any).replaceAll(`"${relUrl}"`, `"/${resourceUrl}"`);
-        contents = (contents as any).replaceAll(`'${relUrl}'`, `'/${resourceUrl}'`);
-
-        log(`\n*** REPLACED ${relUrl}`);
-        log(`WITH ${resourceUrl}`);
-      } else {
-        log(`\n*** NOT REPLACED ${relUrl}`);
-        log(`WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}`);
-      }
+      log(`\n*** NOT REPLACED ${relUrl}`);
+      log(
+        `WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}\n`,
+      );
     }
-  }
 
-  fs.writeFileSync(filePath, contents, { flag: 'w' });
+    fs.writeFileSync(filePath, contents, { flag: 'w' });
+  }
 }
