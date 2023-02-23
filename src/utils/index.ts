@@ -50,16 +50,15 @@ export function insertText(originalText: string, textToInsert: string, insertAt:
 
 export function findUrls(filePath: string, contents: string): RegExpMatchArray[] {
   const ext = path.extname(filePath).toLowerCase();
-  const isHtmlFile = ['.html', '.htm'].includes(ext);
-  const isCssFile = ext === '.css';
 
-  if (!isHtmlFile && !isCssFile) {
-    return [];
+  let matches: RegExpMatchArray[] = [];
+  if (['.html', '.htm'].includes(ext)) {
+    matches = [...contents.matchAll(constants.HTML_URL_ATTRIBS_REGEX)];
+  } else if (ext === '.css') {
+    matches = [...contents.matchAll(constants.CSS_URL_ATTRIBS_REGEX)];
+  } else if (ext === '.svg') {
+    matches = [...contents.matchAll(constants.SVG_URL_ATTRIBS_REGEX)];
   }
-
-  let regex: RegExp = isHtmlFile ? constants.HTML_URL_ATTRIBS_REGEX : constants.CSS_URL_ATTRIBS_REGEX;
-
-  const matches = [...contents.matchAll(regex)];
 
   return matches;
 }

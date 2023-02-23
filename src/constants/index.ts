@@ -9,12 +9,19 @@ export const CONFIG_FILE_NAME = 'metadata.json';
 export const COM_ORIGYN_NS = 'com.origyn';
 export const GOV_CANISTER_ID = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
-// HTML and CSS attributes can use double or single quotes
-// however, neither are allowed in URLs, so there
-// is no need to use a backreference to the first quote.
+// the captured url will be at index 2 of the match
 export const HTML_URL_ATTRIBS_REGEX =
-  /<(?:a|link|script|img|video)[^>]*(?:href|src|srcset)\s*=\s*[\"']([^\"']+)[\"'][^>]*>/gi;
-export const CSS_URL_ATTRIBS_REGEX = /[:\s]url\s*\(\s*[\"']([^\"']*)[\"']\s*\)/gi;
+  /<(?:a|link|script|img|video|object)[^>]*?(?:href|src|srcset|data-src|data-href|data)\s*=\s*(['"]?)(.*?)\1[^>]*>/gi;
+
+// <use href='http://example.com/another.svg' />
+// the captured url will be at index 2 of the match
+export const SVG_URL_ATTRIBS_REGEX = /<use[^>]+(?:xlink:)?href\s*=\s*(['"]?)(.*?)\1[^>]*>/gi;
+
+// many CSS attributes take a url: background, background-image, border-image, content, cursor, list-style-image, mask-image, shape-outside, src
+// the format is always the same: <attribute name>: url("http://example.com")
+// the captured url will be at index 2 of the match
+export const CSS_URL_ATTRIBS_REGEX = /:\s*url\(\s*(['"]?)(.*?)\1[^\)]*\)/gi;
+
 export const SRCSET_VALUE_UNIT_REGEX = /(\s\d+w)|(\s\d+(?:\.\d+)?x)/gi;
 export const HTTP_OR_HTTPS_REGEX = /https?:\/\//gi;
 export const DATA_URL_REGEX = /data:/gi;
