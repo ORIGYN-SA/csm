@@ -5,7 +5,7 @@ JavaScript library for configuring, staging and minting Origyn NFTs from a local
 ### Installation
 
 ```
-npm i @origyn-sa/csm
+npm i @origyn/csm
 ```
 
 ### Local testing of unpublished csm
@@ -21,7 +21,7 @@ npm i <path-to-csm>
 Start by importing the `csm` in your code.
 
 ```js
-import { config, stage, mint } from '@origyn-sa/csm';
+import { config, stage, mint } from '@origyn/csm';
 ```
 
 For a full example see https://github.com/ORIGYN-SA/minting-starter.

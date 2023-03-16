@@ -1,20 +1,16 @@
-import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate} from '../types/config.js';
+import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate } from '../types/config.js';
 import { MintArgs } from '../types/mint.js';
 import { StageArgs } from '../types/stage.js';
 //import { GOV_CANISTER_ID } from '../constants/index.js';
 const GOV_CANISTER_ID = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
-  const creatorPrincipal = getArgValue(argv, ['-p', '--creatorPrincipal']);
+  const creatorPrincipal = getArgValue(argv, ['--creatorPrincipal']);
 
   const args: ConfigArgs = {
     collectionId: getArgValue(argv, ['--collectionId']),
     displayName: getArgValue(argv, ['--displayName', '--collectionDisplayName']),
     description: getArgValue(argv, ['--description', '--collectionDescription']),
-    tokenPrefix: getArgValue(argv, ['--tokenPrefix']),
-    tokenWords: getArgValue(argv, ['--tokenWords']),
-    minWords: getArgValue(argv, ['--minWords'], "3"),
-    maxWords: getArgValue(argv, ['--maxWords'], "3"),
     nftCanisterId: getArgValue(argv, ['--nftCanisterId']),
     creatorPrincipal,
     folderPath: getArgValue(argv, ['--folderPath']),
@@ -29,7 +25,7 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
     nodePrincipal: getArgValue(argv, ['--nodePrincipal'], GOV_CANISTER_ID),
     networkPrincipal: getArgValue(argv, ['--networkPrincipal'], GOV_CANISTER_ID),
-    
+
     // primary royalties
     primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate'], '0.01'),
     primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
@@ -47,19 +43,17 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
   // validate args
   if (!args.collectionId) {
-    throw 'Missing collection id argument (-c) with the id of the collection used in the URL and __apps section.';
+    throw 'Missing collection id argument (--collectionId) with the id of the collection used in the URL and __apps section.';
   } else if (!args.displayName) {
-    throw 'Missing collection display name argument (-d).';
-  } else if (!args.tokenPrefix && !args.tokenWords) {
-    throw 'Missing token prefix argument (-t) or token words (-w).';
+    throw 'Missing display name argument (--displayName).';
   } else if (!args.nftCanisterId) {
-    throw 'Missing canister id argument (-i).';
+    throw 'Missing canister id argument (--nftCanisterId).';
   } else if (!args.creatorPrincipal) {
-    throw 'Missing creator principal id argument (-p).';
+    throw 'Missing creator principal id argument (--creatorPrincipal).';
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
+    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
   } else if (!args.assetMappings) {
-    throw 'Missing NFT argument/s (-m) with a comma delimited list of asset type to file name mappings.';
+    throw 'Missing asset mappings (--assetMappings) with a comma delimited list of asset type to file name mappings.';
   }
 
   return args;
@@ -74,11 +68,11 @@ export function parseStageArgs(argv: string[]): StageArgs {
 
   // validate args
   if (!args.environment) {
-    throw 'Missing environment argument (-e).';
+    throw 'Missing environment argument (--environment).';
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
+    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
   } else if (!args.keyFilePath) {
-    throw 'Missing seed file path argument (-s)';
+    throw 'Missing key file path argument (--keyFilePath)';
   }
 
   return args;
@@ -97,11 +91,11 @@ export function parseMintArgs(argv: string[]): MintArgs {
 
   // validate args
   if (!args.environment) {
-    throw 'Missing environment argument (-e).';
+    throw 'Missing environment argument (--environment).';
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (-f) with the path to the folder containing the NFT assets.';
+    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
   } else if (!args.keyFilePath) {
-    throw 'Missing seed file path argument (-s)';
+    throw 'Missing key file path argument (--keyFilePath)';
   }
 
   return args;

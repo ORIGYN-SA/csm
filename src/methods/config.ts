@@ -25,7 +25,6 @@ import {
 import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser.js';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
 import { log } from './logger.js';
-import { getTokenIds } from './token-ids.js';
 import * as constants from '../constants/index.js';
 
 export function config(args: ConfigArgs): string {
@@ -75,7 +74,19 @@ export function config(args: ConfigArgs): string {
   return outputFilePath;
 }
 
+function getTokenIds(folderPath: string) {
+  const fileName = 'token-ids.json';
+  const filePath = path.join(folderPath, fileName);
+  if (!fse.existsSync(filePath)) {
+    throw new Error(`Expected to find a '${fileName}' file at ${folderPath}`);
+  }
+  const tokenIds = JSON.parse(fs.readFileSync(filePath).toString());
+  return tokenIds;
+}
+
 function initConfigSettings(args: ConfigArgs): ConfigSettings {
+  const tokenIds = getTokenIds(args.folderPath);
+
   const assetTypeMapPatterns = parseAssetTypeMapPatterns(args.assetMappings);
 
   let nftQuantities: number[] = [];
@@ -174,47 +185,6 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
       },
     },
   };
-
-  // Create an array of token IDs
-  let tokenIds: string[] = [];
-  const tokenWords =
-    args.tokenWords
-      ?.split(',')
-      .map((w) => w.trim())
-      .filter((w) => w.length) || [];
-  if (tokenWords.length) {
-    if (args.minWords && !Number.parseInt(args.minWords)) {
-      throw 'minWords arg must be an integer';
-    }
-    if (args.maxWords && !Number.parseInt(args.maxWords)) {
-      throw 'maxWords arg must be an integer';
-    }
-
-    const minWords = Number.parseInt(args.minWords);
-    const maxWords = Number.parseInt(args.maxWords);
-
-    if (minWords < 1 || minWords > 5) {
-      throw 'minWords must be an integer from 1 to 5';
-    }
-    if (maxWords < 1 || maxWords > 5) {
-      throw 'maxWords must be an integer from 1 to 5';
-    }
-    if (maxWords < minWords) {
-      throw 'maxWords must be equal to or greater than minWords';
-    }
-
-    tokenIds = getTokenIds(tokenWords, minWords, maxWords, totalNftCount);
-    if (tokenIds.length < totalNftCount) {
-      const err = `Not enough token words provided to generate ${totalNftCount} unique token IDs.`;
-      throw err;
-    }
-  } else if (!args.tokenPrefix) {
-    throw 'Either the tokenWords or tokenPrefix arg must be provided.';
-  } else {
-    for (let nftIndex = 1; nftIndex <= totalNftCount; nftIndex++) {
-      tokenIds.push(`${args.tokenPrefix}${nftIndex}`.toLowerCase());
-    }
-  }
 
   const settings: ConfigSettings = {
     args,

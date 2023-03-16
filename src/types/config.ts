@@ -4,10 +4,6 @@ export type ConfigArgs = {
   collectionId: string;
   displayName: string;
   description: string;
-  tokenPrefix: string;
-  tokenWords: string;
-  minWords: string;
-  maxWords: string;
   nftCanisterId: string;
   creatorPrincipal: string;
   folderPath: string;
@@ -96,8 +92,8 @@ export type ConfigFile = {
 export type CustomRoyaltyRate = {
   customName: string;
   principalId: string;
-  rate: string
-}
+  rate: string;
+};
 
 export type RoyaltyPayees = {
   originator: string;
@@ -110,13 +106,13 @@ export type RoyaltyRates = {
   broker: string;
   node: string;
   network: string;
-  custom: CustomRoyaltyRate[]
+  custom: CustomRoyaltyRate[];
 };
 
 export type Royalties = {
-  payees: RoyaltyPayees,
+  payees: RoyaltyPayees;
   rates: {
-    primary: RoyaltyRates,
-    secondary: RoyaltyRates
-  }
-}
+    primary: RoyaltyRates;
+    secondary: RoyaltyRates;
+  };
+};
