@@ -777,7 +777,8 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = '', nft
     dataAttributes.push({
       name: `custom_properties`,
       value: {
-        Array: { thawed: formatted_properties },
+        Array: { thawed: [{ "Class": formatted_properties }],
+        }
       },
       immutable: false,
     });
