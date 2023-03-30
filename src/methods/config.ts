@@ -11,6 +11,7 @@ import {
   ConfigSettings,
   FileInfoMap,
   Royalties,
+  NFTAttributes,
 } from '../types/config.js';
 import {
   LibraryFile,
@@ -86,6 +87,16 @@ function getTokenIds(folderPath: string) {
 
 function initConfigSettings(args: ConfigArgs): ConfigSettings {
   const tokenIds = getTokenIds(args.folderPath);
+
+  let customAttributes: NFTAttributes[] = [];
+  if (fse.existsSync(args.attributeFilePath)) {
+    try {
+      customAttributes = JSON.parse(fs.readFileSync(args.attributeFilePath).toString());
+      console.log("customAttributes", customAttributes)
+    } catch (error) { throw error; }
+  } else if (args.attributeFilePath) {
+    throw new Error(`Expected to find an attribute file at ${args.attributeFilePath}`);
+  };
 
   const assetTypeMapPatterns = parseAssetTypeMapPatterns(args.assetMappings);
 
@@ -193,6 +204,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     stageFolder,
     collectionFolder,
     nftsFolder,
+    customAttributes,
     nftDefinitionCount,
     nftQuantities,
     totalNftCount,
@@ -521,7 +533,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
     immutable: false,
   });
 
-  attribs.push(createAppsAttribute(settings, tokenId));
+  attribs.push(createAppsAttribute(settings, tokenId, nftIndex));
 
   return {
     meta: {
@@ -708,7 +720,7 @@ function createFloatAttrib(name: string, value: number, immutable: boolean = fal
   };
 }
 
-function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): MetadataProperty {
+function createAppsAttribute(settings: ConfigSettings, tokenId: string = '', nftIndex: number = 0): MetadataProperty {
   const dataAttributes: any[] = [];
 
   // at the collection level, include the collection id (i.e. "bayc") which is used in the
@@ -744,14 +756,32 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
     immutable: false,
   });
 
-  // provide empty array for custom properties
-  dataAttributes.push({
-    name: `custom_properties`,
-    value: {
-      Array: { thawed: [] },
-    },
-    immutable: false,
-  });
+  
+  // provide empty array for collection level custom properties
+  if (tokenId === '') {
+    dataAttributes.push({
+      name: `custom_properties`,
+      value: {
+        Array: { thawed: [] },
+      },
+      immutable: false,
+    });
+  } else if (settings.args.attributeFilePath) {
+    let formatted_properties = settings.customAttributes[nftIndex - 1].attributes.map(item => {
+      return {
+        name: item.trait_type,
+        value: { Text: item.value },
+        immutable: false
+      };
+    });
+    dataAttributes.push({
+      name: `custom_properties`,
+      value: {
+        Array: { thawed: formatted_properties },
+      },
+      immutable: false,
+    });
+  };
 
   return {
     name: '__apps',
@@ -994,13 +1024,13 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       contents = (contents as any).replaceAll(`"${relUrl}`, `"/${onChainUrl}`);
       contents = (contents as any).replaceAll(`'${relUrl}`, `'/${onChainUrl}`);
 
-      log(`\n*** REPLACED ${relUrl}`);
-      log(`WITH ${onChainUrl}`);
+      // log(`\n*** REPLACED ${relUrl}`);
+      // log(`WITH ${onChainUrl}`);
     } else {
-      log(`\n*** NOT REPLACED ${relUrl}`);
-      log(
-        `WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}\n`,
-      );
+      // log(`\n*** NOT REPLACED ${relUrl}`);
+      // log(
+      //  `WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}\n`,
+      //);
     }
 
     fs.writeFileSync(filePath, contents, { flag: 'w' });

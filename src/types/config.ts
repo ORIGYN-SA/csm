@@ -23,6 +23,8 @@ export type ConfigArgs = {
   // example: '0:3,1:3,2:5,3:10'
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
+  // file with custom attribute definitions
+  attributeFilePath: string;
 
   // royalties
   nodePrincipal: string;
@@ -46,6 +48,7 @@ export type ConfigSettings = {
   stageFolder: string;
   collectionFolder: string;
   nftsFolder: string;
+  customAttributes: NFTAttributes[];
   tokenIds: string[];
   nftDefinitionCount: number;
   nftQuantities: number[];
@@ -115,4 +118,11 @@ export type Royalties = {
     primary: RoyaltyRates;
     secondary: RoyaltyRates;
   };
+};
+
+export type NFTAttributes = {
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
 };
