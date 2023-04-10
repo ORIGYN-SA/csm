@@ -11,7 +11,7 @@ import {
   ConfigSettings,
   FileInfoMap,
   Royalties,
-  NFTAttributes,
+  CustomProperty,
 } from '../types/config.js';
 import {
   LibraryFile,
@@ -88,14 +88,12 @@ function getTokenIds(folderPath: string) {
 function initConfigSettings(args: ConfigArgs): ConfigSettings {
   const tokenIds = getTokenIds(args.folderPath);
 
-  let customAttributes: NFTAttributes[] = [];
-  if (fse.existsSync(args.attributeFilePath)) {
-    try {
-      customAttributes = JSON.parse(fs.readFileSync(args.attributeFilePath).toString());
-      console.log("customAttributes", customAttributes)
-    } catch (error) { throw error; }
-  } else if (args.attributeFilePath) {
-    throw new Error(`Expected to find an attribute file at ${args.attributeFilePath}`);
+  let customProperties: CustomProperty[] = [];
+  const customPropertiesPath = path.join(args.folderPath, 'custom-properties.json');
+  if (!fse.existsSync(customPropertiesPath)) {
+    log(`\nNo Custom Properties found for collection`);
+  } else {
+    customProperties = JSON.parse(fs.readFileSync(customPropertiesPath).toString());
   };
 
   const assetTypeMapPatterns = parseAssetTypeMapPatterns(args.assetMappings);
@@ -204,7 +202,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     stageFolder,
     collectionFolder,
     nftsFolder,
-    customAttributes,
+    customProperties,
     nftDefinitionCount,
     nftQuantities,
     totalNftCount,
@@ -766,8 +764,8 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = '', nft
       },
       immutable: false,
     });
-  } else if (settings.args.attributeFilePath) {
-    let formatted_properties = settings.customAttributes[nftIndex - 1].attributes.map(item => {
+  } else if (settings.customProperties[nftIndex - 1]) {
+    let formatted_properties = settings.customProperties[nftIndex - 1].attributes.map(item => {
       return {
         name: item.trait_type,
         value: { Text: item.value },

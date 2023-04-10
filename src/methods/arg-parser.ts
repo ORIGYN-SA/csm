@@ -20,7 +20,6 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     nftOwnerId: getArgValue(argv, ['--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['--nftQuantities']),
-    attributeFilePath: getArgValue(argv, ['--attributeFilePath']),
 
     // payees (for royalties)
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
