@@ -546,32 +546,39 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 function createRoyalties(settings: ConfigSettings, secondary: boolean = false): MetadataProperty {
   const rates = secondary ? settings.royalties.rates.secondary : settings.royalties.rates.primary;
 
-  let royalties = [
-    {
+  let royalties: any = [];
+  if (rates.originator) {
+    royalties.push({
       Class: [
         createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.originator`),
         createFloatAttrib('rate', Number(rates.originator)),
       ],
-    },
-    {
+    })
+  }
+  if (rates.broker) {
+    royalties.push({
       Class: [
         createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.broker`),
         createFloatAttrib('rate', Number(rates.broker)),
       ],
-    },
-    {
+    })
+  }
+  if (rates.node) {
+    royalties.push({
       Class: [
         createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.node`),
         createFloatAttrib('rate', Number(rates.node)),
       ],
-    },
-    {
+    })
+  }
+  if (rates.network) {
+    royalties.push({
       Class: [
         createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.network`),
         createFloatAttrib('rate', Number(rates.network)),
       ],
-    },
-  ];
+    })
+  }
 
   if (rates.custom) {
     rates.custom.forEach((customRate) => {

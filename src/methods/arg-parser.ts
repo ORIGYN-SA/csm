@@ -27,17 +27,17 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     networkPrincipal: getArgValue(argv, ['--networkPrincipal'], GOV_CANISTER_ID),
 
     // primary royalties
-    primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate'], '0.01'),
-    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate'], '0.03'),
-    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate'], '0.035'),
-    primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate'], '0.005'),
+    primaryOriginatorRate: getArgValue(argv, ['--primaryOriginatorRate']),
+    primaryBrokerRate: getArgValue(argv, ['--primaryBrokerRate']),
+    primaryNodeRate: getArgValue(argv, ['--primaryNodeRate']),
+    primaryNetworkRate: getArgValue(argv, ['--primaryNetworkRate']),
     primaryCustomRates: getArgValue(argv, ['--primaryCustomRates']),
 
     // secondary royalties
-    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate'], '0.01'),
-    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate'], '0.03'),
-    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate'], '0.035'),
-    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate'], '0.005'),
+    secondaryOriginatorRate: getArgValue(argv, ['--secondaryOriginatorRate']),
+    secondaryBrokerRate: getArgValue(argv, ['--secondaryBrokerRate']),
+    secondaryNodeRate: getArgValue(argv, ['--secondaryNodeRate']),
+    secondaryNetworkRate: getArgValue(argv, ['--secondaryNetworkRate']),
     secondaryCustomRates: getArgValue(argv, ['--secondaryCustomRates']),
   };
 
