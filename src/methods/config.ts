@@ -742,19 +742,29 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = '', nft
     immutable: false,
   });
 
-  // default all NFTs to same description as the collection
-  // this can be changed in a post-script script
-  dataAttributes.push({
-    name: `description`,
-    value: {
-      Text:
-        settings.args.description ||
-        `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace`,
-    },
-    immutable: false,
-  });
+  // default collection description is set with the description flag
+  // individual NFT descriptions can be set with custom-properties.json
+  if (tokenId === '') {
+    dataAttributes.push({
+      name: `description`,
+      value: {
+        Text:
+          settings.args.description ||
+          `An NFT collection hosted at https://${settings.args.nftCanisterId}.raw.ic0.app/collection/-/marketplace`,
+      },
+      immutable: false,
+    });
+  } else if (settings.customProperties[nftIndex - 1].description) {
+    dataAttributes.push({
+      name: `description`,
+      value: {
+        Text:
+          settings.customProperties[nftIndex - 1].description,
+      },
+      immutable: false,
+    });
+  };
 
-  
   // provide empty array for collection level custom properties
   if (tokenId === '') {
     dataAttributes.push({
@@ -764,7 +774,7 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = '', nft
       },
       immutable: false,
     });
-  } else if (settings.customProperties[nftIndex - 1]) {
+  } else if (settings.customProperties[nftIndex - 1].attributes) {
     let formatted_properties = settings.customProperties[nftIndex - 1].attributes.map(item => {
       return {
         name: item.trait_type,
@@ -1023,13 +1033,13 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       contents = (contents as any).replaceAll(`"${relUrl}`, `"/${onChainUrl}`);
       contents = (contents as any).replaceAll(`'${relUrl}`, `'/${onChainUrl}`);
 
-      // log(`\n*** REPLACED ${relUrl}`);
-      // log(`WITH ${onChainUrl}`);
+      log(`\n*** REPLACED ${relUrl}`);
+      log(`WITH ${onChainUrl}`);
     } else {
-      // log(`\n*** NOT REPLACED ${relUrl}`);
-      // log(
-      //  `WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}\n`,
-      //);
+      log(`\n*** NOT REPLACED ${relUrl}`);
+      log(
+       `WARNING: Could not find file "${relFilePathLower}" or "${relCollFilePathLower}" referenced in ${filePath}\n`,
+      );
     }
 
     fs.writeFileSync(filePath, contents, { flag: 'w' });

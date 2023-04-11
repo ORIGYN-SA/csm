@@ -119,6 +119,7 @@ export type Royalties = {
 };
 
 export type CustomProperty = {
+  description: string;
   attributes: {
     trait_type: string;
     value: string;
