@@ -1,4 +1,4 @@
-import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate } from '../types/config.js';
+import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate, Social  } from '../types/config.js';
 import { MintArgs } from '../types/mint.js';
 import { StageArgs } from '../types/stage.js';
 //import { GOV_CANISTER_ID } from '../constants/index.js';
@@ -20,6 +20,7 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     nftOwnerId: getArgValue(argv, ['--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['--nftQuantities']),
+    socials: (getArgValue(argv, ['--socials'])),
 
     // payees (for royalties)
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
@@ -157,6 +158,35 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
     });
 
   return customRates;
+}
+
+export function parseSocials(patterns: string): Social[] {
+  let socials: Social[] = [];
+  if (!patterns) {
+    return socials;
+  }
+
+  patterns
+    .split(/\s?,\s?/)
+    .map((n) => n.split(/\s?:\s?/))
+    .forEach((m) => {
+      if (m.length != 2) {
+        const err = `Invalid syntax for social urls. ${m}`;
+        throw err;
+      }
+
+      const name = m[0].trim().toLowerCase();
+      const url = m[1].trim();
+
+      if ( !name || !url ) {
+        const err = 'Socials, name or url not provided!';
+        throw err;
+      }
+
+      socials.push({ name, url });
+    });
+
+  return socials;
 }
 
 export function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
