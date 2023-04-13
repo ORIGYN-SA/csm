@@ -11,6 +11,7 @@ import {
   ConfigSettings,
   FileInfoMap,
   Royalties,
+  Social,
 } from '../types/config.js';
 import {
   LibraryFile,
@@ -22,7 +23,7 @@ import {
   LocationType,
   BoolValue,
 } from '../types/metadata.js';
-import { parseAssetTypeMapPatterns, parseCustomRates } from './arg-parser.js';
+import { parseAssetTypeMapPatterns, parseCustomRates, parseSocials } from './arg-parser.js';
 import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
 import { log } from './logger.js';
 import * as constants from '../constants/index.js';
@@ -93,6 +94,8 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   if (args.nftQuantities) {
     nftQuantities = args.nftQuantities.split(',').map((q) => Number(q.trim()));
   }
+
+  const socials: Social[] = args.socials ? parseSocials(args.socials) : [];
 
   const stageFolder = path.join(args.folderPath, '..', constants.STAGE_FOLDER);
   copyFolder(args.folderPath, stageFolder);
@@ -193,6 +196,7 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
     stageFolder,
     collectionFolder,
     nftsFolder,
+    socials,
     nftDefinitionCount,
     nftQuantities,
     totalNftCount,
@@ -743,6 +747,33 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
     },
     immutable: false,
   });
+
+  if (tokenId === '' && settings.args.socials) {
+    const formatted_socials = settings.socials.map(item => {
+      return { Class: [
+      {
+        name: "type",
+        value: {
+          Text: item.name
+        },
+        immutable: false
+      },
+      {
+        name: "url",
+        value: {
+          "Text": decodeURIComponent(item.url)
+        },
+        immutable: false
+      }]};
+    });
+    dataAttributes.push({
+      name: `social_links`,
+      value: {
+        Array: { thawed: formatted_socials }
+      },
+      immutable: false,
+    });
+  }
 
   // provide empty array for custom properties
   dataAttributes.push({

@@ -23,6 +23,10 @@ export type ConfigArgs = {
   // example: '0:3,1:3,2:5,3:10'
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
+  // string with a comma delimited list of social urls for the collection
+  // urls must be encoded and not include chars such as ':' 
+  // example: 'twitter:https%3A%2F%2Ftwitter.com%2FYumiMarketplace, dscvr:https%3A%2F%2Fh5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app%2Fu%2Fyumi_marketplace'
+  socials: string,
 
   // royalties
   nodePrincipal: string;
@@ -49,6 +53,7 @@ export type ConfigSettings = {
   tokenIds: string[];
   nftDefinitionCount: number;
   nftQuantities: number[];
+  socials: Social[];
   totalNftCount: number;
   fileMap: FileInfoMap;
   collectionLibraries: LibraryFile[];
@@ -115,4 +120,9 @@ export type Royalties = {
     primary: RoyaltyRates;
     secondary: RoyaltyRates;
   };
+};
+
+export type Social = {
+  name: string;
+  url: string;
 };
