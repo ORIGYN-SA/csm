@@ -1,9 +1,9 @@
-export type StageArgs = {
+export interface StageArgs {
   environment: string;
   folderPath: string;
   keyFilePath: string;
-};
+}
 
-export type Metrics = {
+export interface Metrics {
   totalFileSize: number;
-};
+}
