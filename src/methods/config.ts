@@ -229,7 +229,7 @@ function getResourceUrl(resourceName: string, tokenId: string = ''): string {
   // Relative URLs can be tested with the proper root URL:
 
   // Localhost without proxy, without phonebook:
-  // http://{canister-id}.localhost:8000/
+  // http://{canister-id}.localhost:8080/
   // Localhost with proxy, without phonebook:
   // http://localhost:3000/-/{canister-id}/
   // Localhost with proxy, with phonebook:
