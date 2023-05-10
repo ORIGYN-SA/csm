@@ -1,6 +1,6 @@
 {
   "name": "@origyn/csm",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "JavaScript library for configuring, staging and minting Origyn NFTs from a local directory.",
   "author": "Origyn",
   "homepage": "https://github.com/ORIGYN-SA/csm#readme",
@@ -29,7 +29,7 @@
   "types": "lib/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && npm run compile",
+    "build": "npm run clean && npm run lint && npm run compile",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "compile": "tsc -b tsconfig.json",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -37,21 +37,20 @@
     "docs": "typedoc --plugin typedoc-plugin-markdown --githubPages false --out docs src/index.ts",
     "postversion": "git push && git push --tags",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm run build && npm test",
     "preversion": "npm run lint",
     "test": "npm run build && jest",
     "version": "npm run format && git add -A src"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.13.3",
-    "@dfinity/candid": "^0.13.3",
-    "@dfinity/identity": "^0.13.3",
-    "@dfinity/principal": "^0.13.3",
-    "@origyn/actor-reference": "^0.1.3",
+    "@dfinity/agent": "^0.15.6",
+    "@dfinity/candid": "^0.15.6",
+    "@dfinity/identity": "^0.15.6",
+    "@dfinity/principal": "^0.15.6",
+    "@origyn/actor-reference": "^0.1.9",
     "bip39": "^3.0.4",
     "fs-extra": "^10.1.0",
     "hdkey": "^2.0.1",
-    "node-fetch": "^3.2.10",
     "sha256": "^0.2.0"
   },
   "devDependencies": {
@@ -77,7 +76,7 @@
     "prettier": "^2.8.3",
     "ts-jest": "^29.0.3",
     "typedoc": "^0.24.4",
-    "typedoc-plugin-markdown": "^3.15.1",
+    "typedoc-plugin-markdown": "^3.15.3",
     "typescript": "^4.9.4"
   }
 }
