@@ -734,8 +734,18 @@ export const idlFactory = ({ IDL }) => {
     ok: IDL.Text,
     err: OrigynError,
   });
-  const GovernanceRequest = IDL.Variant({ clear_shared_wallets: IDL.Text });
-  const GovernanceResponse = IDL.Variant({ clear_shared_wallets: IDL.Bool });
+  const GovernanceRequest = IDL.Variant({
+    update_system_var: IDL.Record({
+      key: IDL.Text,
+      val: CandyShared,
+      token_id: IDL.Text,
+    }),
+    clear_shared_wallets: IDL.Text,
+  });
+  const GovernanceResponse = IDL.Variant({
+    update_system_var: IDL.Bool,
+    clear_shared_wallets: IDL.Bool,
+  });
   const GovernanceResult = IDL.Variant({
     ok: GovernanceResponse,
     err: OrigynError,
@@ -1486,7 +1496,7 @@ export const idlFactory = ({ IDL }) => {
     bearer_batch_secure_nft_origyn: IDL.Func([IDL.Vec(IDL.Text)], [IDL.Vec(BearerResult)], []),
     bearer_nft_origyn: IDL.Func([IDL.Text], [BearerResult], ['query']),
     bearer_secure_nft_origyn: IDL.Func([IDL.Text], [BearerResult], []),
-    canister_status: IDL.Func([IDL.Record({ canister_id })], [canister_status], []),
+    canister_status: IDL.Func([IDL.Record({ canister_id: canister_id })], [canister_status], []),
     chunk_nft_origyn: IDL.Func([ChunkRequest], [ChunkResult], ['query']),
     chunk_secure_nft_origyn: IDL.Func([ChunkRequest], [ChunkResult], []),
     collectCanisterMetrics: IDL.Func([], [], ['query']),
@@ -1529,6 +1539,7 @@ export const idlFactory = ({ IDL }) => {
     get_halt: IDL.Func([], [IDL.Bool], ['query']),
     get_nat_as_token_id_origyn: IDL.Func([IDL.Nat], [IDL.Text], ['query']),
     get_token_id_as_nat_origyn: IDL.Func([IDL.Text], [IDL.Nat], ['query']),
+    governance_batch_nft_origyn: IDL.Func([IDL.Vec(GovernanceRequest)], [IDL.Vec(GovernanceResult)], []),
     governance_nft_origyn: IDL.Func([GovernanceRequest], [GovernanceResult], []),
     history_batch_nft_origyn: IDL.Func(
       [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Opt(IDL.Nat), IDL.Opt(IDL.Nat)))],

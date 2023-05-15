@@ -672,8 +672,16 @@ export interface GetMetricsParameters {
   granularity: MetricsGranularity;
   dateFromMillis: bigint;
 }
-export type GovernanceRequest = { clear_shared_wallets: string };
-export type GovernanceResponse = { clear_shared_wallets: boolean };
+export type GovernanceRequest =
+  | {
+      update_system_var: {
+        key: string;
+        val: CandyShared;
+        token_id: string;
+      };
+    }
+  | { clear_shared_wallets: string };
+export type GovernanceResponse = { update_system_var: boolean } | { clear_shared_wallets: boolean };
 export type GovernanceResult = { ok: GovernanceResponse } | { err: OrigynError };
 export interface HTTPResponse {
   body: Uint8Array | number[];
@@ -978,6 +986,7 @@ export interface Nft_Canister {
   get_halt: ActorMethod<[], boolean>;
   get_nat_as_token_id_origyn: ActorMethod<[bigint], string>;
   get_token_id_as_nat_origyn: ActorMethod<[string], bigint>;
+  governance_batch_nft_origyn: ActorMethod<[Array<GovernanceRequest>], Array<GovernanceResult>>;
   governance_nft_origyn: ActorMethod<[GovernanceRequest], GovernanceResult>;
   history_batch_nft_origyn: ActorMethod<[Array<[string, [] | [bigint], [] | [bigint]]>], Array<HistoryResult>>;
   history_batch_secure_nft_origyn: ActorMethod<[Array<[string, [] | [bigint], [] | [bigint]]>], Array<HistoryResult>>;
