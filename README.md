@@ -8,6 +8,7 @@ Each release of `csm` is compatible with a specific version of the `Origyn NFT s
 
 | CSM Version  | Origyn NFT Version |
 | ------------ | ------------------ |
+| 1.0.0-beta.8 | 0.1.4              |
 | 1.0.0-beta.7 | 0.1.4              |
 | 1.0.0-beta.6 | 0.1.4              |
 | 1.0.0-beta.5 | 0.1.3              |
