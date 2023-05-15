@@ -1,6 +1,6 @@
-import { LibraryFile, Meta } from './metadata.js';
+import type { LibraryFile, MetaWithLibrary } from './metadata.js';
 
-export type ConfigArgs = {
+export interface ConfigArgs {
   collectionId: string;
   displayName: string;
   description: string;
@@ -13,7 +13,7 @@ export type ConfigArgs = {
   // example: 'primary:nft*.png,experience:index.html,hidden:hidden.jpg'
   assetMappings: string;
 
-  //optional args, but will map to empty strings
+  // optional args, but will map to empty strings
 
   // if empty, defaults to NFT canister id
   nftOwnerId: string;
@@ -24,9 +24,9 @@ export type ConfigArgs = {
   // if empty, defaults to 1 NFT per NFT definition
   nftQuantities: string;
   // string with a comma delimited list of social urls for the collection
-  // urls must be encoded and not include chars such as ':' 
+  // urls must be encoded and not include chars such as ':'
   // example: 'twitter:https%3A%2F%2Ftwitter.com%2FYumiMarketplace, dscvr:https%3A%2F%2Fh5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app%2Fu%2Fyumi_marketplace'
-  socials: string,
+  socials: string;
 
   // royalties
   nodePrincipal: string;
@@ -42,9 +42,9 @@ export type ConfigArgs = {
   secondaryNetworkRate: string;
   primaryCustomRates: string;
   secondaryCustomRates: string;
-};
+}
 
-export type ConfigSettings = {
+export interface ConfigSettings {
   args: ConfigArgs;
   assetTypeMapPatterns: AssetTypeMap;
   stageFolder: string;
@@ -59,70 +59,69 @@ export type ConfigSettings = {
   collectionLibraries: LibraryFile[];
   totalFileSize: number;
   royalties: Royalties;
-};
+}
 
-export type FileInfo = {
+export interface FileInfo {
   title: string;
   libraryId: string;
   resourceUrl: string;
   filePath: string;
   immutable?: boolean;
-};
+}
 
-export type FileInfoMap = {
-  [filePath: string]: FileInfo;
-};
+// equivalent to: [filePath: string]: FileInfo;
+export interface FileInfoMap extends Record<string, FileInfo> {}
 
-export type AssetTypeMap = {
+export interface AssetTypeMap {
   primary?: string;
   preview?: string;
   experience?: string;
   hidden?: string;
-};
+}
 
-export type ConfigSummary = {
+export interface ConfigSummary {
   totalFilesFound: number;
   totalFileSize: string;
   totalNftDefinitionCount: number;
   totalNftCount: number;
-};
+}
 
-export type ConfigFile = {
+export interface ConfigFile {
   settings: ConfigSettings;
   summary: ConfigSummary;
-  collection: Meta;
-  nfts: Meta[];
-};
+  collection: MetaWithLibrary;
+  nfts: MetaWithLibrary[];
+}
 
-export type CustomRoyaltyRate = {
+export interface CustomRoyaltyRate {
   customName: string;
   principalId: string;
   rate: string;
-};
+}
 
-export type RoyaltyPayees = {
+export interface RoyaltyPayees {
   originator: string;
   node: string;
   network: string;
-};
+}
 
-export type RoyaltyRates = {
+export interface RoyaltyRates {
   originator: string;
   broker: string;
   node: string;
   network: string;
   custom: CustomRoyaltyRate[];
-};
+}
 
-export type Royalties = {
+export interface Royalties {
   payees: RoyaltyPayees;
   rates: {
     primary: RoyaltyRates;
     secondary: RoyaltyRates;
   };
-};
+}
 
-export type Social = {
+export interface Social {
   name: string;
   url: string;
-};
+}
