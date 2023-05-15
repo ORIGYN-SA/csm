@@ -3,7 +3,7 @@ import fse from 'fs-extra';
 import path from 'path';
 import * as utils from '../utils/index.js';
 import { lookup } from 'mrmime';
-import {
+import type {
   AssetTypeMap,
   ConfigArgs,
   ConfigSummary,
@@ -13,24 +13,25 @@ import {
   Royalties,
   Social,
 } from '../types/config.js';
-import {
+import type {
   LibraryFile,
   MetadataClass,
-  MetadataProperty,
-  Meta,
+  MetaWithLibrary,
   TextValue,
   NatValue,
   LocationType,
   BoolValue,
 } from '../types/metadata.js';
 import { parseAssetTypeMapPatterns, parseCustomRates, parseSocials } from './arg-parser.js';
-import { getSubFolders, flattenFiles, copyFolder, findUrls, getExternalUrls } from '../utils/index.js';
+import { getSubFolders, flattenFiles, copyFolder, findUrls } from '../utils/index.js';
 import { log } from './logger.js';
 import * as constants from '../constants/index.js';
+import type { PropertyShared } from '../idl/origyn_nft_reference.did.d.js';
+import { Principal } from '@dfinity/principal';
 
 export function config(args: ConfigArgs): string {
   // config object
-  let settings = initConfigSettings(args) as any;
+  const settings = initConfigSettings(args) as any;
 
   log(constants.LINE_DIVIDER_SECTION);
   log('\nCreating metadata for the collection\n');
@@ -75,14 +76,25 @@ export function config(args: ConfigArgs): string {
   return outputFilePath;
 }
 
-function getTokenIds(folderPath: string) {
+function getTokenIds(folderPath: string): string[] {
   const fileName = 'token-ids.json';
   const filePath = path.join(folderPath, fileName);
+
   if (!fse.existsSync(filePath)) {
     throw new Error(`Expected to find a '${fileName}' file at ${folderPath}`);
   }
+
   const tokenIds = JSON.parse(fs.readFileSync(filePath).toString());
-  return tokenIds;
+
+  if (!Array.isArray(tokenIds)) {
+    throw new Error('Token IDs is not an array.');
+  }
+
+  if (!tokenIds.every((id) => typeof id === 'string')) {
+    throw new Error('Token IDs array contains non-string values.');
+  }
+
+  return tokenIds as string[];
 }
 
 function initConfigSettings(args: ConfigArgs): ConfigSettings {
@@ -101,50 +113,50 @@ function initConfigSettings(args: ConfigArgs): ConfigSettings {
   copyFolder(args.folderPath, stageFolder);
 
   const subFolders = getSubFolders(stageFolder);
-  let collectionFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.COLLECTION_FOLDER) || '';
+  let collectionFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.COLLECTION_FOLDER) ?? '';
 
   if (!collectionFolder) {
     const error = `Expected to find a '${constants.COLLECTION_FOLDER}' folder at ${path.relative(
       stageFolder,
       path.join(args.folderPath, constants.COLLECTION_FOLDER),
     )}`;
-    throw error;
+    throw new Error(error);
   }
 
-  let nftsFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.NFTS_FOLDER) || '';
+  let nftsFolder = subFolders.find((f) => path.basename(f).toLowerCase() === constants.NFTS_FOLDER) ?? '';
 
   if (!nftsFolder) {
     const error = `Expected to find an '${constants.NFTS_FOLDER}' folder at ${path.relative(
       stageFolder,
       path.join(args.folderPath, constants.NFTS_FOLDER),
     )}`;
-    throw error;
+    throw new Error(error);
   }
 
   let nftFolderNames: string[] = [];
   if (nftsFolder) {
     nftFolderNames = getSubFolders(nftsFolder)
       .map((f) => path.basename(f))
-      .filter((n) => !Number.isNaN(parseInt(n)))
-      .sort((a, b) => parseInt(a) - parseInt(b));
+      .filter((n) => !Number.isNaN(parseInt(n, 10)))
+      .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
   }
 
   const nftDefinitionCount = nftFolderNames.length;
   if (nftDefinitionCount === 0) {
     const error = `No NFT definitions found. Please create a folder under the '${constants.NFTS_FOLDER}' folder for each NFT definition and name it with the index of the NFT starting with 0.`;
-    throw error;
+    throw new Error(error);
   }
 
   for (let i = 1; i <= nftDefinitionCount; i++) {
-    if (i !== parseInt(nftFolderNames[i - 1])) {
+    if (i !== parseInt(nftFolderNames[i - 1], 10)) {
       const error = `The ${constants.NFTS_FOLDER} folder's subfolders must be numbered in sequence starting at 1. Missing folder ${i}.'`;
-      throw error;
+      throw new Error(error);
     }
   }
 
-  if (nftQuantities?.length && nftDefinitionCount != nftQuantities.length) {
+  if (nftQuantities?.length && nftDefinitionCount !== nftQuantities.length) {
     const error = `Error: Count mismatch: ${nftDefinitionCount} NFT folders and ${nftQuantities.length} quantities (-q arg).`;
-    throw error;
+    throw new Error(error);
   }
 
   let totalNftCount = 0;
@@ -217,7 +229,7 @@ function getResourceUrl(resourceName: string, tokenId: string = ''): string {
   // Relative URLs can be tested with the proper root URL:
 
   // Localhost without proxy, without phonebook:
-  // http://{canister-id}.localhost:8000/
+  // http://{canister-id}.localhost:8080/
   // Localhost with proxy, without phonebook:
   // http://localhost:3000/-/{canister-id}/
   // Localhost with proxy, with phonebook:
@@ -263,7 +275,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
     const resourceUrl = `${getResourceUrl(libraryId)}`.toLowerCase();
     const relativeFilePath = path.relative(settings.stageFolder, filePath);
-    let immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
+    const immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
 
     fileInfoMap[relativeFilePath.toLowerCase()] = {
       title,
@@ -308,7 +320,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
 
         const resourceUrl = `${getResourceUrl(libraryId, tokenId)}`;
         const relativeFilePath = path.relative(settings.stageFolder, filePath);
-        let immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
+        const immutable = fileNameWithoutExt.endsWith('-immutable') || fileNameWithoutExt.endsWith('_immutable');
 
         fileInfoMap[relativeFilePath.toLowerCase()] = {
           title,
@@ -326,7 +338,7 @@ function buildFileMap(settings: ConfigSettings): FileInfoMap {
   return fileInfoMap;
 }
 
-function configureCollectionMetadata(settings: ConfigSettings): Meta {
+function configureCollectionMetadata(settings: ConfigSettings): MetaWithLibrary {
   const resources: MetadataClass[] = [];
   const files = flattenFiles(constants.COLLECTION_FOLDER, settings.stageFolder);
 
@@ -359,7 +371,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 
   // Creates metadata representing a collection
 
-  const attribs: MetadataProperty[] = [];
+  const attribs: PropertyShared[] = [];
 
   // The id for a collection is an empty string
   attribs.push(createTextAttrib('id', ''));
@@ -373,9 +385,9 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   attribs.push(createRoyalties(settings, true));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
-  for (let assetType in mappings) {
+  Object.keys(mappings).forEach((assetType) => {
     attribs.push(createTextAttrib(`${assetType}_asset`, `${mappings[assetType]}`));
-  }
+  });
 
   // attribs.push(
   //     createBoolAttrib('is_soulbound', settings.args.soulbound, false)
@@ -387,7 +399,7 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
   attribs.push({
     name: 'library',
     value: {
-      Array: { thawed: [...resourceReferences] },
+      Array: [...resourceReferences],
     },
     immutable: false,
   });
@@ -420,10 +432,10 @@ function configureCollectionMetadata(settings: ConfigSettings): Meta {
 //   }
 // }
 
-function configureNftsMetadata(settings: ConfigSettings): Meta[] {
+function configureNftsMetadata(settings: ConfigSettings): MetaWithLibrary[] {
   let nftIndex = 1;
 
-  let nfts: Meta[] = [];
+  const nfts: MetaWithLibrary[] = [];
 
   for (let i = 1; i <= settings.nftDefinitionCount; i++) {
     // defaults to 1 NFT per NFT definition
@@ -441,7 +453,7 @@ function configureNftsMetadata(settings: ConfigSettings): Meta[] {
   return nfts;
 }
 
-function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta {
+function configureNftMetadata(settings: ConfigSettings, nftIndex: number): MetaWithLibrary {
   const resources: MetadataClass[] = [];
   const libraries: LibraryFile[] = [];
 
@@ -502,15 +514,15 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
 
   // Creates metadata representing a single NFT
 
-  const attribs: MetadataProperty[] = [];
+  const attribs: PropertyShared[] = [];
 
   attribs.push(createTextAttrib('id', tokenId));
   attribs.push(createPrincipalAttrib('owner', settings.args.nftOwnerId || settings.args.creatorPrincipal));
 
   // assetType = 'primary_asset', 'preview_asset', 'experience_asset' or 'hidden_asset'
-  for (let assetType in assetTypeMap) {
+  Object.keys(assetTypeMap).forEach((assetType) => {
     attribs.push(createTextAttrib(`${assetType}_asset`, `${assetTypeMap[assetType]}`));
-  }
+  });
 
   attribs.push(createBoolAttrib('is_soulbound', settings.args.soulbound === 'true'));
 
@@ -520,7 +532,7 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   attribs.push({
     name: 'library',
     value: {
-      Array: { thawed: [...resourceRefs] },
+      Array: [...resourceRefs],
     },
     immutable: false,
   });
@@ -537,10 +549,10 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): Meta 
   };
 }
 
-function createRoyalties(settings: ConfigSettings, secondary: boolean = false): MetadataProperty {
+function createRoyalties(settings: ConfigSettings, secondary: boolean = false): PropertyShared {
   const rates = secondary ? settings.royalties.rates.secondary : settings.royalties.rates.primary;
 
-  let royalties = [
+  const royalties = [
     {
       Class: [
         createTextAttrib('tag', `${constants.COM_ORIGYN_NS}.royalty.originator`),
@@ -582,9 +594,7 @@ function createRoyalties(settings: ConfigSettings, secondary: boolean = false): 
   return {
     name: `${constants.COM_ORIGYN_NS}.royalties.${secondary ? 'secondary' : 'primary'}.default`,
     value: {
-      Array: {
-        frozen: royalties,
-      },
+      Array: royalties,
     },
     immutable: false,
   };
@@ -600,7 +610,7 @@ function getCollectionReferences(filePath: string): string[] {
 
   if (!Array.isArray(refs) || refs.length === 0) {
     const err = `Expected "${filePath}" to contain a JSON array of file paths starting at the root of the "collection" folder.`;
-    throw err;
+    throw new Error(err);
   }
 
   return refs;
@@ -609,17 +619,17 @@ function getCollectionReferences(filePath: string): string[] {
 function getAssetTypeMap(files: string[], assetTypeMapPatterns: AssetTypeMap): AssetTypeMap {
   const mappings: AssetTypeMap = {};
 
-  for (const assetType in assetTypeMapPatterns) {
+  Object.keys(assetTypeMapPatterns).forEach((assetType) => {
     const fileNameEscaped = utils.escapeRegex(assetTypeMapPatterns[assetType].replace('*', '∞').toLowerCase());
 
     const fileNameRegEx = fileNameEscaped.replace('∞', '.*');
 
     const matches = files.filter((f) => path.basename(f).match(new RegExp(fileNameRegEx, 'gi'))?.length);
 
-    for (let filePath of matches) {
+    for (const filePath of matches) {
       mappings[assetType] = path.basename(filePath);
     }
-  }
+  });
 
   return mappings;
 }
@@ -638,7 +648,7 @@ function createClassForResource(
   if (!mimeType) {
     const err = `Could not find mime type for file: ${filePath}`;
     log(err);
-    throw err;
+    throw new Error(err);
   }
 
   const relFilePathLower = path.relative(settings.stageFolder, filePath).toLowerCase();
@@ -672,7 +682,7 @@ function createLibrary(settings: ConfigSettings, filePath: string): LibraryFile 
   };
 }
 
-function createTextAttrib(name: string, value: string, immutable: boolean = false): MetadataProperty {
+function createTextAttrib(name: string, value: string, immutable: boolean = false): PropertyShared {
   return {
     name,
     value: { Text: value },
@@ -680,15 +690,15 @@ function createTextAttrib(name: string, value: string, immutable: boolean = fals
   };
 }
 
-function createPrincipalAttrib(name: string, value: string, immutable: boolean = false): MetadataProperty {
+function createPrincipalAttrib(name: string, value: string, immutable: boolean = false): PropertyShared {
   return {
     name,
-    value: { Principal: value },
+    value: { Principal: Principal.fromText(value) },
     immutable,
   };
 }
 
-function createBoolAttrib(name: string, value: boolean, immutable: boolean = false): MetadataProperty {
+function createBoolAttrib(name: string, value: boolean, immutable: boolean = false): PropertyShared {
   return {
     name,
     value: { Bool: value },
@@ -696,7 +706,7 @@ function createBoolAttrib(name: string, value: boolean, immutable: boolean = fal
   };
 }
 
-function createNatAttrib(name: string, value: bigint, immutable: boolean = false): MetadataProperty {
+function createNatAttrib(name: string, value: bigint, immutable: boolean = false): PropertyShared {
   return {
     name,
     value: { Nat: value },
@@ -704,7 +714,7 @@ function createNatAttrib(name: string, value: bigint, immutable: boolean = false
   };
 }
 
-function createFloatAttrib(name: string, value: number, immutable: boolean = false): MetadataProperty {
+function createFloatAttrib(name: string, value: number, immutable: boolean = false): PropertyShared {
   return {
     name,
     value: { Float: value },
@@ -712,7 +722,7 @@ function createFloatAttrib(name: string, value: number, immutable: boolean = fal
   };
 }
 
-function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): MetadataProperty {
+function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): PropertyShared {
   const dataAttributes: any[] = [];
 
   // at the collection level, include the collection id (i.e. "bayc") which is used in the
@@ -731,7 +741,7 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
       // if tokenId is passed, the display name for the NFT is the tokenId by default
       // an empty tokenId means that we are building collection level metadata
       // so provide the collection display name
-      Text: tokenId ? tokenId : settings.args.displayName,
+      Text: tokenId ?? settings.args.displayName,
     },
     immutable: false,
   });
@@ -749,27 +759,30 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
   });
 
   if (tokenId === '' && settings.args.socials) {
-    const formatted_socials = settings.socials.map(item => {
-      return { Class: [
-      {
-        name: "type",
-        value: {
-          Text: item.name
-        },
-        immutable: false
-      },
-      {
-        name: "url",
-        value: {
-          "Text": decodeURIComponent(item.url)
-        },
-        immutable: false
-      }]};
+    const formattedSocials = settings.socials.map((item) => {
+      return {
+        Class: [
+          {
+            name: 'type',
+            value: {
+              Text: item.name,
+            },
+            immutable: false,
+          },
+          {
+            name: 'url',
+            value: {
+              Text: decodeURIComponent(item.url),
+            },
+            immutable: false,
+          },
+        ],
+      };
     });
     dataAttributes.push({
       name: `social_links`,
       value: {
-        Array: { thawed: formatted_socials }
+        Array: formattedSocials,
       },
       immutable: false,
     });
@@ -779,7 +792,7 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
   dataAttributes.push({
     name: `custom_properties`,
     value: {
-      Array: { thawed: [] },
+      Array: [],
     },
     immutable: false,
   });
@@ -787,81 +800,75 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Me
   return {
     name: '__apps',
     value: {
-      Array: {
-        thawed: [
-          {
-            Class: [
-              {
-                name: 'app_id',
-                value: { Text: 'com.origyn.metadata.general' },
-                immutable: false,
-              },
-              {
-                name: 'read',
-                value: { Text: 'public' },
-                immutable: false,
-              },
-              {
-                name: 'write',
-                value: {
-                  Class: [
-                    {
-                      name: 'type',
-                      value: { Text: 'allow' },
-                      immutable: false,
-                    },
-                    {
-                      name: 'list',
-                      value: {
-                        Array: {
-                          thawed: [
-                            {
-                              Principal: settings.args.creatorPrincipal,
-                            },
-                          ],
+      Array: [
+        {
+          Class: [
+            {
+              name: 'app_id',
+              value: { Text: 'com.origyn.metadata.general' },
+              immutable: false,
+            },
+            {
+              name: 'read',
+              value: { Text: 'public' },
+              immutable: false,
+            },
+            {
+              name: 'write',
+              value: {
+                Class: [
+                  {
+                    name: 'type',
+                    value: { Text: 'allow' },
+                    immutable: false,
+                  },
+                  {
+                    name: 'list',
+                    value: {
+                      Array: [
+                        {
+                          Principal: Principal.fromText(settings.args.creatorPrincipal),
                         },
-                      },
-                      immutable: false,
+                      ],
                     },
-                  ],
-                },
-                immutable: false,
+                    immutable: false,
+                  },
+                ],
               },
-              {
-                name: 'permissions',
-                value: {
-                  Class: [
-                    {
-                      name: 'type',
-                      value: { Text: 'allow' },
-                      immutable: false,
-                    },
-                    {
-                      name: 'list',
-                      value: {
-                        Array: {
-                          thawed: [
-                            {
-                              Principal: settings.args.creatorPrincipal,
-                            },
-                          ],
+              immutable: false,
+            },
+            {
+              name: 'permissions',
+              value: {
+                Class: [
+                  {
+                    name: 'type',
+                    value: { Text: 'allow' },
+                    immutable: false,
+                  },
+                  {
+                    name: 'list',
+                    value: {
+                      Array: [
+                        {
+                          Principal: Principal.fromText(settings.args.creatorPrincipal),
                         },
-                      },
-                      immutable: false,
+                      ],
                     },
-                  ],
-                },
-                immutable: false,
+                    immutable: false,
+                  },
+                ],
               },
-              {
-                name: 'data',
-                value: { Class: dataAttributes },
-                immutable: false,
-              },
-            ],
-          },
-        ],
-      },
+              immutable: false,
+            },
+            {
+              name: 'data',
+              value: { Class: dataAttributes },
+              immutable: false,
+            },
+          ],
+        },
+      ],
     },
     immutable: false,
   };
@@ -874,7 +881,7 @@ function createClassesForResourceReferences(
 ): MetadataClass[] {
   const resourceReferences: MetadataClass[] = [];
 
-  for (let cls of resourceClasses) {
+  for (const cls of resourceClasses) {
     const libraryIdProperty = cls.Class.find((a) => a.name === 'library_id');
     if (!libraryIdProperty) {
       continue;
@@ -891,7 +898,7 @@ function createClassesForResourceReferences(
         locationType = 'collection';
       } else {
         const err = `Could not find libraryId ${libraryId} in NFT or collection libraries.`;
-        throw err;
+        throw new Error(err);
       }
     }
 
@@ -909,7 +916,7 @@ function createClassesForResourceReferences(
     const immutableLibrary = cls.Class.find((a) => a.name === 'com.origyn.immutable_library')?.value;
 
     if (!title || !location || !size || !sort || !contentType || !contentHash) {
-      throw 'Unexpected missing properties of resource class.';
+      throw new Error('Unexpected missing properties of resource class.');
     }
 
     const attribs = [
@@ -937,8 +944,8 @@ function createClassesForResourceReferences(
 function buildConfigFileData(
   settings: ConfigSettings,
   summary: ConfigSummary,
-  collection: Meta,
-  nfts: Meta[],
+  collection: MetaWithLibrary,
+  nfts: MetaWithLibrary[],
 ): ConfigFile {
   return {
     settings,
@@ -965,8 +972,8 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
     return;
   }
 
-  let urls = matches.flatMap((m) => {
-    let attribValue = m[2];
+  const urls = matches.flatMap((m) => {
+    const attribValue = m[2];
 
     // remove srcset units so that only url remains
     // <img srcset="image-480w.jpg 480w, image-800w.jpg 800w"
@@ -976,17 +983,17 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
     const srcsetUrls = attribValue.split(',').map((v) => v.trim());
     if (srcsetUrls.length > 1) {
       for (let i = 0; i < srcsetUrls.length; i++) {
-        let units = [...srcsetUrls[i].matchAll(constants.SRCSET_VALUE_UNIT_REGEX)];
+        const units = [...srcsetUrls[i].matchAll(constants.SRCSET_VALUE_UNIT_REGEX)];
         if (units.length > 0) {
           srcsetUrls[i] = srcsetUrls[i].substring(0, units[units.length - 1].index);
         }
       }
 
       // remove any query string and/or fragment
-      let baseUrls = srcsetUrls.map((v) => v.split(/#|\?/)[0]).filter((v) => v.length > 0);
+      const baseUrls = srcsetUrls.map((v) => v.split(/#|\?/)[0]).filter((v) => v.length > 0);
       return baseUrls;
     } else {
-      let baseUrl = attribValue.split(/#|\?/)[0];
+      const baseUrl = attribValue.split(/#|\?/)[0];
       return [baseUrl];
     }
   });
@@ -1016,7 +1023,7 @@ function replaceRelativeUrls(settings: ConfigSettings, filePath: string): void {
       .relative(settings.stageFolder, path.resolve(path.join(settings.stageFolder, settings.collectionFolder), relUrl))
       .toLowerCase();
 
-    let mapping = settings.fileMap[relFilePathLower] || settings.fileMap[relCollFilePathLower];
+    const mapping = settings.fileMap[relFilePathLower] || settings.fileMap[relCollFilePathLower];
 
     if (mapping) {
       const onChainUrl = mapping.resourceUrl;

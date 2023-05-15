@@ -1,7 +1,6 @@
-import { AssetTypeMap, ConfigArgs, CustomRoyaltyRate, Social  } from '../types/config.js';
-import { MintArgs } from '../types/mint.js';
-import { StageArgs } from '../types/stage.js';
-//import { GOV_CANISTER_ID } from '../constants/index.js';
+import type { AssetTypeMap, ConfigArgs, CustomRoyaltyRate, Social } from '../types/config.js';
+import type { MintArgs } from '../types/mint.js';
+import type { StageArgs } from '../types/stage.js';
 const GOV_CANISTER_ID = 'a3lu7-uiaaa-aaaaj-aadnq-cai';
 
 export function parseConfigArgs(argv: string[]): ConfigArgs {
@@ -16,11 +15,11 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     folderPath: getArgValue(argv, ['--folderPath']),
     assetMappings: getArgValue(argv, ['--assetMappings']),
 
-    //optional args
+    // optional args
     nftOwnerId: getArgValue(argv, ['--nftOwnerId'], creatorPrincipal),
     soulbound: getArgValue(argv, ['--soulbound'], 'false'),
     nftQuantities: getArgValue(argv, ['--nftQuantities']),
-    socials: (getArgValue(argv, ['--socials'])),
+    socials: getArgValue(argv, ['--socials']),
 
     // payees (for royalties)
     originatorPrincipal: getArgValue(argv, ['--originatorPrincipal'], creatorPrincipal),
@@ -44,17 +43,23 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
   // validate args
   if (!args.collectionId) {
-    throw 'Missing collection id argument (--collectionId) with the id of the collection used in the URL and __apps section.';
+    throw new Error(
+      'Missing collection id argument (--collectionId) with the id of the collection used in the URL and __apps section.',
+    );
   } else if (!args.displayName) {
-    throw 'Missing display name argument (--displayName).';
+    throw new Error('Missing display name argument (--displayName).');
   } else if (!args.nftCanisterId) {
-    throw 'Missing canister id argument (--nftCanisterId).';
+    throw new Error('Missing canister id argument (--nftCanisterId).');
   } else if (!args.creatorPrincipal) {
-    throw 'Missing creator principal id argument (--creatorPrincipal).';
+    throw new Error('Missing creator principal id argument (--creatorPrincipal).');
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
+    throw new Error(
+      'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.',
+    );
   } else if (!args.assetMappings) {
-    throw 'Missing asset mappings (--assetMappings) with a comma delimited list of asset type to file name mappings.';
+    throw new Error(
+      'Missing asset mappings (--assetMappings) with a comma delimited list of asset type to file name mappings.',
+    );
   }
 
   return args;
@@ -69,11 +74,13 @@ export function parseStageArgs(argv: string[]): StageArgs {
 
   // validate args
   if (!args.environment) {
-    throw 'Missing environment argument (--environment).';
+    throw new Error('Missing environment argument (--environment).');
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
+    throw new Error(
+      'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.',
+    );
   } else if (!args.keyFilePath) {
-    throw 'Missing key file path argument (--keyFilePath)';
+    throw new Error('Missing key file path argument (--keyFilePath)');
   }
 
   return args;
@@ -92,11 +99,13 @@ export function parseMintArgs(argv: string[]): MintArgs {
 
   // validate args
   if (!args.environment) {
-    throw 'Missing environment argument (--environment).';
+    throw new Error('Missing environment argument (--environment).');
   } else if (!args.folderPath) {
-    throw 'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.';
+    throw new Error(
+      'Missing folder path argument (--folderPath) with the path to the folder containing the file assets.',
+    );
   } else if (!args.keyFilePath) {
-    throw 'Missing key file path argument (--keyFilePath)';
+    throw new Error('Missing key file path argument (--keyFilePath)');
   }
 
   return args;
@@ -111,9 +120,9 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 2) {
-        const err = `Invalid syntax for mapping asset types to file names. ${m}`;
-        throw err;
+      if (m.length !== 2) {
+        const err = `Invalid syntax for mapping asset types to file names. ${JSON.stringify(m, null, 2)}`;
+        throw new Error(err);
       }
 
       const assetType = m[0].trim().toLowerCase();
@@ -121,7 +130,7 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
 
       if (!['primary', 'preview', 'experience', 'hidden'].includes(assetType)) {
         const err = `Invalid asset type '${assetType}'. Valid types are: 'primary', 'preview', 'experience' and 'hidden'.`;
-        throw err;
+        throw new Error(err);
       }
 
       assetTypeMapPatterns[assetType] = fileName;
@@ -131,7 +140,7 @@ export function parseAssetTypeMapPatterns(patterns: string): AssetTypeMap {
 }
 
 export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
-  let customRates: CustomRoyaltyRate[] = [];
+  const customRates: CustomRoyaltyRate[] = [];
   if (!patterns) {
     return customRates;
   }
@@ -140,9 +149,9 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 3) {
-        const err = `Invalid syntax for custom rates. ${m}`;
-        throw err;
+      if (m.length !== 3) {
+        const err = `Invalid syntax for custom rates. ${JSON.stringify(m, null, 2)}`;
+        throw new Error(err);
       }
 
       const customName = m[0].trim().toLowerCase();
@@ -150,8 +159,7 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
       const principalId = m[2].trim();
 
       if (!principalId || !rate || !customName) {
-        const err = 'Custom rate, principal or name not provided!';
-        throw err;
+        throw new Error('Custom rate, principal or name not provided!');
       }
 
       customRates.push({ customName, rate, principalId });
@@ -161,7 +169,7 @@ export function parseCustomRates(patterns: string): CustomRoyaltyRate[] {
 }
 
 export function parseSocials(patterns: string): Social[] {
-  let socials: Social[] = [];
+  const socials: Social[] = [];
   if (!patterns) {
     return socials;
   }
@@ -170,17 +178,16 @@ export function parseSocials(patterns: string): Social[] {
     .split(/\s?,\s?/)
     .map((n) => n.split(/\s?:\s?/))
     .forEach((m) => {
-      if (m.length != 2) {
-        const err = `Invalid syntax for social urls. ${m}`;
-        throw err;
+      if (m.length !== 2) {
+        const err = `Invalid syntax for social urls. ${JSON.stringify(m, null, 2)}`;
+        throw new Error(err);
       }
 
       const name = m[0].trim().toLowerCase();
       const url = m[1].trim();
 
-      if ( !name || !url ) {
-        const err = 'Socials, name or url not provided!';
-        throw err;
+      if (!name || !url) {
+        throw new Error('Socials, name or url not provided!');
       }
 
       socials.push({ name, url });
@@ -189,7 +196,7 @@ export function parseSocials(patterns: string): Social[] {
   return socials;
 }
 
-export function getArgValue(argv: string[], argNames: string[], defaultValue: string = '') {
+export function getArgValue(argv: string[], argNames: string[], defaultValue: string = ''): string {
   const index = argv.findIndex((arg) => argNames.map((n) => n.toLowerCase()).includes(arg.toLocaleLowerCase()));
   if (index > -1 && argv.length - 1 > index) {
     const value = argv[index + 1];
