@@ -1,52 +1,42 @@
+import type { CandyShared, PropertyShared } from '../idl/origyn_nft_reference.did.d.js';
+
 export type LocationType = 'collection' | 'canister' | 'web';
 export type AssetType = 'primary' | 'hidden' | 'experience' | 'preview';
 
-export type LibraryFile = {
+export interface LibraryFile {
   library_id: string;
   library_file: string;
-};
+}
 
-export type TextValue = {
+export interface TextValue {
   Text: string;
-};
+}
 
-export type NatValue = {
+export interface NatValue {
   Nat: bigint;
-};
+}
 
-export type FloatValue = {
+export interface FloatValue {
   Float: number;
 }
 
-export type BoolValue = {
+export interface BoolValue {
   Bool: boolean;
-};
+}
 
-export type PrincipalValue = {
-  Principal: string;
-};
+export interface ArrayValue {
+  Array: CandyShared[];
+}
 
-export type FrozenArrayValue = {
-  Array: { frozen: MetadataClass[] | PrincipalValue[] };
-};
+export interface MetadataClass {
+  Class: PropertyShared[];
+}
 
-export type ThawedArrayValue = {
-  Array: { thawed: MetadataClass[] | PrincipalValue[] };
-};
+export interface Meta {
+  metadata: MetadataClass;
+}
 
-export type MetadataProperty = {
-  name: string;
-  value: BoolValue | NatValue | FloatValue | TextValue | PrincipalValue | FrozenArrayValue | ThawedArrayValue | MetadataClass;
-  immutable: boolean;
-};
-
-export type MetadataClass = {
-  Class: MetadataProperty[];
-};
-
-export type Meta = {
-  meta: {
-    metadata: MetadataClass;
-  };
+export interface MetaWithLibrary {
+  meta: Meta;
   library: LibraryFile[];
-};
+}
