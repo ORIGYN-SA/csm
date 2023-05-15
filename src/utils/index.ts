@@ -8,8 +8,8 @@ import * as constants from '../constants/index.js';
 const ignoredFolders = ['node_modules', '.vscode', '.idea', '.vessel'];
 const ignoredFiles = ['.ds_store', '.gitignore'];
 
-export function wait(ms: number) {
-  return new Promise((resolve) => {
+export async function wait(ms: number): Promise<number> {
+  return await new Promise((resolve) => {
     log(`\nWaiting ${ms / 1000} seconds...`);
     setTimeout(() => {
       log('Wait time complete.\n');
@@ -38,7 +38,7 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)).toString() + ' ' + sizes[i];
 }
 
 export function insertText(originalText: string, textToInsert: string, insertAt: number): string {
@@ -64,7 +64,7 @@ export function findUrls(filePath: string, contents: string): RegExpMatchArray[]
 }
 
 export function getExternalUrls(filePath: string): string[] {
-  let contents: string = fs.readFileSync(filePath).toString();
+  const contents: string = fs.readFileSync(filePath).toString();
   const matches = findUrls(filePath, contents);
 
   log(`\nregex matches ${matches.length}`);
@@ -90,7 +90,7 @@ export function getExternalUrls(filePath: string): string[] {
   return urls;
 }
 
-export function copyFolder(fromPath: string, toPath: string) {
+export function copyFolder(fromPath: string, toPath: string): void {
   fse.ensureDirSync(toPath);
   fse.emptyDirSync(toPath);
   fse.copySync(fromPath, toPath, { overwrite: true });
@@ -135,7 +135,7 @@ export function flattenFiles(
 
     if (uniqueFileNames.has(fileNameLower)) {
       const err = `Duplicate file name: ${file}`;
-      throw err;
+      throw new Error(err);
     }
     uniqueFileNames.add(fileNameLower);
 

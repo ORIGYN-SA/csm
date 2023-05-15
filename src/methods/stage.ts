@@ -1,34 +1,35 @@
 import fs from 'fs';
 import path from 'path';
-import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE as OrigynNftCanister } from '../idl/origyn_nft_reference.did.d.js';
+import type { ActorSubclass } from '@dfinity/agent';
+import type { OrigynNftCanister } from '../idl/origyn_nft_reference.did.d.js';
 import { getOrigynNftActor } from './actor.js';
 import { Principal } from '@dfinity/principal';
 import { formatBytes, wait } from '../utils/index.js';
-import { ConfigFile } from '../types/config.js';
-import { Metrics, StageArgs } from '../types/stage.js';
-import { LibraryFile, Meta, MetadataClass, TextValue } from '../types/metadata.js';
+import type { ConfigFile } from '../types/config.js';
+import type { Metrics, StageArgs } from '../types/stage.js';
+import type { LibraryFile, Meta, MetaWithLibrary, TextValue } from '../types/metadata.js';
 import { getLibraryMetadata } from './metadata.js';
 import { log } from './logger.js';
 import * as constants from '../constants/index.js';
 
-export async function stage(args: StageArgs) {
+export async function stage(args: StageArgs): Promise<void> {
   log(`\n${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
   log('Started (stage subcommand)');
 
   // *** validate args
   if (!['local', 'ic'].includes(args.environment)) {
     const err = `Invalid environment (-e): "${args.environment}". Valid values are "local" (localhost) and "ic" (mainnet).`;
+    throw new Error(err);
   }
 
   if (!args.folderPath) {
-    throw 'Missing folder argument (-f) with the path to the folder containing the NFT assets.';
+    throw new Error('Missing folder argument (-f) with the path to the folder containing the NFT assets.');
   }
 
-  let configFilePath = path.join(args.folderPath, '..', constants.STAGE_FOLDER, constants.CONFIG_FILE_NAME);
+  const configFilePath = path.join(args.folderPath, '..', constants.STAGE_FOLDER, constants.CONFIG_FILE_NAME);
   if (!fs.existsSync(configFilePath)) {
     const err = `Configuration file not found at path: '${configFilePath}'`;
-    throw err;
+    throw new Error(err);
   }
 
   // *** Read data from config file
@@ -36,7 +37,7 @@ export async function stage(args: StageArgs) {
   const config = JSON.parse(json) as ConfigFile;
 
   const isLocal = args.environment === 'local';
-  const actor = await getOrigynNftActor(isLocal, args.keyFilePath || 'seed.txt', config.settings.args.nftCanisterId);
+  const actor = await getOrigynNftActor(config.settings.args.nftCanisterId, args.keyFilePath, isLocal);
 
   // *** Stage NFTs and Library Assets
   // nfts and collections have the same metadata structure
@@ -45,15 +46,15 @@ export async function stage(args: StageArgs) {
   const metrics: Metrics = { totalFileSize: 0 };
   const items = [config.collection, ...config.nfts];
   for (const nftOrColl of items) {
-    var tokenId = (nftOrColl?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
+    const tokenId = (nftOrColl?.meta?.metadata?.Class.find((c) => c.name === 'id')?.value as TextValue)?.Text?.trim();
 
     // Stage NFT
     log(`\n${constants.LINE_DIVIDER_SECTION}`);
     log(`\nStaging metadata for ${tokenId ? 'NFT ' + tokenId : 'Collection'}\n`);
-    const metadataToStage = deserializeConfig(nftOrColl.meta);
 
-    //console.log(metadataToStage);
+    const metadataToStage = deserializeMetadata(nftOrColl.meta);
     const stageResult = await actor.stage_nft_origyn(metadataToStage);
+
     log(JSON.stringify(stageResult));
 
     // *** Stage Library Assets (as chunks)
@@ -68,40 +69,50 @@ export async function stage(args: StageArgs) {
   log(`${constants.LINE_DIVIDER_SUBCOMMAND}\n`);
 }
 
-function deserializeConfig(config) {
-  // Iterates config object tree and converts all
-  // string values representing a Principal or Nat
-  // to a Principal object or BigInt respectively.
-
-  if (typeof config !== 'object') {
-    return config;
+/**
+ * Prepares metadata for staging by converting values to their correct types
+ */
+function deserializeMetadata(data: Meta): Meta {
+  if (typeof data !== 'object') {
+    return data;
   }
-  for (var p in config) {
-    switch (typeof config[p]) {
+  Object.keys(data).forEach((p) => {
+    if (data[p] === null) {
+      data[p] = { Option: [] }; // value was 'Empty' before 0.1.4
+    }
+    switch (typeof data[p]) {
       case 'object':
-        // recurse objects
-        config[p] = deserializeConfig(config[p]);
+        if (p === 'Principal') {
+          // rehydrate Principal (from JSON/file) so it gets the prototype methods back
+          const principalId = Principal.fromUint8Array(Object.values(data[p]._arr) as unknown as Uint8Array).toText();
+          data[p] = Principal.fromText(principalId);
+        } else {
+          // recurse
+          data[p] = deserializeMetadata(data[p]);
+        }
         break;
       case 'string':
         if (p === 'Principal') {
-          config[p] = Principal.fromText(config[p]);
-        } else if (p === 'Nat') {
-          config[p] = BigInt(config[p]);
+          data[p] = Principal.fromText(data[p]);
+        } else if (['Nat8', 'Nat16', 'Nat32', 'Int8', 'Int16', 'Int32', 'Float'].includes(p)) {
+          data[p] = Number(data[p]);
+        } else if (['Nat', 'Nat64', 'Int', 'Int64'].includes(p)) {
+          data[p] = BigInt(data[p]);
+          break;
         }
-        break;
     }
-  }
-  return config;
+  });
+  return data;
 }
 
 async function stageLibraryAsset(
   actor: ActorSubclass<OrigynNftCanister>,
   stageFolder: string,
-  nftOrColl: Meta,
+  nftOrColl: MetaWithLibrary,
   libraryAsset: LibraryFile,
   tokenId: string,
   metrics: Metrics,
-) {
+): Promise<void> {
   log(`\n${constants.LINE_DIVIDER_SECTION}`);
   log(`\nStaging asset: ${libraryAsset.library_id}`);
   log(`\nFile path: ${libraryAsset.library_file}`);
@@ -125,7 +136,15 @@ async function stageLibraryAsset(
     }
 
     // library metadata is only sent with the first chunk
-    await uploadChunk(actor, libraryAsset.library_id, tokenId, fileData, i, metrics, i === 0 ? libraryMetadata : undefined);
+    await uploadChunk(
+      actor,
+      libraryAsset.library_id,
+      tokenId,
+      fileData,
+      i,
+      metrics,
+      i === 0 ? libraryMetadata : undefined,
+    );
   }
 }
 
@@ -138,7 +157,7 @@ async function uploadChunk(
   metrics: Metrics,
   metadata?: any,
   retries = 0,
-) {
+): Promise<void> {
   const start = chunkNumber * constants.MAX_CHUNK_SIZE;
   const end = start + constants.MAX_CHUNK_SIZE > fileData.length ? fileData.length : start + constants.MAX_CHUNK_SIZE;
 
@@ -152,10 +171,10 @@ async function uploadChunk(
 
   try {
     // *** Stage Library Asset
-    let result = await actor.stage_library_nft_origyn({
+    const result = await actor.stage_library_nft_origyn({
       token_id: tokenId,
       library_id: libraryId,
-      filedata: metadata ?? { Empty: null },
+      filedata: metadata ?? { Option: [] },
       chunk: BigInt(chunkNumber),
       content: Array.from(chunk),
     });
@@ -168,7 +187,7 @@ async function uploadChunk(
         `\nMax retries of ${constants.MAX_CHUNK_UPLOAD_RETRIES} has been reached for ${libraryId} chunk #${chunkNumber}.\n`,
       );
     } else {
-      log('\n' + ex.toString());
+      log(`\n${ex}`);
       log('\n*** Caught the above error while staging a library asset chunk. Waiting 3 seconds, then trying again.\n');
       await wait(3000);
       retries++;
