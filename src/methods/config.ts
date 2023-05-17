@@ -502,14 +502,16 @@ function configureNftMetadata(settings: ConfigSettings, nftIndex: number): MetaW
 
     const refFileInfo = settings.fileMap[refFilePath];
 
-    const refFileFullPath = path.resolve(settings.stageFolder, refFileInfo.filePath);
+    if (refFileInfo) {
+      const refFileFullPath = path.resolve(settings.stageFolder, refFileInfo.filePath);
 
-    const stats = fs.statSync(refFileFullPath);
-    // note: do not add collection resources to totalFileSize
-    resources.push(createClassForResource(settings, refFileFullPath, sort, stats.size));
-    // note: do not add collection resources to NFT library
+      const stats = fs.statSync(refFileFullPath);
+      // note: do not add collection resources to totalFileSize
+      resources.push(createClassForResource(settings, refFileFullPath, sort, stats.size));
+      // note: do not add collection resources to NFT library
 
-    sort++;
+      sort++;
+    }
   }
 
   // Creates metadata representing a single NFT
