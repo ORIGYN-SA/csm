@@ -29,7 +29,7 @@
 
 #### Defined in
 
-types/config.ts:48
+types/config.ts:50
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-types/config.ts:49
+types/config.ts:51
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-types/config.ts:51
+types/config.ts:53
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Defined in
 
-types/config.ts:59
+types/config.ts:61
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 #### Defined in
 
-types/config.ts:58
+types/config.ts:60
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-types/config.ts:54
+types/config.ts:56
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-types/config.ts:55
+types/config.ts:57
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-types/config.ts:52
+types/config.ts:54
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-types/config.ts:61
+types/config.ts:63
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 #### Defined in
 
-types/config.ts:56
+types/config.ts:58
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 #### Defined in
 
-types/config.ts:50
+types/config.ts:52
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 #### Defined in
 
-types/config.ts:53
+types/config.ts:55
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 #### Defined in
 
-types/config.ts:60
+types/config.ts:62
 
 ___
 
@@ -159,4 +159,4 @@ ___
 
 #### Defined in
 
-types/config.ts:57
+types/config.ts:59

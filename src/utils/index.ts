@@ -23,6 +23,16 @@ export function getFileHash(filePath: string): string {
   return crypto.createHash('sha256').update(fileBuffer).digest('hex');
 }
 
+export function getBase64(filePath: string): string {
+  try {
+    const fileData = fs.readFileSync(path.resolve(filePath));
+    return fileData.toString('base64');
+  } catch (err) {
+    console.error(err);
+    return '';
+  }
+}
+
 export function escapeRegex(s: string): string {
   // credit: https://mail.mozilla.org/pipermail/es-discuss/2012-March/021635.html
   return s.replace(/[-[\]{}()*+?.,\\^$|]/g, '\\$&');

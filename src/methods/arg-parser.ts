@@ -8,7 +8,9 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
 
   const args: ConfigArgs = {
     collectionId: getArgValue(argv, ['--collectionId']),
-    displayName: getArgValue(argv, ['--displayName', '--collectionDisplayName']),
+    collectionName: getArgValue(argv, ['--collectionName']),
+    collectionSymbol: getArgValue(argv, ['--collectionSymbol']),
+    collectionLogoPath: getArgValue(argv, ['--collectionLogoPath']),
     description: getArgValue(argv, ['--description', '--collectionDescription']),
     nftCanisterId: getArgValue(argv, ['--nftCanisterId']),
     creatorPrincipal,
@@ -46,8 +48,14 @@ export function parseConfigArgs(argv: string[]): ConfigArgs {
     throw new Error(
       'Missing collection id argument (--collectionId) with the id of the collection used in the URL and __apps section.',
     );
-  } else if (!args.displayName) {
-    throw new Error('Missing display name argument (--displayName).');
+  } else if (!args.collectionName) {
+    throw new Error('Missing collection name argument (--collectionName).');
+  } else if (!args.collectionSymbol) {
+    throw new Error('Missing collection symbol argument (--collectionSymbol).');
+  } else if (!args.collectionLogoPath) {
+    throw new Error(
+      'Missing collection logo path argument (--collectionLogoPath) with the path to the image file containing the logo.',
+    );
   } else if (!args.nftCanisterId) {
     throw new Error('Missing canister id argument (--nftCanisterId).');
   } else if (!args.creatorPrincipal) {
