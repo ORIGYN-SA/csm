@@ -20,7 +20,7 @@
 
 #### Defined in
 
-types/config.ts:68
+types/config.ts:70
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-types/config.ts:69
+types/config.ts:71
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-types/config.ts:66
+types/config.ts:68
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-types/config.ts:67
+types/config.ts:69
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 #### Defined in
 
-types/config.ts:65
+types/config.ts:67

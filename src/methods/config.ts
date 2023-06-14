@@ -658,7 +658,7 @@ function createClassForResource(
 
   const attribs = [
     createTextAttrib('library_id', fileInfo.libraryId),
-    createTextAttrib('title', `${settings.args.displayName} ${fileNameLower}`),
+    createTextAttrib('title', `${settings.args.collectionName} ${fileNameLower}`),
     createTextAttrib('location_type', 'canister'),
     createTextAttrib('location', fileInfo.resourceUrl),
     createTextAttrib('content_type', mimeType),
@@ -743,7 +743,7 @@ function createAppsAttribute(settings: ConfigSettings, tokenId: string = ''): Pr
       // if tokenId is passed, the display name for the NFT is the tokenId by default
       // an empty tokenId means that we are building collection level metadata
       // so provide the collection display name
-      Text: tokenId ?? settings.args.displayName,
+      Text: tokenId ?? settings.args.collectionName,
     },
     immutable: false,
   });

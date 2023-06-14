@@ -8,9 +8,11 @@
 
 - [assetMappings](ConfigArgs.md#assetmappings)
 - [collectionId](ConfigArgs.md#collectionid)
+- [collectionLogoPath](ConfigArgs.md#collectionlogopath)
+- [collectionName](ConfigArgs.md#collectionname)
+- [collectionSymbol](ConfigArgs.md#collectionsymbol)
 - [creatorPrincipal](ConfigArgs.md#creatorprincipal)
 - [description](ConfigArgs.md#description)
-- [displayName](ConfigArgs.md#displayname)
 - [folderPath](ConfigArgs.md#folderpath)
 - [networkPrincipal](ConfigArgs.md#networkprincipal)
 - [nftCanisterId](ConfigArgs.md#nftcanisterid)
@@ -39,7 +41,7 @@
 
 #### Defined in
 
-types/config.ts:14
+types/config.ts:16
 
 ___
 
@@ -53,13 +55,43 @@ types/config.ts:4
 
 ___
 
+### collectionLogoPath
+
+• **collectionLogoPath**: `string`
+
+#### Defined in
+
+types/config.ts:7
+
+___
+
+### collectionName
+
+• **collectionName**: `string`
+
+#### Defined in
+
+types/config.ts:5
+
+___
+
+### collectionSymbol
+
+• **collectionSymbol**: `string`
+
+#### Defined in
+
+types/config.ts:6
+
+___
+
 ### creatorPrincipal
 
 • **creatorPrincipal**: `string`
 
 #### Defined in
 
-types/config.ts:8
+types/config.ts:10
 
 ___
 
@@ -69,17 +101,7 @@ ___
 
 #### Defined in
 
-types/config.ts:6
-
-___
-
-### displayName
-
-• **displayName**: `string`
-
-#### Defined in
-
-types/config.ts:5
+types/config.ts:8
 
 ___
 
@@ -89,7 +111,7 @@ ___
 
 #### Defined in
 
-types/config.ts:9
+types/config.ts:11
 
 ___
 
@@ -99,7 +121,7 @@ ___
 
 #### Defined in
 
-types/config.ts:34
+types/config.ts:36
 
 ___
 
@@ -109,7 +131,7 @@ ___
 
 #### Defined in
 
-types/config.ts:7
+types/config.ts:9
 
 ___
 
@@ -119,7 +141,7 @@ ___
 
 #### Defined in
 
-types/config.ts:19
+types/config.ts:21
 
 ___
 
@@ -129,7 +151,7 @@ ___
 
 #### Defined in
 
-types/config.ts:25
+types/config.ts:27
 
 ___
 
@@ -139,7 +161,7 @@ ___
 
 #### Defined in
 
-types/config.ts:32
+types/config.ts:34
 
 ___
 
@@ -149,7 +171,7 @@ ___
 
 #### Defined in
 
-types/config.ts:33
+types/config.ts:35
 
 ___
 
@@ -159,7 +181,7 @@ ___
 
 #### Defined in
 
-types/config.ts:35
+types/config.ts:37
 
 ___
 
@@ -169,7 +191,7 @@ ___
 
 #### Defined in
 
-types/config.ts:43
+types/config.ts:45
 
 ___
 
@@ -179,7 +201,7 @@ ___
 
 #### Defined in
 
-types/config.ts:38
+types/config.ts:40
 
 ___
 
@@ -189,7 +211,7 @@ ___
 
 #### Defined in
 
-types/config.ts:36
+types/config.ts:38
 
 ___
 
@@ -199,7 +221,7 @@ ___
 
 #### Defined in
 
-types/config.ts:37
+types/config.ts:39
 
 ___
 
@@ -209,7 +231,7 @@ ___
 
 #### Defined in
 
-types/config.ts:39
+types/config.ts:41
 
 ___
 
@@ -219,7 +241,7 @@ ___
 
 #### Defined in
 
-types/config.ts:44
+types/config.ts:46
 
 ___
 
@@ -229,7 +251,7 @@ ___
 
 #### Defined in
 
-types/config.ts:42
+types/config.ts:44
 
 ___
 
@@ -239,7 +261,7 @@ ___
 
 #### Defined in
 
-types/config.ts:40
+types/config.ts:42
 
 ___
 
@@ -249,7 +271,7 @@ ___
 
 #### Defined in
 
-types/config.ts:41
+types/config.ts:43
 
 ___
 
@@ -259,7 +281,7 @@ ___
 
 #### Defined in
 
-types/config.ts:29
+types/config.ts:31
 
 ___
 
@@ -269,4 +291,4 @@ ___
 
 #### Defined in
 
-types/config.ts:21
+types/config.ts:23

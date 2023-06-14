@@ -18,7 +18,7 @@
 
 #### Defined in
 
-types/config.ts:105
+types/config.ts:107
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 #### Defined in
 
-types/config.ts:104
+types/config.ts:106
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 #### Defined in
 
-types/config.ts:103
+types/config.ts:105

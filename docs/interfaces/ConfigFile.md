@@ -19,7 +19,7 @@
 
 #### Defined in
 
-types/config.ts:92
+types/config.ts:94
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 #### Defined in
 
-types/config.ts:93
+types/config.ts:95
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-types/config.ts:90
+types/config.ts:92
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 #### Defined in
 
-types/config.ts:91
+types/config.ts:93

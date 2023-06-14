@@ -18,7 +18,7 @@
 
 #### Defined in
 
-types/config.ts:97
+types/config.ts:99
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 #### Defined in
 
-types/config.ts:98
+types/config.ts:100
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 #### Defined in
 
-types/config.ts:99
+types/config.ts:101

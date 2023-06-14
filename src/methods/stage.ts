@@ -4,7 +4,7 @@ import type { ActorSubclass } from '@dfinity/agent';
 import type { OrigynNftCanister } from '../idl/origyn_nft_reference.did.d.js';
 import { getOrigynNftActor } from './actor.js';
 import { Principal } from '@dfinity/principal';
-import { formatBytes, wait } from '../utils/index.js';
+import { formatBytes, getBase64, wait } from '../utils/index.js';
 import type { ConfigFile } from '../types/config.js';
 import type { Metrics, StageArgs } from '../types/stage.js';
 import type { LibraryFile, Meta, MetaWithLibrary, TextValue } from '../types/metadata.js';
@@ -38,6 +38,17 @@ export async function stage(args: StageArgs): Promise<void> {
 
   const isLocal = args.environment === 'local';
   const actor = await getOrigynNftActor(config.settings.args.nftCanisterId, args.keyFilePath, isLocal);
+
+  // *** Update collection properties
+  log(`\nUpdating collection settings with name, symbol, logo and network principal\n`);
+  const updateResult = await actor.collection_update_batch_nft_origyn([
+    { UpdateName: [config.settings.args.collectionName] },
+    { UpdateSymbol: [config.settings.args.collectionSymbol] },
+    { UpdateNetwork: [Principal.fromText(config.settings.args.networkPrincipal)] },
+    { UpdateLogo: [getBase64(config.settings.args.collectionLogoPath)] },
+  ]);
+
+  log(JSON.stringify(updateResult));
 
   // *** Stage NFTs and Library Assets
   // nfts and collections have the same metadata structure

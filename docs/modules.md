@@ -180,7 +180,7 @@ ___
 
 #### Defined in
 
-methods/arg-parser.ts:89
+methods/arg-parser.ts:97
 
 ___
 
@@ -200,7 +200,7 @@ ___
 
 #### Defined in
 
-methods/arg-parser.ts:68
+methods/arg-parser.ts:76
 
 ___
 
