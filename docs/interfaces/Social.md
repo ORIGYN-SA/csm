@@ -17,7 +17,7 @@
 
 #### Defined in
 
-types/config.ts:125
+types/config.ts:127
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 #### Defined in
 
-types/config.ts:126
+types/config.ts:128

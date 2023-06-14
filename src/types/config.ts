@@ -2,7 +2,9 @@ import type { LibraryFile, MetaWithLibrary } from './metadata.js';
 
 export interface ConfigArgs {
   collectionId: string;
-  displayName: string;
+  collectionName: string;
+  collectionSymbol: string;
+  collectionLogoPath: string;
   description: string;
   nftCanisterId: string;
   creatorPrincipal: string;
